@@ -1,10 +1,11 @@
-import { PlacementDiagnostic } from "@/components/placement-diagnostic";
+import { DiagnosticTest } from "@/components/diagnostic-test";
 
 export const metadata = {
-  title: "Xác định trình độ | AAA",
-  description: "Bước 2: bài đánh giá đầu vào IELTS.",
+  title: "IELTS Diagnostic Placement Test | AAA",
+  description:
+    "Xác định trình độ IELTS đầu vào với bài kiểm tra 4 kỹ năng Listening, Reading, Writing và Speaking.",
 };
 
 export default function PlacementTestPage() {
-  return <PlacementDiagnostic />;
+  return <DiagnosticTest />;
 }
