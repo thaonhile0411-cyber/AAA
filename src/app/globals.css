@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+.onboarding-handoff { display: flex; gap: 18px; border: 1px solid #bcdacb; background: #f0fbf6; border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+.onboarding-handoff > svg { color: #16875a; margin-top: 4px; }
+.onboarding-handoff h2 { margin: 0 0 10px; font-size: 19px; }
+.onboarding-handoff p { font-size: 14px; line-height: 1.7; margin: 8px 0; }
+.onboarding-handoff .primary-button { display: inline-flex; align-items: center; margin-top: 12px; }
+
 :root {
   --blue: #175cdd;
   --navy: #11213f;

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 import {
@@ -18,7 +20,11 @@ import {
   type Scores,
   type Skill,
 } from "@/lib/goals";
-import { loadGoalsFromServer, saveGoalsToServer } from "@/lib/goal-api";
+import {
+  GoalApiError,
+  loadGoalsFromServer,
+  saveGoalsToServer,
+} from "@/lib/goal-api";
 
 type ScoreDraft = Record<Skill, string>;
 const EMPTY_SCORES: ScoreDraft = {
@@ -34,6 +40,8 @@ export function GoalSurvey({
   mode?: "onboarding" | "settings";
 }) {
   const settings = mode === "settings";
+  const router = useRouter();
+  const search = useSearchParams();
   const formId = useId();
   const [targetBand, setTargetBand] = useState("");
   const [examDate, setExamDate] = useState("");
@@ -49,6 +57,8 @@ export function GoalSurvey({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [saved, setSaved] = useState(false);
   const [reload, setReload] = useState(0);
+  const [assessedBand, setAssessedBand] = useState<number | null>(null);
+  const [serverWarning, setServerWarning] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +68,11 @@ export function GoalSurvey({
         if (cancelled) return;
         setToday(data.today);
         setMinDate(data.minExamDate);
+        setAssessedBand(
+          data.profile?.scoreSource === "placement"
+            ? data.profile.currentBand
+            : null,
+        );
         if (data.profile) {
           const profile = data.profile;
           setTargetBand(String(profile.targetBand));
@@ -80,7 +95,7 @@ export function GoalSurvey({
         }
         if (!cancelled)
           setLoadError(
-            "Trình duyệt chưa cho phép đọc dữ liệu đã lưu. Kiểm tra quyền lưu trữ rồi thử lại.",
+            "Chưa thể tải mục tiêu từ hệ thống. Kiểm tra kết nối rồi thử lại.",
           );
       })
       .finally(() => {
@@ -95,7 +110,7 @@ export function GoalSurvey({
   const numericScores = completeScores
     ? (Object.fromEntries(SKILLS.map((s) => [s, Number(scores[s])])) as Scores)
     : null;
-  const currentBand = numericScores ? overallBand(numericScores) : null;
+  const currentBand = numericScores ? overallBand(numericScores) : assessedBand;
   const warning = targetBand
     ? goalWarning(Number(targetBand), currentBand)
     : null;
@@ -157,9 +172,15 @@ export function GoalSurvey({
     setErrors({});
     setSaving(true);
     try {
-      await saveGoalsToServer(validation.data);
+      const result = await saveGoalsToServer(validation.data);
+      setServerWarning(result.warning);
       setSaved(true);
+      if (!settings)
+        router.replace(
+          result.nextPath ?? `/onboarding/goals?next=${result.nextStep}`,
+        );
     } catch (err) {
+      if (err instanceof GoalApiError && err.fields) setErrors(err.fields);
       setError(
         err instanceof Error
           ? err.message
@@ -202,6 +223,26 @@ export function GoalSurvey({
           <Icon name="clock" size={16} /> Chỉ khoảng 1 phút
         </span>
       </div>
+      {!settings && saved && search.get("next") && (
+        <section className="onboarding-handoff" role="status">
+          <Icon name="check" />
+          <div>
+            <h2>Đã lưu mục tiêu vào tài khoản AAA</h2>
+            <p>
+              {search.get("next") === "roadmap"
+                ? "Bạn đã cung cấp đủ điểm 4 kỹ năng và có thể bỏ qua placement. Bước tiếp theo: tạo lộ trình học."
+                : "Bước tiếp theo: làm bài Placement Test để xác định trình độ hiện tại."}
+            </p>
+            {serverWarning && <p className="field-error">{serverWarning}</p>}
+            <p>
+              Bạn có thể điều chỉnh mục tiêu bất cứ lúc nào trong cài đặt tài khoản.
+            </p>
+            <Link className="primary-button" href="/settings/goals">
+              Xem mục tiêu đã lưu <Icon name="arrow" />
+            </Link>
+          </div>
+        </section>
+      )}
       {!settings && (
         <ol className="stepper" aria-label="Các bước thiết lập lộ trình">
           <li className="current" aria-current="step">
