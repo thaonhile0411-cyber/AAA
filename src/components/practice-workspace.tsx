@@ -374,6 +374,15 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
               : "Tự lưu mỗi 15 giây"}
         </span>
       </div>
+      {exercise.source_url && (
+        <p className="workspace-source">
+          Nội dung nguồn: {exercise.source_attribution ?? exercise.source_title} · {exercise.source_license}
+          {" · "}
+          <a href={exercise.source_url} target="_blank" rel="noreferrer">
+            Xem bài gốc
+          </a>
+        </p>
+      )}
       {initial.restored && (
         <p className="restore-message" role="status">
           <Icon name="check" size={16} />

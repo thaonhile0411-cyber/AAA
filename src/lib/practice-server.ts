@@ -4,7 +4,7 @@ import { scoresFromDatabase } from "./goal-record";
 import type { PracticeContext } from "./practice";
 
 export const EXERCISE_COLUMNS =
-  "id, slug, title, summary, skill, band_group, question_types, duration_minutes, question_count";
+  "id, slug, title, summary, skill, band_group, question_types, duration_minutes, question_count, source_title, source_url, source_license, source_attribution";
 export async function practiceContext(
   supabase: SupabaseClient,
 ): Promise<PracticeContext> {

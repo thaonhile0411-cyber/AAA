@@ -279,6 +279,16 @@ export function PracticeLibrary() {
                     <div className="exercise-card-body">
                       <h3>{exercise.title}</h3>
                       <p>{exercise.summary}</p>
+                  {exercise.source_url && (
+                    <a
+                      className="exercise-source"
+                      href={exercise.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Nguồn: {exercise.source_attribution ?? exercise.source_title}
+                    </a>
+                  )}
                       <div className="exercise-meta">
                         <span>
                           <Icon name="clock" size={15} />

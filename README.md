@@ -52,7 +52,8 @@ Migration source lives in `supabase/migrations/`:
 4. `0004_us102_goal_survey_validation.sql` — US-102 database constraints.
 5. `0005_us102_goal_submission_guards.sql` — strict JSON score validation, seven-day exam rule and allowed study choices.
 6. `0006_us301_exercise_bank.sql` — exercise bank, questions and RLS.
-7. `0007_us301_original_exercises.sql` — eight original short exercises and 42 questions.
+7. `0007_us301_original_exercises.sql` — initial US-301 sample data.
+8. `0008_us301_voa_public_domain_content.sql` — eight source-attributed VOA Learning English exercises and 40 AAA-authored questions.
 
 This branch is linked to project `hbykdmctfljfrfwrrbaw`. To view the saved
 rows in Supabase, open **Table Editor → `learning_goals`**. To check migration

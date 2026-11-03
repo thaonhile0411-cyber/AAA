@@ -209,14 +209,16 @@ try {
   assert.equal(filtered.body.exercises.length, 1);
   assert.equal((await request("/api/practice?band=unknown")).status, 400);
   assert.equal((await request("/api/practice/missing-resource")).status, 404);
-  const exercise = await request("/api/practice/the-community-garden");
+  const exercise = await request("/api/practice/voa-sleepy-teens-reading");
   assert.equal(exercise.body.exercise.questions.length, 5);
+  assert.equal(exercise.body.exercise.source_attribution, "VOA Learning English");
+  assert.match(exercise.body.exercise.source_url, /^https:\/\//);
   assert.ok(!JSON.stringify(exercise.body).includes('"correct_answer"'));
   assert.ok(!JSON.stringify(exercise.body).includes('"transcript"'));
   const protectedWrite = await one.client
     .from("practice_exercises")
     .update({ title: "overwrite" })
-    .eq("slug", "the-community-garden");
+    .eq("slug", "voa-sleepy-teens-reading");
   assert.ok(protectedWrite.error);
   const privateRows = await admin
     .from("practice_exercises")
@@ -247,7 +249,7 @@ try {
       .eq("id", privateRows.data.id);
   }
   const audioExercise = await request(
-    "/api/practice/a-visit-to-riverside-centre",
+    "/api/practice/voa-sleepy-teens-listening",
   );
   const audio = await fetch(
     `http://localhost:${port}${audioExercise.body.exercise.audio_path}`,

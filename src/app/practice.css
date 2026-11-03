@@ -412,6 +412,26 @@
 .practice-session-bar span:last-child {
   color: #238463;
 }
+.workspace-source {
+  margin: -8px 0 16px;
+  color: #687993;
+  font-size: 12px;
+}
+.workspace-source a,
+.exercise-source {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+.workspace-source a:hover,
+.exercise-source:hover {
+  text-decoration: underline;
+}
+.exercise-source {
+  display: inline-block;
+  font-size: 11px;
+  margin-top: 8px;
+}
 .restore-message {
   display: flex;
   align-items: center;

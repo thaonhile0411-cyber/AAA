@@ -31,6 +31,10 @@ export type ExerciseSummary = {
   question_types: QuestionType[];
   duration_minutes: number;
   question_count: number;
+  source_title: string | null;
+  source_url: string | null;
+  source_license: string | null;
+  source_attribution: string | null;
 };
 export type Exercise = ExerciseSummary & {
   passage: string[] | null;

@@ -24,6 +24,10 @@ const exercise: Exercise = {
   question_types: ["gap_fill", "multiple_choice"],
   duration_minutes: 10,
   question_count: 2,
+  source_title: null,
+  source_url: null,
+  source_license: null,
+  source_attribution: null,
   passage: ["A short paragraph for annotation."],
   audio_path: null,
   audio_bytes: null,
@@ -162,7 +166,7 @@ test("highlight recolouring and partial removal preserve text offsets and outsid
 test("repository content covers both skills in every band and every audio is a real MP3 below 15 MB", () => {
   const records = JSON.parse(
     readFileSync(
-      new URL("../content/practice-exercises.json", import.meta.url),
+      new URL("../content/practice-exercises-voa.json", import.meta.url),
       "utf8",
     ),
   );
@@ -175,6 +179,9 @@ test("repository content covers both skills in every band and every audio is a r
       );
   for (const record of records) {
     assert.ok(record.questions.length >= 5);
+    assert.equal(record.source.attribution, "VOA Learning English");
+    assert.equal(record.source.license, "Public domain");
+    assert.match(record.source.url, /^https:\/\//);
     if (record.skill === "listening") {
       const path = new URL(
         `../public/audio/${record.slug}.mp3`,

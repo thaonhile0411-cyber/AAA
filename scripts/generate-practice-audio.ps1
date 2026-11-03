@@ -1,7 +1,8 @@
-# Original AAA training scripts; synthetic English narration, not official IELTS audio.
+# Builds compact local narration from source material that AAA is permitted to reuse.
+# The narration is an AAA accessibility/practice rendering, not VOA's original recording.
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path -Parent $PSScriptRoot
-$taskExercises = Get-Content -LiteralPath (Join-Path $taskRoot 'content/practice-exercises.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$taskExercises = Get-Content -LiteralPath (Join-Path $taskRoot 'content/practice-exercises-voa.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $taskAudioDirectory = Join-Path $taskRoot 'public/audio'
 New-Item -ItemType Directory -Force -Path $taskAudioDirectory | Out-Null
 Add-Type -AssemblyName System.Speech
