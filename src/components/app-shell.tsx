@@ -4,11 +4,9 @@ import { Icon } from "./icon";
 export function AppShell({
   children,
   active = "goals",
-  demoMode = false,
 }: {
   children: React.ReactNode;
   active?: "goals" | "settings";
-  demoMode?: boolean;
 }) {
   return (
     <div className="app-shell">
@@ -63,9 +61,7 @@ export function AppShell({
               <Icon name="book" size={18} />
             </span>
             IELTS Academic
-            <span className="course-pill">
-              {demoMode ? "Chế độ trải nghiệm" : "Hành trình của bạn"}
-            </span>
+            <span className="course-pill">Hành trình của bạn</span>
           </div>
           <Link className="account-link" href="/settings/goals">
             <span className="account-avatar">Y</span>
@@ -79,8 +75,7 @@ export function AppShell({
         <footer className="page-footer">
           <span>Đặt mục tiêu rõ ràng. Học tập vững vàng.</span>
           <span>
-            <Icon name="shield" size={15} /> Bản frontend · Mục tiêu lưu trên
-            trình duyệt này
+            <Icon name="shield" size={15} /> Dữ liệu được bảo vệ theo tài khoản
           </span>
         </footer>
       </div>

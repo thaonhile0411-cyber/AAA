@@ -18,7 +18,7 @@ import {
   type Scores,
   type Skill,
 } from "@/lib/goals";
-import { loadBrowserGoals, saveBrowserGoals } from "@/lib/goal-storage";
+import { loadGoalsFromServer, saveGoalsToServer } from "@/lib/goal-api";
 
 type ScoreDraft = Record<Skill, string>;
 const EMPTY_SCORES: ScoreDraft = {
@@ -49,17 +49,15 @@ export function GoalSurvey({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [saved, setSaved] = useState(false);
   const [reload, setReload] = useState(0);
-  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     Promise.resolve()
-      .then(() => loadBrowserGoals())
+      .then(() => loadGoalsFromServer())
       .then((data) => {
         if (cancelled) return;
         setToday(data.today);
         setMinDate(data.minExamDate);
-        setDemoMode(data.demoMode);
         if (data.profile) {
           const profile = data.profile;
           setTargetBand(String(profile.targetBand));
@@ -75,7 +73,11 @@ export function GoalSurvey({
           );
         }
       })
-      .catch(() => {
+      .catch((loadFailure: unknown) => {
+        if (!cancelled && loadFailure instanceof Error) {
+          setLoadError(loadFailure.message);
+          return;
+        }
         if (!cancelled)
           setLoadError(
             "Trình duyệt chưa cho phép đọc dữ liệu đã lưu. Kiểm tra quyền lưu trữ rồi thử lại.",
@@ -155,7 +157,7 @@ export function GoalSurvey({
     setErrors({});
     setSaving(true);
     try {
-      await Promise.resolve().then(() => saveBrowserGoals(validation.data));
+      await saveGoalsToServer(validation.data);
       setSaved(true);
     } catch (err) {
       setError(
@@ -169,7 +171,7 @@ export function GoalSurvey({
   }
 
   return (
-    <AppShell active={settings ? "settings" : "goals"} demoMode={demoMode}>
+    <AppShell active={settings ? "settings" : "goals"}>
       <div className="breadcrumb">
         <span>US-102</span>
         <Icon name="chevron" size={12} />

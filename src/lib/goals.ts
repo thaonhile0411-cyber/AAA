@@ -27,7 +27,6 @@ export type GoalResponse = {
   profile: UserProfile | null;
   today: string;
   minExamDate: string;
-  demoMode: boolean;
 };
 
 /** Calendar dates use the application's Vietnamese timezone, never the host timezone. */
