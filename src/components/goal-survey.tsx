@@ -30,8 +30,10 @@ const EMPTY_SCORES: ScoreDraft = {
 
 export function GoalSurvey({
   mode = "onboarding",
+  onSaveSuccess,
 }: {
   mode?: "onboarding" | "settings";
+  onSaveSuccess?: () => void;
 }) {
   const settings = mode === "settings";
   const formId = useId();
@@ -157,6 +159,9 @@ export function GoalSurvey({
     try {
       await Promise.resolve().then(() => saveBrowserGoals(validation.data));
       setSaved(true);
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
     } catch (err) {
       setError(
         err instanceof Error

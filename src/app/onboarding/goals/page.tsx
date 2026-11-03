@@ -1,4 +1,16 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { GoalSurvey } from "@/components/goal-survey";
+
 export default function GoalsPage() {
-  return <GoalSurvey />;
+  const router = useRouter();
+
+  return (
+    <GoalSurvey
+      onSaveSuccess={() => {
+        router.push("/onboarding/placement-test");
+      }}
+    />
+  );
 }
