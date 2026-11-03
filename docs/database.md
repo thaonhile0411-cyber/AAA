@@ -24,7 +24,7 @@ auth.users
 | Table | Purpose and important constraints |
 | --- | --- |
 | `profiles` | One-to-one application profile keyed by `auth.users.id`. Created by an auth trigger. No password fields. |
-| `learning_goals` | One current goal per user: target half-band, expected exam date, and weekly available minutes. |
+| `learning_goals` | One current goal per user: target half-band, expected exam date, and daily available minutes (1-1440). |
 | `placement_questions` | Shared active Reading/Listening multiple-choice prompts. Authenticated read-only. |
 | `placement_question_keys` | Correct options and explanations, separated so browser clients cannot download them. Trusted secret-key server client only. |
 | `placement_attempts` | Private attempt state plus server-computed approximate result. Multiple attempts are allowed. |
@@ -35,6 +35,12 @@ auth.users
 | `roadmap_activities` | Ordered completable work items, optionally linked to a catalog material. `completed_at` is the completion record. |
 
 UUID primary keys allow safe client/server creation. Foreign keys cascade when private parent data is deleted, while deleting a catalog material only clears an activity's optional material link.
+
+## Daily study availability (US-102)
+
+The onboarding survey and application payload use `available_minutes_per_day`, an integer from 1 to 1440. For example, 45 means 45 minutes of study per day. Do not send the historical `available_minutes_per_week` field after migration 0002 has been applied.
+
+`0001_initial_schema.sql` retains the original weekly field for migration history. Apply `0002_daily_study_time.sql` next to rename it, convert existing weekly values to a rounded daily average (weekly minutes / 7), and enforce the daily range. This is an initial estimate for existing users; learners can update it in their goal survey. New installations must apply both migrations, and existing projects must apply the pending migration before using the new field. These changes do not automatically create a fixed daily timetable.
 
 ## Progress calculation
 
@@ -93,7 +99,7 @@ No existing Supabase project is assumed.
    supabase db reset
    ```
 
-   `db reset` recreates the local database, applies `supabase/migrations/0001_initial_schema.sql`, then runs `supabase/seed.sql`.
+   `db reset` recreates the local database, applies all files in `supabase/migrations/` in order, then runs `supabase/seed.sql`.
 
 6. To apply to a newly created hosted project:
 
@@ -184,7 +190,7 @@ const { error } = await supabase.from("learning_goals").upsert(
     user_id: user!.id,
     target_band: 7.0,
     expected_exam_date: "2027-03-20",
-    available_minutes_per_week: 300,
+    available_minutes_per_day: 45,
   },
   { onConflict: "user_id" },
 );
@@ -235,7 +241,7 @@ Test RLS through the API with actual user sessions. Running SQL as the dashboard
 
 - [ ] Create separate Supabase development and eventual production projects.
 - [ ] Enable and configure Email authentication; defer Google OAuth.
-- [ ] Apply `0001_initial_schema.sql` and seed only the development environment.
+- [ ] Apply all migrations in order and seed only the development environment.
 - [ ] Add local secrets to `.env.local`; confirm it is gitignored.
 - [ ] Install `@supabase/supabase-js` and `@supabase/ssr` in the existing Next.js app.
 - [ ] Add browser/server clients and App Router session refresh using the current Supabase SSR guide.
