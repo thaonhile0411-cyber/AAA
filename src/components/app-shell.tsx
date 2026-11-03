@@ -6,7 +6,7 @@ export function AppShell({
   active = "goals",
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings";
+  active?: "goals" | "settings" | "practice";
 }) {
   return (
     <div className="app-shell">
@@ -22,7 +22,17 @@ export function AppShell({
         <div className="workspace-label">KHÔNG GIAN HỌC TẬP</div>
         <nav className="side-nav" aria-label="Điều hướng chính">
           <Link
+            href="/practice"
+            className={active === "practice" ? "active" : ""}
+            aria-current={active === "practice" ? "page" : undefined}
+            aria-label="Kho bài luyện Reading và Listening"
+          >
+            <Icon name="book" />
+            Kho bài luyện{active === "practice" && <span className="nav-dot" />}
+          </Link>
+          <Link
             href="/onboarding/goals"
+            aria-label="Mục tiêu học tập"
             className={active === "goals" ? "active" : ""}
             aria-current={active === "goals" ? "page" : undefined}
           >
@@ -32,6 +42,7 @@ export function AppShell({
           </Link>
           <Link
             href="/settings/goals"
+            aria-label="Cài đặt mục tiêu"
             className={active === "settings" ? "active" : ""}
             aria-current={active === "settings" ? "page" : undefined}
           >

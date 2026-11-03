@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
+import "./practice.css";
 export const metadata: Metadata = {
   icons: { icon: "/icon.svg" },
   title: "Mục tiêu IELTS của bạn | AAA",
