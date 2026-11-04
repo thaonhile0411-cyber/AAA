@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
@@ -43,8 +42,8 @@ export function GoalSurvey({
   const [dailyTime, setDailyTime] = useState<number | null>(null);
   const [useScores, setUseScores] = useState(false);
   const [scores, setScores] = useState<ScoreDraft>(EMPTY_SCORES);
-  const [today, setToday] = useState(todayInVietnam);
-  const [minDate, setMinDate] = useState(() => addDays(todayInVietnam(), 7));
+  const [today, setToday] = useState("");
+  const [minDate, setMinDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState("");
@@ -164,7 +163,9 @@ export function GoalSurvey({
         return;
       }
       setSaved(true);
-      if (!settings) router.push("/onboarding/placement-test");
+      if (!settings) {
+        router.push("/onboarding/placement-test");
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -499,8 +500,7 @@ export function GoalSurvey({
                 <div className="success-box" role="status">
                   <Icon name="check" />
                   <p>
-                    Đã lưu mục tiêu.{" "}
-                    <Link href="/dashboard" className="underline">Tiếp tục tới Dashboard</Link>
+                    Đã lưu mục tiêu. Bạn có thể điều chỉnh lại bất cứ lúc nào.
                   </p>
                 </div>
               )}

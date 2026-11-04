@@ -1,5 +1,5 @@
 import { countWords, roundToIeltsBand } from "./placement-scoring.ts";
-import type { AssessmentStatus } from "./placement-ai-types";
+import type { AssessmentStatus } from "./placement-ai-types.ts";
 
 // Vietnamese accented character regex
 const VIETNAMESE_ACCENT_REGEX =
@@ -40,12 +40,21 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
 
   const wordCount = countWords(trimmed);
 
-  // Check 1: Insufficient length (under 20 words cannot be assessed as an IELTS essay)
+  // Reject obvious gibberish before applying the minimum-length rule so malformed
+  // submissions are reported accurately even when they contain few words.
   if (
-    wordCount < 20 &&
-    !/(.)\1{5,}/.test(trimmed) &&
-    !trimmed.split(/\s+/).some((word) => word.length > 35)
+    /(.)\1{5,}/.test(trimmed) ||
+    /(?:^|\s)(\S{2,16})\1{3,}(?=\s|$)/.test(trimmed)
   ) {
+    return {
+      valid: false,
+      status: "invalid_response",
+      message: "Bài viết chứa các chuỗi ký tự lặp lại vô nghĩa (gibberish/spam).",
+    };
+  }
+
+  // Check 1: Insufficient length (under 20 words cannot be assessed as an IELTS essay)
+  if (wordCount < 20) {
     return {
       valid: false,
       status: "insufficient_response",
@@ -72,15 +81,6 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
       status: "invalid_response",
       message:
         "Bài viết phát hiện sử dụng tiếng Việt. Bài thi IELTS Academic Writing Task 2 bắt buộc phải được viết hoàn toàn bằng tiếng Anh.",
-    };
-  }
-
-  // Check 3: Repeated character gibberish (e.g. "aaaaaaa", "asdfasdfasdfasdf")
-  if (/(.)\1{5,}/.test(trimmed)) {
-    return {
-      valid: false,
-      status: "invalid_response",
-      message: "Bài viết chứa các chuỗi ký tự lặp lại vô nghĩa (gibberish/spam).",
     };
   }
 

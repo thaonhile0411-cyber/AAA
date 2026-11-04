@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { readBrowserProfile } from "@/lib/goal-storage";
-import { todayInVietnam, formatDate, type UserProfile } from "@/lib/goals";
+import { loadGoals } from "@/features/auth/onboarding";
+import { formatDate, type UserProfile } from "@/lib/goals";
 import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 type ResultDashboardProps = {
@@ -30,20 +30,21 @@ export function ResultDashboard({
   const [profileState, setProfileState] = useState<{
     profile: UserProfile | null;
     loaded: boolean;
-  }>({ profile: null, loaded: false });
+    today: string;
+  }>({ profile: null, loaded: false, today: "" });
   const [selectedSkillModal, setSelectedSkillModal] = useState<"writing" | "speaking" | null>(null);
-  const today = todayInVietnam();
 
   useEffect(() => {
     let cancelled = false;
-    Promise.resolve().then(() => {
+    Promise.resolve().then(async () => {
       if (cancelled) return;
       try {
-        const profile = readBrowserProfile();
-        setProfileState({ profile, loaded: true });
+        const { profile, today } = await loadGoals();
+        if (!cancelled) setProfileState({ profile, loaded: true, today });
       } catch (e) {
-        console.warn("Could not read profile in result dashboard", e);
-        setProfileState({ profile: null, loaded: true });
+        console.warn("Could not load profile in result dashboard", e);
+        if (!cancelled)
+          setProfileState({ profile: null, loaded: true, today: "" });
       }
     });
     return () => {
@@ -53,6 +54,7 @@ export function ResultDashboard({
 
   const userProfile = profileState.profile;
   const profileLoaded = profileState.loaded;
+  const today = profileState.today;
 
   const { overallBand, skills, errorMessage } = result;
 
