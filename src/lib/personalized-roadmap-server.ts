@@ -33,6 +33,8 @@ export async function savePersonalizedRoadmap(
           title: milestone.title,
           description: milestone.description,
           position: milestone.position,
+          phase_target_band: milestone.phaseTargetBand,
+          scheduled_week: milestone.scheduledWeek,
         })
         .select("id")
         .single();
@@ -50,6 +52,10 @@ export async function savePersonalizedRoadmap(
               description: activity.description,
               position: activity.position,
               estimated_minutes: activity.estimatedMinutes,
+              scheduled_week: activity.scheduledWeek,
+              difficulty_band_min: activity.difficultyBandMin,
+              difficulty_band_max: activity.difficultyBandMax,
+              adjustment_kind: activity.adjustmentKind,
             })),
           );
         if (activityError) throw new Error("RoadmapActivitySaveError");

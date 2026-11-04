@@ -30,6 +30,10 @@ export type RoadmapActivityDraft = {
   description: string;
   estimatedMinutes: number;
   position: number;
+  scheduledWeek: number;
+  difficultyBandMin: number;
+  difficultyBandMax: number;
+  adjustmentKind: "standard";
 };
 
 export type RoadmapMilestoneDraft = {
@@ -37,6 +41,8 @@ export type RoadmapMilestoneDraft = {
   title: string;
   description: string;
   position: number;
+  phaseTargetBand: number;
+  scheduledWeek: number;
   activities: RoadmapActivityDraft[];
 };
 
@@ -85,6 +91,8 @@ export function createPersonalizedRoadmapDraft(
       title: `Củng cố ${SKILL_LABELS[skill]}`,
       description: `Ưu tiên ${allocation.allocations[skill].desiredPercent}% tài liệu cho kỹ năng ${SKILL_LABELS[skill]}.`,
       position: milestoneIndex + 1,
+      phaseTargetBand: Math.min(targetBand ?? profile.skills[skill]! + 0.5, profile.skills[skill]! + 0.5),
+      scheduledWeek: 1,
       activities: selected.map((resource, activityIndex) => ({
         skill,
         resourceSlug: resource.slug,
@@ -92,6 +100,10 @@ export function createPersonalizedRoadmapDraft(
         description: resource.summary,
         estimatedMinutes: ESTIMATED_MINUTES[skill],
         position: activityIndex + 1,
+        scheduledWeek: 1,
+        difficultyBandMin: profile.skills[skill]!,
+        difficultyBandMax: Math.min(9, profile.skills[skill]! + 0.5),
+        adjustmentKind: "standard",
       })),
     } satisfies RoadmapMilestoneDraft;
   });
