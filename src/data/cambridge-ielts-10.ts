@@ -55,12 +55,40 @@ export const cambridgeAnswerKeys: Partial<Record<string, Partial<Record<"listeni
       36: ["NO"], 37: ["YES"], 38: ["NOT GIVEN"], 39: ["NOT GIVEN"], 40: ["NO"],
     },
   },
+  "academic-test-2": {
+    listening: {
+      1: ["Hardie"], 2: ["19"], 3: ["GT8 2LC"], 4: ["hairdresser"], 5: ["dentist", "dentist's"],
+      6: ["lighting"], 7: ["trains"], 8: ["safe"], 9: ["shower"], 10: ["training"],
+      11: ["A"], 12: ["C"], 13: ["C"], 14: ["A"], 15: ["E"], 16: ["F"], 17: ["D"],
+      18: ["H"], 19: ["A"], 20: ["B"], 21: ["B", "C"], 22: ["B", "C"],
+      23: ["B", "E"], 24: ["B", "E"], 25: ["A"], 26: ["C"], 27: ["C"], 28: ["A"],
+      29: ["B"], 30: ["A"], 31: ["competition"], 32: ["global"], 33: ["demand"],
+      34: ["customers"], 35: ["regulation"], 36: ["project"], 37: ["flexible"],
+      38: ["leadership"], 39: ["women"], 40: ["self-employed"],
+    },
+    reading: {
+      1: ["iv"], 2: ["viii"], 3: ["vii"], 4: ["i"], 5: ["vi"], 6: ["ix"], 7: ["ii"],
+      8: ["NOT GIVEN"], 9: ["TRUE"], 10: ["FALSE"], 11: ["FALSE"], 12: ["NOT GIVEN"],
+      13: ["TRUE"], 14: ["A"], 15: ["D"], 16: ["F"], 17: ["D"], 18: ["B"], 19: ["D"],
+      20: ["E"], 21: ["A"], 22: ["C"], 23: ["books and activities"],
+      24: ["internal regulation", "self-regulation"], 25: ["emotional awareness"],
+      26: ["spoon-feeding"], 27: ["B"], 28: ["H"], 29: ["L"], 30: ["G"], 31: ["D"],
+      32: ["C"], 33: ["D"], 34: ["A"], 35: ["D"], 36: ["NOT GIVEN"], 37: ["NO"],
+      38: ["YES"], 39: ["NOT GIVEN"], 40: ["NO"],
+    },
+  },
 };
 
 /** Groups explicitly marked IN EITHER ORDER in the book's answer key. */
 export const cambridgeAnswerGroups: Partial<Record<string, Partial<Record<"listening" | "reading", CambridgeAnswerGroup[]>>>> = {
   "academic-test-1": {
     listening: [{ numbers: [11, 12], accepted: ["A", "C"] }],
+  },
+  "academic-test-2": {
+    listening: [
+      { numbers: [21, 22], accepted: ["B", "C"] },
+      { numbers: [23, 24], accepted: ["B", "E"] },
+    ],
   },
 };
 
