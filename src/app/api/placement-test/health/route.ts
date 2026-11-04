@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getProviderHealthReport } from "@/lib/ai-provider-manager";
 import { getAiUsageSummary } from "@/lib/ai-cost-tracker";
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
   const healthReport = getProviderHealthReport();
   const usageSummary = getAiUsageSummary();

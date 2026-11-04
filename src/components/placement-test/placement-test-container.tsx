@@ -82,16 +82,7 @@ export function PlacementTestContainer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [evaluationStep, setEvaluationStep] = useState<string>("");
-  const [attemptId, setAttemptId] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("aaa_placement_attempt_id");
-      if (saved) return saved;
-      const gen = `attempt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      localStorage.setItem("aaa_placement_attempt_id", gen);
-      return gen;
-    }
-    return `attempt_${Date.now()}`;
-  });
+  const [attemptId, setAttemptId] = useState("");
 
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const submitRef = useRef<() => void>(() => {});
@@ -104,6 +95,15 @@ export function PlacementTestContainer() {
     let cancelled = false;
     Promise.resolve().then(() => {
       if (cancelled) return;
+
+      const savedAttemptId = localStorage.getItem("aaa_placement_attempt_id");
+      const currentAttemptId =
+        savedAttemptId ??
+        `attempt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      if (!savedAttemptId) {
+        localStorage.setItem("aaa_placement_attempt_id", currentAttemptId);
+      }
+      setAttemptId(currentAttemptId);
 
       const submitted = isTestSubmitted();
       if (submitted) {
