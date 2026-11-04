@@ -32,6 +32,9 @@ jobs:
       - name: Check code with ESLint
         run: npm run lint
 
+      - name: Run unit tests
+        run: npm test
+
       - name: Check TypeScript
         run: |
           npx next typegen
@@ -39,4 +42,3 @@ jobs:
 
       - name: Build application
         run: npm run build
-        

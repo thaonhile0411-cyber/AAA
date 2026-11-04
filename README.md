@@ -7,6 +7,10 @@ Phong cách xanh–trắng lấy cảm hứng từ PREP, dùng thương hiệu *
 đăng nhập thật, thuật toán chấm placement hoặc sinh lộ trình. Dữ liệu bản xem trước
 được lưu trong trình duyệt bằng localStorage, không ghi vào `user_profiles`.
 
+## Writing question bank (US-303)
+
+Mở `/writing` để luyện Task 1 và Task 2 với dàn ý, từ vựng, bài mẫu tô sáng và biểu đồ phóng to. Module này chạy được mà không cần Docker hay thông tin Supabase. Xem [hướng dẫn và tiêu chí kiểm thử](docs/us-303-writing.md).
+
 ## Chạy dự án
 
 Node.js 22.18+ (máy hiện tại dùng Node 24) và npm:
