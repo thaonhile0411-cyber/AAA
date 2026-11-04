@@ -2,6 +2,16 @@
 -- Supabase Database Migration: Persistent AI Evaluation Queue (US-103)
 -- File: supabase/migrations/20261104_ai_evaluation_jobs_v4.sql
 
+-- Keep this migration self-contained on fresh projects. Some older linked
+-- databases already had this helper, but the queue trigger requires it.
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- 1. Create ai_evaluation_jobs table for persistent AI grading
 CREATE TABLE IF NOT EXISTS public.ai_evaluation_jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -2,7 +2,7 @@
 begin;
 alter table public.roadmap_activities add column if not exists scheduled_date date;
 -- Older generators schedule by week. Expose that date without rewriting history.
-create view public.user_roadmaps with (security_invoker=true) as
+create or replace view public.user_roadmaps with (security_invoker=true) as
 select r.user_id,r.id roadmap_id,r.status,a.id task_id,a.title,a.completed_at,
  coalesce(a.scheduled_date,(r.created_at at time zone 'Asia/Ho_Chi_Minh')::date+7*(a.scheduled_week-1)) scheduled_date,
  a.position,m.position milestone_position,coalesce(a.skill,m.skill) skill,a.resource_slug
@@ -11,7 +11,7 @@ join public.roadmap_activities a on a.milestone_id=m.id;
 revoke all on public.user_roadmaps from anon;
 grant select on public.user_roadmaps to authenticated;
 
-create table public.user_activity_logs (
+create table if not exists public.user_activity_logs (
  id uuid primary key default gen_random_uuid(),
  user_id uuid not null references auth.users(id) on delete cascade,
  task_id uuid references public.roadmap_activities(id) on delete set null,
@@ -23,14 +23,15 @@ create table public.user_activity_logs (
  unique(user_id,event_id),
  check(event_type='active_time' or active_seconds=0)
 );
-create unique index activity_completion_once on public.user_activity_logs(user_id,task_id) where event_type='completed' and task_id is not null;
-create index activity_user_time on public.user_activity_logs(user_id,occurred_at desc);
+create unique index if not exists activity_completion_once on public.user_activity_logs(user_id,task_id) where event_type='completed' and task_id is not null;
+create index if not exists activity_user_time on public.user_activity_logs(user_id,occurred_at desc);
 alter table public.user_activity_logs enable row level security;
+drop policy if exists activity_read_own on public.user_activity_logs;
 create policy activity_read_own on public.user_activity_logs for select to authenticated using(user_id=(select auth.uid()));
 revoke all on public.user_activity_logs from anon, authenticated;
 grant select on public.user_activity_logs to authenticated;
 
-create function public.record_active_study(p_resource_slug text,p_event_id uuid,p_seconds integer,p_task_id uuid default null)
+create or replace function public.record_active_study(p_resource_slug text,p_event_id uuid,p_seconds integer,p_task_id uuid default null)
 returns boolean language plpgsql security definer set search_path='' as $$
 declare owner_id uuid:=auth.uid();
 begin
@@ -54,7 +55,7 @@ revoke all on function public.record_active_study(text,uuid,integer,uuid) from p
 grant execute on function public.record_active_study(text,uuid,integer,uuid) to authenticated;
 
 -- The existing roadmap completion endpoint and UI remain responsible for marking tasks.
-create function public.log_roadmap_completion() returns trigger language plpgsql security definer set search_path='' as $$
+create or replace function public.log_roadmap_completion() returns trigger language plpgsql security definer set search_path='' as $$
 begin
  if new.completed_at is not null and (tg_op='INSERT' or old.completed_at is null) then
   insert into public.user_activity_logs(user_id,task_id,resource_slug,event_id,event_type,occurred_at)
@@ -65,12 +66,13 @@ begin
  return new;
 end $$;
 revoke all on function public.log_roadmap_completion() from public;
+drop trigger if exists log_roadmap_completion on public.roadmap_activities;
 create trigger log_roadmap_completion after insert or update of completed_at on public.roadmap_activities
 for each row execute function public.log_roadmap_completion();
 
 -- Consume the US-302 outbox in its original transaction. Match one unfinished task,
 -- so one attempt never completes multiple scheduled repetitions of a resource.
-create function public.apply_practice_completion() returns trigger language plpgsql security definer set search_path='' as $$
+create or replace function public.apply_practice_completion() returns trigger language plpgsql security definer set search_path='' as $$
 declare slug text; selected_task uuid; requested_task uuid:=nullif(current_setting('app.roadmap_task',true),'')::uuid;
 begin
  select e.slug into slug from public.practice_attempts a join public.practice_exercises e on e.id=a.exercise_id where a.id=new.attempt_id;
@@ -88,12 +90,13 @@ begin
  return new;
 end $$;
 revoke all on function public.apply_practice_completion() from public;
+drop trigger if exists dashboard_practice_completion on public.practice_completion_events;
 create trigger dashboard_practice_completion before insert on public.practice_completion_events
 for each row execute function public.apply_practice_completion();
 
 -- Add assignment context around the existing grader; retain its original validation,
 -- answer keys, immutable result, and submission-id idempotency.
-create function public.grade_practice_attempt(p_slug text,p_submission_id uuid,p_answers jsonb,p_task_id uuid)
+create or replace function public.grade_practice_attempt(p_slug text,p_submission_id uuid,p_answers jsonb,p_task_id uuid)
 returns jsonb language plpgsql security invoker set search_path='' as $$
 begin
  if p_task_id is not null and not exists(select 1 from public.user_roadmaps where task_id=p_task_id and user_id=auth.uid() and resource_slug=p_slug and status='active') then
@@ -105,7 +108,7 @@ end $$;
 revoke all on function public.grade_practice_attempt(text,uuid,jsonb,uuid) from public;
 grant execute on function public.grade_practice_attempt(text,uuid,jsonb,uuid) to authenticated;
 
-create function public.dashboard_overview() returns jsonb language sql stable security invoker set search_path='' as $$
+create or replace function public.dashboard_overview() returns jsonb language sql stable security invoker set search_path='' as $$
 with tasks as (select * from public.user_roadmaps where user_id=auth.uid() and status='active'),
  stats as (select count(*) total,count(completed_at) completed from tasks)
 select jsonb_build_object(
