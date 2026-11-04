@@ -10,10 +10,19 @@ export type AssessmentHistoryRow = {
 };
 
 export type AssessmentComparison = {
-  baseline: { id: string; createdAt: string; profile: LearnerSkillProfile };
-  reassessment: { id: string; createdAt: string; profile: LearnerSkillProfile };
+  baseline: AssessmentSnapshot;
+  reassessment: AssessmentSnapshot;
+  /** At most the three newest complete attempts, in chronological order. */
+  history: AssessmentSnapshot[];
   skillChanges: Record<Skill, number>;
   overallChange: number | null;
+};
+
+export type AssessmentSnapshot = {
+  id: string;
+  assessmentKind: "placement" | "reassessment";
+  createdAt: string;
+  profile: LearnerSkillProfile;
 };
 
 /** Creates the before/after view from valid completed attempts only. */
@@ -22,13 +31,20 @@ export function comparisonFromAssessmentRows(rows: AssessmentHistoryRow[]): Asse
     const profile = profileFromPlacementAssessment(row.assessment_results);
     return profile?.isComplete ? [{ ...row, profile }] : [];
   });
+  const asSnapshot = (row: (typeof valid)[number]): AssessmentSnapshot => ({
+    id: row.id,
+    assessmentKind: row.assessment_kind,
+    createdAt: row.created_at,
+    profile: row.profile,
+  });
   const baseline = valid.find((row) => row.assessment_kind === "placement") ?? valid[0];
   const reassessment = [...valid].reverse().find((row) => row.assessment_kind === "reassessment");
   if (!baseline || !reassessment || baseline.id === reassessment.id) return null;
 
   return {
-    baseline: { id: baseline.id, createdAt: baseline.created_at, profile: baseline.profile },
-    reassessment: { id: reassessment.id, createdAt: reassessment.created_at, profile: reassessment.profile },
+    baseline: asSnapshot(baseline),
+    reassessment: asSnapshot(reassessment),
+    history: valid.slice(-3).map(asSnapshot),
     skillChanges: Object.fromEntries(
       PROFILE_SKILLS.map((skill) => [
         skill,
