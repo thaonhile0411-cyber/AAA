@@ -56,7 +56,7 @@ function formatRecordingTime(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-function SpeakingRecorder() {
+function SpeakingRecorder({ onRecorded }: { onRecorded: () => void }) {
   const [status, setStatus] = useState<"idle" | "recording" | "ready">("idle");
   const [elapsed, setElapsed] = useState(0);
   const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
@@ -101,6 +101,7 @@ function SpeakingRecorder() {
         blobUrlRef.current = url;
         setRecordingUrl(url);
         setStatus("ready");
+        onRecorded();
       };
       recorder.start();
       setElapsed(0);
@@ -252,9 +253,12 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const [resizing, setResizing] = useState(false);
   const [audioPosition, setAudioPosition] = useState(() => Number(answers.__audioPosition) || 0);
   const [audioSpeed, setAudioSpeed] = useState(() => Number(answers.__audioSpeed) || 1);
+  const [hasSpeakingRecording, setHasSpeakingRecording] = useState(false);
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
-  const isWritingOrSpeaking = active.section.skill === "writing" || active.section.skill === "speaking";
+  const isWriting = active.section.skill === "writing";
+  const isSpeaking = active.section.skill === "speaking";
+  const isWritingOrSpeaking = isWriting || isSpeaking;
   const isListening = active.section.skill === "listening";
 
   useEffect(() => {
@@ -306,8 +310,10 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
     requestAnimationFrame(() => answersRef.current[String(target)]?.focus());
   }
 
-  const completed = isWritingOrSpeaking
+  const completed = isWriting
     ? Boolean(answers.response?.trim())
+    : isSpeaking
+      ? hasSpeakingRecording
     : numbers.filter((number) => answers[String(number)]?.trim()).length;
   const answerKey = answerKeyPage(active.test.id, active.section.skill);
   const acceptedAnswers = answerKeyFor(active.test.id, active.section.skill);
@@ -372,13 +378,14 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
           </section>
           <button type="button" className="exam-divider" aria-label="Kéo để đổi độ rộng hai cột" onPointerDown={() => setResizing(true)} />
           <section className="exam-answer-pane" aria-label="Khu vực trả lời">
-            {isWritingOrSpeaking ? (
+            {isWriting ? (
               <>
-                <label className="exam-response-label" htmlFor="exam-response">{active.section.skill === "writing" ? "Your writing" : "Your notes / response"}</label>
+                <label className="exam-response-label" htmlFor="exam-response">Your writing</label>
                 <textarea id="exam-response" ref={(element) => { answersRef.current.response = element; }} value={answers.response ?? ""} onChange={(event) => persist({ ...answers, response: event.target.value })} />
                 <small>{answers.response?.trim() ? answers.response.trim().split(/\s+/).length : 0} words · Saved on this device</small>
-                {active.section.skill === "speaking" && <SpeakingRecorder />}
               </>
+            ) : isSpeaking ? (
+              <SpeakingRecorder onRecorded={() => setHasSpeakingRecording(true)} />
             ) : (
               <>
                 <h2>Questions {active.part.questionStart}–{active.part.questionEnd}</h2>
