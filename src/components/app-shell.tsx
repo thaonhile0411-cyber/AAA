@@ -6,7 +6,7 @@ export function AppShell({
   active = "goals",
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "practice";
+  active?: "goals" | "settings" | "practice" | "test";
 }) {
   return (
     <div className="app-shell">
