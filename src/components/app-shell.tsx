@@ -7,7 +7,7 @@ export function AppShell({
   demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "test";
+  active?: "goals" | "settings" | "test" | "practice";
   demoMode?: boolean;
 }) {
   return (
@@ -24,6 +24,16 @@ export function AppShell({
         <div className="workspace-label">KHÔNG GIAN HỌC TẬP</div>
         <nav className="side-nav" aria-label="Điều hướng chính">
           <Link href="/dashboard">Dashboard</Link>
+          <Link
+            href="/practice"
+            className={active === "practice" ? "active" : ""}
+            aria-current={active === "practice" ? "page" : undefined}
+            aria-label="Kho tài liệu IELTS"
+          >
+            <Icon name="book" />
+            Kho tài liệu
+            {active === "practice" && <span className="nav-dot" />}
+          </Link>
           <Link
             href="/onboarding/goals"
             className={active === "goals" ? "active" : ""}

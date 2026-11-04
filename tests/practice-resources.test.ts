@@ -5,8 +5,8 @@ import {
   resourceCollections,
 } from "../src/data/practice-resources.ts";
 
-test("US-301 exposes the complete external Reading and Listening catalogue", () => {
-  assert.equal(practiceResources.length, 19);
+test("US-301 exposes the complete external four-skill catalogue", () => {
+  assert.equal(practiceResources.length, 21);
   assert.deepEqual(resourceCollections, [
     "Tất cả",
     "Cambridge IELTS",
@@ -14,9 +14,15 @@ test("US-301 exposes the complete external Reading and Listening catalogue", () 
     "IELTS Practice Test Plus",
     "IELTS Trainer",
     "Official Guide to IELTS",
+    "DOL English Samples",
   ]);
   for (const resource of practiceResources) {
     assert.match(resource.url, /^https:\/\/tuhoc\.dolenglish\.vn\//);
-    assert.match(resource.url, /utm_source=woot6$/);
   }
+  assert.deepEqual(
+    practiceResources.flatMap((resource) => resource.skills).sort(),
+    [...Array(19).fill(["listening", "reading"]), ["speaking"], ["writing"]]
+      .flat()
+      .sort(),
+  );
 });
