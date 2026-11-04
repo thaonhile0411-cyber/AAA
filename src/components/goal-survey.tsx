@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 import {
@@ -20,11 +19,7 @@ import {
   type Scores,
   type Skill,
 } from "@/lib/goals";
-import {
-  GoalApiError,
-  loadGoalsFromServer,
-  saveGoalsToServer,
-} from "@/lib/goal-api";
+import { loadGoals, saveGoals } from "@/features/auth/onboarding";
 
 type ScoreDraft = Record<Skill, string>;
 const EMPTY_SCORES: ScoreDraft = {
@@ -39,17 +34,16 @@ export function GoalSurvey({
 }: {
   mode?: "onboarding" | "settings";
 }) {
-  const settings = mode === "settings";
   const router = useRouter();
-  const search = useSearchParams();
+  const settings = mode === "settings";
   const formId = useId();
   const [targetBand, setTargetBand] = useState("");
   const [examDate, setExamDate] = useState("");
   const [dailyTime, setDailyTime] = useState<number | null>(null);
   const [useScores, setUseScores] = useState(false);
   const [scores, setScores] = useState<ScoreDraft>(EMPTY_SCORES);
-  const [today, setToday] = useState(todayInVietnam);
-  const [minDate, setMinDate] = useState(() => addDays(todayInVietnam(), 7));
+  const [today, setToday] = useState("");
+  const [minDate, setMinDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState("");
@@ -57,22 +51,17 @@ export function GoalSurvey({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [saved, setSaved] = useState(false);
   const [reload, setReload] = useState(0);
-  const [assessedBand, setAssessedBand] = useState<number | null>(null);
-  const [serverWarning, setServerWarning] = useState<string | null>(null);
+  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     Promise.resolve()
-      .then(() => loadGoalsFromServer())
+      .then(() => loadGoals())
       .then((data) => {
         if (cancelled) return;
         setToday(data.today);
         setMinDate(data.minExamDate);
-        setAssessedBand(
-          data.profile?.scoreSource === "placement"
-            ? data.profile.currentBand
-            : null,
-        );
+        setDemoMode(data.demoMode);
         if (data.profile) {
           const profile = data.profile;
           setTargetBand(String(profile.targetBand));
@@ -88,14 +77,10 @@ export function GoalSurvey({
           );
         }
       })
-      .catch((loadFailure: unknown) => {
-        if (!cancelled && loadFailure instanceof Error) {
-          setLoadError(loadFailure.message);
-          return;
-        }
+      .catch(() => {
         if (!cancelled)
           setLoadError(
-            "Chưa thể tải mục tiêu từ hệ thống. Kiểm tra kết nối rồi thử lại.",
+            "Không tải được mục tiêu từ tài khoản. Hãy thử lại.",
           );
       })
       .finally(() => {
@@ -110,7 +95,7 @@ export function GoalSurvey({
   const numericScores = completeScores
     ? (Object.fromEntries(SKILLS.map((s) => [s, Number(scores[s])])) as Scores)
     : null;
-  const currentBand = numericScores ? overallBand(numericScores) : assessedBand;
+  const currentBand = numericScores ? overallBand(numericScores) : null;
   const warning = targetBand
     ? goalWarning(Number(targetBand), currentBand)
     : null;
@@ -172,18 +157,16 @@ export function GoalSurvey({
     setErrors({});
     setSaving(true);
     try {
-      const result = await saveGoalsToServer(validation.data);
-      setServerWarning(result.warning);
+      const result = await saveGoals(validation.data);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
       setSaved(true);
-      if (!settings)
-        router.replace(
-          result.nextPath ??
-            (result.nextStep === "placement"
-              ? "/onboarding/placement-test"
-              : "/practice"),
-        );
+      if (!settings) {
+        router.push("/onboarding/placement-test");
+      }
     } catch (err) {
-      if (err instanceof GoalApiError && err.fields) setErrors(err.fields);
       setError(
         err instanceof Error
           ? err.message
@@ -195,7 +178,7 @@ export function GoalSurvey({
   }
 
   return (
-    <AppShell active={settings ? "settings" : "goals"}>
+    <AppShell active={settings ? "settings" : "goals"} demoMode={demoMode}>
       <div className="breadcrumb">
         <span>US-102</span>
         <Icon name="chevron" size={12} />
@@ -226,27 +209,6 @@ export function GoalSurvey({
           <Icon name="clock" size={16} /> Chỉ khoảng 1 phút
         </span>
       </div>
-      {!settings && saved && search.get("next") && (
-        <section className="onboarding-handoff" role="status">
-          <Icon name="check" />
-          <div>
-            <h2>Đã lưu mục tiêu vào tài khoản AAA</h2>
-            <p>
-              {search.get("next") === "roadmap"
-                ? "Bạn đã cung cấp đủ điểm 4 kỹ năng và có thể bỏ qua placement. Bước tiếp theo: tạo lộ trình học."
-                : "Bước tiếp theo: làm bài Placement Test để xác định trình độ hiện tại."}
-            </p>
-            {serverWarning && <p className="field-error">{serverWarning}</p>}
-            <p>
-              Bạn có thể điều chỉnh mục tiêu bất cứ lúc nào trong cài đặt tài
-              khoản.
-            </p>
-            <Link className="primary-button" href="/settings/goals">
-              Xem mục tiêu đã lưu <Icon name="arrow" />
-            </Link>
-          </div>
-        </section>
-      )}
       {!settings && (
         <ol className="stepper" aria-label="Các bước thiết lập lộ trình">
           <li className="current" aria-current="step">

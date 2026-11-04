@@ -9,8 +9,6 @@ import {
 import { GOAL_COLUMNS, profileFromRow, type GoalRow } from "@/lib/goal-record";
 import { apiFailure, json } from "@/lib/api-response";
 
-export const dynamic = "force-dynamic";
-
 async function handle(request?: Request) {
   try {
     const supabase = await createClient();
@@ -110,6 +108,7 @@ async function handle(request?: Request) {
       profile,
       today,
       minExamDate: addDays(today, 7),
+      demoMode: false,
       warning: profile
         ? goalWarning(profile.targetBand, profile.currentBand)
         : null,

@@ -1,4 +1,3 @@
--- Recovered verbatim from the hosted project's migration history (0003).
 alter table public.profiles
   add column avatar_url text check (
     avatar_url is null or (char_length(avatar_url) <= 2048 and avatar_url like 'https://%')

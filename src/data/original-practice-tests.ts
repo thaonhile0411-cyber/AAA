@@ -1,3 +1,5 @@
+import type { GradableQuestion } from "@/lib/practice-grading";
+
 export type TestSkill = "reading" | "listening" | "writing" | "speaking";
 
 export type OriginalPracticeTest = {
@@ -6,9 +8,7 @@ export type OriginalPracticeTest = {
   title: string;
   summary: string;
   prompt: string;
-  question?: string;
-  options?: string[];
-  answer?: string;
+  question?: GradableQuestion;
 };
 
 const themes = [
@@ -40,14 +40,35 @@ export const originalPracticeTests: OriginalPracticeTest[] = themes.flatMap(
         title: title("reading", index),
         summary: `Bài đọc tự soạn: ${theme}.`,
         prompt: readingPassage,
-        question: "Why did more people join the project?",
-        options: [
-          "It was practical and welcoming.",
-          "Residents were required to attend.",
-          "It finished in one week.",
-          "It used expensive equipment.",
-        ],
-        answer: "It was practical and welcoming.",
+        question:
+          index % 2 === 0
+            ? {
+                id: `reading-${number}-q1`,
+                type: "multiple_choice" as const,
+                prompt: "Why did more people join the project?",
+                options: [
+                  "It was practical and welcoming.",
+                  "Residents were required to attend.",
+                  "It finished in one week.",
+                  "It used expensive equipment.",
+                ],
+                acceptedAnswers: ["It was practical and welcoming."],
+                displayAnswer: "It was practical and welcoming.",
+                explanation:
+                  "The final sentence directly says that more people joined because the project was practical, welcoming, and easy to try.",
+                evidence: "more people joined because the project was practical, welcoming, and easy to try",
+              }
+            : {
+                id: `reading-${number}-q1`,
+                type: "gap_fill" as const,
+                prompt:
+                  "Complete the sentence: The project was practical, welcoming, and ____ to try.",
+                acceptedAnswers: ["easy"],
+                displayAnswer: "easy",
+                explanation:
+                  "The passage describes the project as easy to try, which explains why participation increased.",
+                evidence: "the project was practical, welcoming, and easy to try",
+              },
       },
       {
         slug: `original-listening-${number}`,
@@ -55,9 +76,34 @@ export const originalPracticeTests: OriginalPracticeTest[] = themes.flatMap(
         title: title("listening", index),
         summary: `Bài nghe giọng đọc máy từ nội dung tự soạn: ${theme}.`,
         prompt: listeningScript,
-        question: "What should participants bring?",
-        options: ["A notebook", "A passport", "Sports equipment", "A laptop"],
-        answer: "A notebook",
+        question:
+          index % 2 === 0
+            ? {
+                id: `listening-${number}-q1`,
+                type: "multiple_choice" as const,
+                prompt: "What should participants bring?",
+                options: [
+                  "A notebook",
+                  "A passport",
+                  "Sports equipment",
+                  "A laptop",
+                ],
+                acceptedAnswers: ["A notebook"],
+                displayAnswer: "A notebook",
+                explanation:
+                  "The organiser explicitly tells participants to bring a notebook; the other objects are never requested.",
+                evidence: "Participants should bring a notebook",
+              }
+            : {
+                id: `listening-${number}-q1`,
+                type: "gap_fill" as const,
+                prompt: "Complete the instruction: Participants should bring a ____.",
+                acceptedAnswers: ["notebook", "a notebook"],
+                displayAnswer: "notebook",
+                explanation:
+                  "The announcement says that every participant should bring a notebook to the activity.",
+                evidence: "Participants should bring a notebook",
+              },
       },
       {
         slug: `original-writing-${number}`,

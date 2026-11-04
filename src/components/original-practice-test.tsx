@@ -1,16 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import {
   findOriginalPracticeTest,
   type OriginalPracticeTest,
 } from "@/data/original-practice-tests";
+import {
+  evidenceParts,
+  gradePracticeAnswer,
+  type GradeResult,
+} from "@/lib/practice-grading";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 
 function responseKey(test: OriginalPracticeTest) {
   return `aaa:original-practice:v1:${test.slug}`;
+}
+
+function EvidenceText({
+  source,
+  evidence,
+  evidenceRef,
+}: {
+  source: string;
+  evidence: string;
+  evidenceRef: RefObject<HTMLElement | null>;
+}) {
+  const parts = evidenceParts(source, evidence);
+  if (!parts) return source;
+  return (
+    <>
+      {parts.before}
+      <mark ref={evidenceRef} className="answer-evidence" tabIndex={-1}>
+        {parts.match}
+      </mark>
+      {parts.after}
+    </>
+  );
 }
 
 export function OriginalPracticeTestPage({ slug }: { slug: string }) {
@@ -22,8 +49,22 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
   );
   const [saved, setSaved] = useState(false);
   const [listening, setListening] = useState(false);
+  const [grade, setGrade] = useState<GradeResult | null>(null);
+  const evidenceRef = useRef<HTMLElement>(null);
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  useEffect(() => {
+    if (!grade) return;
+    const frame = window.requestAnimationFrame(() => {
+      evidenceRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      evidenceRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [grade, slug]);
+
   if (!test) {
     return (
       <AppShell active="practice">
@@ -36,23 +77,44 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
       </AppShell>
     );
   }
-  const isChoice = test.skill === "reading" || test.skill === "listening";
+
+  const question = test.question;
+  const isGradable = test.skill === "reading" || test.skill === "listening";
   const isListening = test.skill === "listening";
   const isWriting = test.skill === "writing";
-  const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(test.prompt);
+
+  function updateAnswer(value: string) {
+    setAnswer(value);
+    setGrade(null);
+    setSaved(false);
+  }
+
+  function speak() {
+    if (listening) {
+      window.speechSynthesis.cancel();
+      setListening(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(test!.prompt);
     utterance.lang = "en-US";
     utterance.rate = 0.85;
     utterance.onend = () => setListening(false);
+    utterance.onerror = () => setListening(false);
     setListening(true);
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
-  };
-  const save = () => {
-    localStorage.setItem(responseKey(test), answer);
+  }
+
+  function save() {
+    localStorage.setItem(responseKey(test!), answer);
     setSaved(true);
-  };
-  const correct = isChoice && answer ? answer === test.answer : null;
+  }
+
+  function checkAnswer() {
+    if (!question || !answer.trim()) return;
+    save();
+    setGrade(gradePracticeAnswer(answer, question));
+  }
 
   return (
     <AppShell active="practice">
@@ -85,7 +147,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
         </span>
         <span role="status">{saved ? "Đã lưu" : "Chưa lưu"}</span>
       </div>
-      <div className="practice-split reading">
+      <div className={`practice-split ${test.skill}`}>
         <section className="practice-resource">
           <div className="reading-passage" lang="en">
             <h2>
@@ -98,18 +160,46 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
             {isListening ? (
               <>
                 <p>
-                  Press play to hear the original audio script. You can replay
-                  it as needed.
+                  Press play to hear the announcement. You can replay it as
+                  needed, then submit your answer to reveal the transcript.
                 </p>
                 <button className="primary-button" onClick={speak}>
                   <Icon name={listening ? "pause" : "play"} size={18} />
-                  {listening ? "Playing" : "Play audio"}
+                  {listening ? "Pause audio" : "Play audio"}
                 </button>
               </>
             ) : (
-              <p>{test.prompt}</p>
+              <p>
+                {grade && question ? (
+                  <EvidenceText
+                    source={test.prompt}
+                    evidence={question.evidence}
+                    evidenceRef={evidenceRef}
+                  />
+                ) : (
+                  test.prompt
+                )}
+              </p>
             )}
           </div>
+
+          {isListening && grade && question && (
+            <section className="answer-transcript" aria-label="Audio transcript">
+              <div>
+                <Icon name="fileText" size={18} />
+                <h3>Audio transcript</h3>
+              </div>
+              <p lang="en">
+                <EvidenceText
+                  source={test.prompt}
+                  evidence={question.evidence}
+                  evidenceRef={evidenceRef}
+                />
+              </p>
+              <small>Vị trí chứa đáp án được tô sáng sau khi chấm bài.</small>
+            </section>
+          )}
+
           {test.skill === "speaking" && (
             <section className="practice-notes">
               <label htmlFor="spoken-response">
@@ -121,7 +211,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 rows={10}
                 maxLength={5000}
                 value={answer}
-                onChange={(event) => setAnswer(event.target.value)}
+                onChange={(event) => updateAnswer(event.target.value)}
                 placeholder="Plan your response, then speak aloud for one to two minutes. Write notes or a self-reflection here…"
               />
             </section>
@@ -136,7 +226,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 rows={14}
                 maxLength={10000}
                 value={answer}
-                onChange={(event) => setAnswer(event.target.value)}
+                onChange={(event) => updateAnswer(event.target.value)}
                 placeholder="Write your answer here…"
               />
               <small>
@@ -145,48 +235,103 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
             </section>
           )}
         </section>
+
         <section className="practice-questions" aria-label="Câu trả lời">
           <div className="questions-heading">
             <div>
-              <h2>{isChoice ? "Question" : "Your response"}</h2>
+              <h2>{isGradable ? "Question" : "Your response"}</h2>
               <p>
-                {isChoice
-                  ? test.question
+                {isGradable
+                  ? question?.prompt
                   : "Complete the task, then save your work."}
               </p>
             </div>
+            {grade && <span>{grade.correct ? "1/1" : "0/1"}</span>}
           </div>
-          {isChoice ? (
+
+          {isGradable && question ? (
             <div className="question-list original-question-list" lang="en">
               <fieldset className="practice-question">
                 <legend>
-                  <span>1</span> Choose one answer
+                  <span>1</span>
+                  {question.type === "multiple_choice"
+                    ? "Multiple choice"
+                    : "Gap fill"}
                 </legend>
-                <div className="answer-options">
-                  {test.options?.map((option) => (
-                    <label
-                      className={answer === option ? "selected" : ""}
-                      key={option}
-                    >
-                      <input
-                        type="radio"
-                        name="answer"
-                        value={option}
-                        checked={answer === option}
-                        onChange={() => setAnswer(option)}
-                      />
-                      <span>{option}</span>
+                <p className="question-prompt">{question.prompt}</p>
+                {question.type === "multiple_choice" ? (
+                  <div className="answer-options">
+                    {question.options?.map((option) => (
+                      <label
+                        className={answer === option ? "selected" : ""}
+                        key={option}
+                      >
+                        <input
+                          type="radio"
+                          name={question.id}
+                          value={option}
+                          checked={answer === option}
+                          onChange={() => updateAnswer(option)}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <label className="sr-only" htmlFor={`answer-${question.id}`}>
+                      Answer to question 1
                     </label>
-                  ))}
-                </div>
-                {correct !== null && (
-                  <p className={correct ? "restore-message" : "load-error"}>
-                    {correct
-                      ? "Correct — well done."
-                      : "Not quite. Review the task and try again."}
-                  </p>
+                    <input
+                      id={`answer-${question.id}`}
+                      type="text"
+                      autoComplete="off"
+                      maxLength={500}
+                      value={answer}
+                      placeholder="Type your answer…"
+                      onChange={(event) => updateAnswer(event.target.value)}
+                    />
+                  </>
                 )}
               </fieldset>
+
+              {grade && (
+                <section
+                  className={`grading-feedback ${grade.correct ? "correct" : "incorrect"}`}
+                  aria-live="polite"
+                  aria-label="Kết quả chấm bài"
+                >
+                  <div className="grading-title">
+                    <Icon name={grade.correct ? "check" : "x"} size={20} />
+                    <div>
+                      <strong>{grade.correct ? "Correct" : "Not correct yet"}</strong>
+                      <span>Score: {grade.correct ? "1/1" : "0/1"}</span>
+                    </div>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Correct answer</dt>
+                      <dd>{grade.correctAnswer}</dd>
+                    </div>
+                    <div>
+                      <dt>Explanation</dt>
+                      <dd>{grade.explanation}</dd>
+                    </div>
+                  </dl>
+                  <button
+                    type="button"
+                    className="text-link"
+                    onClick={() =>
+                      evidenceRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      })
+                    }
+                  >
+                    Xem vị trí đáp án trong {isListening ? "transcript" : "bài đọc"}
+                  </button>
+                </section>
+              )}
             </div>
           ) : (
             <div className="loading-card">
@@ -197,10 +342,27 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
               </p>
             </div>
           )}
+
           <div className="practice-finish">
-            <button className="primary-button" onClick={save}>
-              <Icon name="check" size={18} /> Lưu bài luyện
-            </button>
+            {isGradable ? (
+              <>
+                <button
+                  className="primary-button"
+                  disabled={!answer.trim()}
+                  onClick={checkAnswer}
+                >
+                  <Icon name="check" size={18} /> Chấm bài
+                </button>
+                <p>
+                  Không phân biệt chữ hoa/thường. Bạn có thể sửa đáp án và chấm
+                  lại.
+                </p>
+              </>
+            ) : (
+              <button className="primary-button" onClick={save}>
+                <Icon name="check" size={18} /> Lưu bài luyện
+              </button>
+            )}
           </div>
         </section>
       </div>

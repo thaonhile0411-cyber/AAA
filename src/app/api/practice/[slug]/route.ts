@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { apiFailure, json } from "@/lib/api-response";
 import { EXERCISE_COLUMNS, practiceContext } from "@/lib/practice-server";
 
-export const dynamic = "force-dynamic";
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string }> },

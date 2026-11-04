@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { loadGoalsFromServer } from "@/lib/goal-api";
-import { todayInVietnam, formatDate, type UserProfile } from "@/lib/goals";
+import { loadGoals } from "@/features/auth/onboarding";
+import { formatDate, type UserProfile } from "@/lib/goals";
 import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 type ResultDashboardProps = {
@@ -30,19 +30,23 @@ export function ResultDashboard({
   const [profileState, setProfileState] = useState<{
     profile: UserProfile | null;
     loaded: boolean;
-  }>({ profile: null, loaded: false });
+    today: string;
+  }>({ profile: null, loaded: false, today: "" });
   const [selectedSkillModal, setSelectedSkillModal] = useState<"writing" | "speaking" | null>(null);
-  const today = todayInVietnam();
 
   useEffect(() => {
     let cancelled = false;
-    loadGoalsFromServer()
-      .then(({ profile }) => {
-        if (!cancelled) setProfileState({ profile, loaded: true });
-      })
-      .catch(() => {
-        if (!cancelled) setProfileState({ profile: null, loaded: true });
-      });
+    Promise.resolve().then(async () => {
+      if (cancelled) return;
+      try {
+        const { profile, today } = await loadGoals();
+        if (!cancelled) setProfileState({ profile, loaded: true, today });
+      } catch (e) {
+        console.warn("Could not load profile in result dashboard", e);
+        if (!cancelled)
+          setProfileState({ profile: null, loaded: true, today: "" });
+      }
+    });
     return () => {
       cancelled = true;
     };
@@ -50,8 +54,9 @@ export function ResultDashboard({
 
   const userProfile = profileState.profile;
   const profileLoaded = profileState.loaded;
+  const today = profileState.today;
 
-  const { overallBand, skills, evaluationStatus, errorMessage } = result;
+  const { overallBand, skills, errorMessage } = result;
 
   // Has any AI skill failed?
   const hasUnassessedAiSkill =

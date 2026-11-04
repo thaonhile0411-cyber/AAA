@@ -27,6 +27,7 @@ export type GoalResponse = {
   profile: UserProfile | null;
   today: string;
   minExamDate: string;
+  demoMode: boolean;
   warning: string | null;
   nextStep: "placement" | "roadmap";
   nextPath: string | null;

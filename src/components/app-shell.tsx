@@ -4,9 +4,11 @@ import { Icon } from "./icon";
 export function AppShell({
   children,
   active = "goals",
+  demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "practice" | "test";
+  active?: "goals" | "settings" | "test" | "practice";
+  demoMode?: boolean;
 }) {
   return (
     <div className="app-shell">
@@ -21,14 +23,16 @@ export function AppShell({
         </Link>
         <div className="workspace-label">KHÔNG GIAN HỌC TẬP</div>
         <nav className="side-nav" aria-label="Điều hướng chính">
+          <Link href="/dashboard">Dashboard</Link>
           <Link
             href="/practice"
             className={active === "practice" ? "active" : ""}
             aria-current={active === "practice" ? "page" : undefined}
-            aria-label="Kho bài luyện Reading và Listening"
+            aria-label="Kho tài liệu IELTS"
           >
             <Icon name="book" />
-            Kho bài luyện{active === "practice" && <span className="nav-dot" />}
+            Kho tài liệu
+            {active === "practice" && <span className="nav-dot" />}
           </Link>
           <Link
             href="/onboarding/goals"
@@ -72,7 +76,9 @@ export function AppShell({
               <Icon name="book" size={18} />
             </span>
             IELTS Academic
-            <span className="course-pill">Hành trình của bạn</span>
+            <span className="course-pill">
+              {demoMode ? "Chế độ trải nghiệm" : "Hành trình của bạn"}
+            </span>
           </div>
           <Link className="account-link" href="/profile">
             <span className="account-avatar">Y</span>
@@ -86,7 +92,7 @@ export function AppShell({
         <footer className="page-footer">
           <span>Đặt mục tiêu rõ ràng. Học tập vững vàng.</span>
           <span>
-            <Icon name="shield" size={15} /> Dữ liệu được bảo vệ theo tài khoản
+            <Icon name="shield" size={15} /> Mục tiêu được lưu trong tài khoản
           </span>
         </footer>
       </div>

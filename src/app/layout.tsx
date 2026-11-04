@@ -1,11 +1,11 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import "./practice.css";
+
 export const metadata: Metadata = {
   icons: { icon: "/icon.svg" },
-  title: "Mục tiêu IELTS của bạn | AAA",
-  description:
-    "Thiết lập band điểm, ngày thi và thời gian học để bắt đầu hành trình IELTS dành riêng cho bạn cùng AAA.",
+  title: "AAA · Hành trình IELTS",
+  description: "Không gian học IELTS cá nhân hóa.",
 };
 export default function RootLayout({
   children,
@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
-      <body>
+    <html lang="vi" className="h-full antialiased">
+      <body className="min-h-full flex flex-col">
         <a className="skip-link" href="#main-content">
           Đến nội dung chính
         </a>

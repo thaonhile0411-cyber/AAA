@@ -5,7 +5,7 @@
 -- 1. Create placement_tests table
 CREATE TABLE IF NOT EXISTS public.placement_tests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   session_id TEXT,
   current_skill TEXT NOT NULL DEFAULT 'listening',
   completed_skills JSONB NOT NULL DEFAULT '[]'::jsonb,
@@ -49,31 +49,30 @@ ALTER TABLE public.placement_tests ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can select own placement tests"
   ON public.placement_tests
   FOR SELECT
+  TO authenticated
   USING (
-    (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-    OR (auth.uid() IS NULL AND session_id IS NOT NULL)
+    (select auth.uid()) = user_id
   );
 
 -- Policy: Users can insert their own tests
 CREATE POLICY "Users can insert own placement tests"
   ON public.placement_tests
   FOR INSERT
+  TO authenticated
   WITH CHECK (
-    (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-    OR (auth.uid() IS NULL)
+    (select auth.uid()) = user_id
   );
 
 -- Policy: Users can update their own tests
 CREATE POLICY "Users can update own placement tests"
   ON public.placement_tests
   FOR UPDATE
+  TO authenticated
   USING (
-    (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-    OR (auth.uid() IS NULL AND session_id IS NOT NULL)
+    (select auth.uid()) = user_id
   )
   WITH CHECK (
-    (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-    OR (auth.uid() IS NULL AND session_id IS NOT NULL)
+    (select auth.uid()) = user_id
   );
 
 -- 5. Storage bucket for speaking audio recordings (Private)
@@ -91,23 +90,18 @@ ON CONFLICT (id) DO NOTHING;
 CREATE POLICY "Users can upload speaking recordings"
   ON storage.objects
   FOR INSERT
+  TO authenticated
   WITH CHECK (
     bucket_id = 'speaking-recordings'
-    AND (
-      (auth.uid() IS NOT NULL AND (storage.foldername(name))[1] = auth.uid()::text)
-      OR auth.uid() IS NULL
-    )
+    AND (storage.foldername(name))[1] = (select auth.uid())::text
   );
 
 -- Storage Policy: Users can read their own audio recordings
 CREATE POLICY "Users can read own speaking recordings"
   ON storage.objects
   FOR SELECT
+  TO authenticated
   USING (
     bucket_id = 'speaking-recordings'
-    AND (
-      (auth.uid() IS NOT NULL AND (storage.foldername(name))[1] = auth.uid()::text)
-      OR auth.uid() IS NULL
-    )
+    AND (storage.foldername(name))[1] = (select auth.uid())::text
   );
-

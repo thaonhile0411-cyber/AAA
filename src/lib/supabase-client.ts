@@ -1,29 +1,25 @@
 "use client";
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { TestSkill } from "@/types/placement-test";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 let clientInstance: SupabaseClient | null = null;
 
 export function getSupabaseClient(): SupabaseClient | null {
   if (typeof window === "undefined") return null;
-  if (!supabaseUrl || !supabaseAnonKey) return null;
+  if (!supabaseUrl || !supabasePublishableKey) return null;
   if (!clientInstance) {
-    clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    });
+    clientInstance = createBrowserClient(supabaseUrl, supabasePublishableKey);
   }
   return clientInstance;
 }
 
 export function isSupabaseConfigured(): boolean {
-  return Boolean(supabaseUrl && supabaseAnonKey);
+  return Boolean(supabaseUrl && supabasePublishableKey);
 }
 
 export type PlacementTestCloudPayload = {
@@ -46,6 +42,8 @@ export type PlacementTestCloudPayload = {
   >;
   target_band?: number | null;
   expected_exam_date?: string | null;
+  assessment_results?: PlacementTestResult;
+  overall_band?: number | null;
   status?: "in_progress" | "evaluating" | "completed";
 };
 
@@ -67,6 +65,9 @@ export async function savePlacementTestCloud(
   try {
     const { data: authData } = await supabase.auth.getUser();
     const userId = authData?.user?.id || null;
+    if (!userId) {
+      return { success: false, error: "Sign in is required to save a placement test." };
+    }
 
     // Use test ID or generate a stable local session ID
     let testId = payload.id;
@@ -84,6 +85,12 @@ export async function savePlacementTestCloud(
       speaking_recordings: payload.speaking_recordings,
       target_band: payload.target_band,
       expected_exam_date: payload.expected_exam_date,
+      ...(payload.assessment_results
+        ? { assessment_results: payload.assessment_results }
+        : {}),
+      ...(payload.overall_band !== undefined
+        ? { overall_band: payload.overall_band }
+        : {}),
       status: payload.status || "in_progress",
       updated_at: new Date().toISOString(),
     };
@@ -157,4 +164,3 @@ export async function uploadSpeakingAudio(
     return { error: message };
   }
 }
-

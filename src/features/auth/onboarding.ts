@@ -13,6 +13,7 @@ export async function loadGoals(): Promise<GoalResponse> {
   const today = todayInVietnam();
   const nextStep = scores ? "roadmap" : "placement";
   return {
+    demoMode: false,
     today,
     minExamDate: addDays(today, 7),
     warning: null,
