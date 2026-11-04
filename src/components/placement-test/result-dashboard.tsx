@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { readBrowserProfile } from "@/lib/goal-storage";
+import { loadGoalsFromServer } from "@/lib/goal-api";
 import { todayInVietnam, formatDate, type UserProfile } from "@/lib/goals";
 import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
@@ -36,16 +36,13 @@ export function ResultDashboard({
 
   useEffect(() => {
     let cancelled = false;
-    Promise.resolve().then(() => {
-      if (cancelled) return;
-      try {
-        const profile = readBrowserProfile();
-        setProfileState({ profile, loaded: true });
-      } catch (e) {
-        console.warn("Could not read profile in result dashboard", e);
-        setProfileState({ profile: null, loaded: true });
-      }
-    });
+    loadGoalsFromServer()
+      .then(({ profile }) => {
+        if (!cancelled) setProfileState({ profile, loaded: true });
+      })
+      .catch(() => {
+        if (!cancelled) setProfileState({ profile: null, loaded: true });
+      });
     return () => {
       cancelled = true;
     };
