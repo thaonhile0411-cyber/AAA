@@ -371,7 +371,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
             {submitted && isListening && active.test.transcriptPages && (
               <section className="exam-transcript" aria-label="Audioscript from Cambridge IELTS 10">
                 <h2>Audioscript</h2>
-                <p>The book audioscript is shown after submission. It is provided as source scans because no audio file was supplied.</p>
+                <p>The book audioscript is shown after submission as source scans. Use the audio player above to replay the supplied section audio.</p>
                 {active.test.transcriptPages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10 audioscript, source page ${page}`} />)}
               </section>
             )}
