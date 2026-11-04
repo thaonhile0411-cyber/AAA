@@ -1,6 +1,9 @@
 -- US-401.1: reuse US-201 roadmaps and US-302's transactional completion outbox.
 begin;
-alter table public.roadmap_activities add column if not exists scheduled_date date;
+alter table public.roadmap_activities
+  add column if not exists scheduled_date date,
+  add column if not exists scheduled_week integer not null default 1
+    check (scheduled_week > 0);
 -- Older generators schedule by week. Expose that date without rewriting history.
 create view public.user_roadmaps with (security_invoker=true) as
 select r.user_id,r.id roadmap_id,r.status,a.id task_id,a.title,a.completed_at,
