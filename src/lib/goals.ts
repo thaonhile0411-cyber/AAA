@@ -19,7 +19,7 @@ export type GoalInput = {
 };
 export type UserProfile = GoalInput & {
   currentBand: number | null;
-  scoreSource: "self_reported" | null;
+  scoreSource: "self_reported" | "placement" | null;
   updatedAt: string;
 };
 export type FieldErrors = Partial<Record<keyof GoalInput | Skill, string>>;
@@ -27,7 +27,9 @@ export type GoalResponse = {
   profile: UserProfile | null;
   today: string;
   minExamDate: string;
-  demoMode: boolean;
+  warning: string | null;
+  nextStep: "placement" | "roadmap";
+  nextPath: string | null;
 };
 
 /** Calendar dates use the application's Vietnamese timezone, never the host timezone. */
