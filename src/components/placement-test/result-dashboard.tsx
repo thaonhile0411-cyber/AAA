@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icon";
+import { SkillRadarChart } from "@/components/skill-radar-chart";
 import { loadGoals } from "@/features/auth/onboarding";
 import { formatDate, type UserProfile } from "@/lib/goals";
+import { profileFromPlacementAssessment } from "@/lib/learner-skill-profile";
 import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 type ResultDashboardProps = {
   result: PlacementTestResult;
+  isReassessment?: boolean;
   onRetakeTest: () => void;
   onRetryAssessment?: () => void;
   isRetrying?: boolean;
@@ -23,16 +27,19 @@ const SKILL_NAMES: Record<TestSkill, string> = {
 
 export function ResultDashboard({
   result,
+  isReassessment = false,
   onRetakeTest,
   onRetryAssessment,
   isRetrying = false,
 }: ResultDashboardProps) {
+  const router = useRouter();
   const [profileState, setProfileState] = useState<{
     profile: UserProfile | null;
     loaded: boolean;
     today: string;
   }>({ profile: null, loaded: false, today: "" });
   const [selectedSkillModal, setSelectedSkillModal] = useState<"writing" | "speaking" | null>(null);
+  const [isGeneratingRoadmap, setIsGeneratingRoadmap] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,6 +64,7 @@ export function ResultDashboard({
   const today = profileState.today;
 
   const { overallBand, skills, errorMessage } = result;
+  const learnerSkillProfile = profileFromPlacementAssessment(result);
 
   // Has any AI skill failed?
   const hasUnassessedAiSkill =
@@ -90,6 +98,43 @@ export function ResultDashboard({
   }
 
   const selectedSkillData = selectedSkillModal ? skills[selectedSkillModal] : null;
+
+  async function handleContinueToRoadmap() {
+    if (isReassessment) {
+      router.push("/progress");
+      return;
+    }
+    if (overallBand === null) {
+      alert("Hoàn thành đánh giá đủ 4 kỹ năng trước khi tạo lộ trình.");
+      return;
+    }
+    setIsGeneratingRoadmap(true);
+    try {
+      const response = await fetch("/api/v1/personalized-roadmap/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const payload = (await response.json()) as {
+        roadmapId?: string;
+        reused?: boolean;
+        error?: string;
+      };
+      if (!response.ok || !payload.roadmapId) {
+        throw new Error(payload.error ?? "Chưa thể tạo lộ trình. Vui lòng thử lại.");
+      }
+      alert(
+        payload.reused
+          ? "Bạn đã có một lộ trình đang hoạt động."
+          : "Đã tạo lộ trình cá nhân hóa và lưu danh sách tài liệu của bạn.",
+      );
+      router.push("/roadmap");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Chưa thể tạo lộ trình. Vui lòng thử lại.");
+    } finally {
+      setIsGeneratingRoadmap(false);
+    }
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto py-2">
@@ -131,8 +176,17 @@ export function ResultDashboard({
               "Hệ thống không sử dụng điểm giả lập. Một số kỹ năng chưa có điểm số AI hợp lệ do thiếu cấu hình GEMINI_API_KEY hoặc nội dung không hợp lệ. Vui lòng xem chi tiết từng kỹ năng bên dưới."}
           </p>
 
-          {onRetryAssessment && (
-            <div className="pt-1">
+          <div className="pt-1 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onRetakeTest}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-[#fffbeb] text-[#925507] border border-[#e9c778] font-bold rounded-lg transition-all cursor-pointer"
+            >
+              <Icon name="refresh" size={13} />
+              <span>Làm lại và bổ sung Writing/Speaking</span>
+            </button>
+
+            {onRetryAssessment && (
               <button
                 type="button"
                 disabled={isRetrying}
@@ -142,8 +196,8 @@ export function ResultDashboard({
                 <Icon name="refresh" size={13} className={isRetrying ? "animate-spin" : ""} />
                 <span>{isRetrying ? "Đang chấm lại..." : "Thử chấm lại với AI"}</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
@@ -311,6 +365,8 @@ export function ResultDashboard({
         </div>
       </div>
 
+      {learnerSkillProfile && <SkillRadarChart profile={learnerSkillProfile} />}
+
       {/* 2. COMPARE WITH MY GOAL (FROM STEP 01) */}
       <div className="bg-white border border-[#e6eaf1] rounded-2xl p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b border-[#f1f5f9] pb-3">
@@ -445,18 +501,15 @@ export function ResultDashboard({
             type="button"
             onClick={() => {
               if (overallBand === null) {
-                alert("Bạn cần hoàn thành đánh giá AI cho cả 4 kỹ năng trước khi tiếp tục lộ trình học.");
+                alert("Hoàn thành đánh giá đủ 4 kỹ năng trước khi tạo lộ trình.");
                 return;
               }
-              alert(
-                "Chúc mừng bạn! Bước 03 (Lộ trình học cá nhân hóa) sẽ được kích hoạt dựa trên Band " +
-                  overallBand.toFixed(1) +
-                  " của bạn.",
-              );
+              void handleContinueToRoadmap();
             }}
-            className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-[#175cdd] hover:bg-[#104dc1] rounded-xl shadow-md transition-all cursor-pointer"
+            disabled={isGeneratingRoadmap}
+            className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-[#175cdd] hover:bg-[#104dc1] rounded-xl shadow-md transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <span>Tiếp tục tới lộ trình học</span>
+            <span>{isReassessment ? "Xem tiến bộ" : isGeneratingRoadmap ? "Đang tạo lộ trình..." : "Tiếp tục tới lộ trình học"}</span>
             <Icon name="arrow" size={15} />
           </button>
         </div>

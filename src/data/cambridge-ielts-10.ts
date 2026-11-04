@@ -6,6 +6,7 @@ export type CambridgePart = {
   questionStart?: number;
   questionEnd?: number;
   sourcePages: number[];
+  audioPath?: string;
 };
 
 export type CambridgeSkillSection = {
@@ -219,7 +220,11 @@ function academicTest(
           [2, 11, 20, pageStart + 2, pageStart + 3],
           [3, 21, 30, pageStart + 4, pageStart + 5],
           [4, 31, 40, pageStart + 6, readingStart - 1],
-        ]),
+        ]).map((part, index) => ({
+          ...part,
+          // Names are taken directly from the supplied Cambridge IELTS 10 Audio ZIP.
+          audioPath: `/assets/cambridge-10/audio/IELTS%2010%20Test%20${number}%20Section%20${index + 1}.mp3`,
+        })),
       },
       {
         skill: "reading",

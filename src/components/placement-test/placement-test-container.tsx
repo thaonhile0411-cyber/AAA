@@ -65,7 +65,7 @@ const DEFAULT_ANSWERS: PlacementTestAnswers = {
 
 const emptySubscribe = () => () => {};
 
-export function PlacementTestContainer() {
+export function PlacementTestContainer({ reassessment = false }: { reassessment?: boolean }) {
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const [stage, setStage] = useState<"intro" | "testing" | "result">("intro");
@@ -95,8 +95,21 @@ export function PlacementTestContainer() {
     let cancelled = false;
     Promise.resolve().then(() => {
       if (cancelled) return;
+      if (reassessment) {
+        // A reassessment must start a new local/cloud attempt, while the
+        // original completed result remains stored in Supabase.
+        clearPlacementTestStorage();
+        setAnswers(DEFAULT_ANSWERS);
+        setCompletedSkills([]);
+        setResult(null);
+        setTimeRemainingSeconds(3300);
+        setCurrentSkill("listening");
+        window.history.replaceState({}, "", "/onboarding/placement-test");
+      }
 
-      const savedAttemptId = localStorage.getItem("aaa_placement_attempt_id");
+      const savedAttemptId = reassessment
+        ? null
+        : localStorage.getItem("aaa_placement_attempt_id");
       const currentAttemptId =
         savedAttemptId ??
         `attempt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
@@ -105,11 +118,8 @@ export function PlacementTestContainer() {
       }
       setAttemptId(currentAttemptId);
 
-      const submitted = isTestSubmitted();
-      if (submitted) {
-        isSubmittedRef.current = true;
-      }
-
+      const submitted = reassessment ? false : isTestSubmitted();
+      if (submitted) isSubmittedRef.current = true;
       const savedRes = loadSavedResult();
       if (savedRes) {
         setResult(savedRes);
@@ -160,7 +170,7 @@ export function PlacementTestContainer() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reassessment]);
 
   // Timer countdown while testing (calculates against saved deadline)
   useEffect(() => {
@@ -744,6 +754,7 @@ export function PlacementTestContainer() {
         speaking_recordings: answers.speakingRecordings,
         assessment_results: evaluated,
         overall_band: evaluated.overallBand,
+      assessment_kind: reassessment ? "reassessment" : "placement",
         status: "completed",
       });
       if (!saveResult.success) {
@@ -1088,6 +1099,7 @@ export function PlacementTestContainer() {
       {stage === "result" && result && (
         <ResultDashboard
           result={result}
+          isReassessment={reassessment}
           onRetakeTest={handleRetakeTest}
           onRetryAssessment={handleRetryFailedAiSkills}
           isRetrying={isRetrying}

@@ -7,7 +7,7 @@ export function AppShell({
   demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "test" | "practice" | "speaking";
+  active?: "goals" | "settings" | "test" | "practice" | "speaking" | "roadmap";
   demoMode?: boolean;
 }) {
   return (
@@ -35,13 +35,12 @@ export function AppShell({
             {active === "practice" && <span className="nav-dot" />}
           </Link>
           <Link
-            href="/speaking"
-            className={active === "speaking" ? "active" : ""}
-            aria-current={active === "speaking" ? "page" : undefined}
+            href="/roadmap"
+            className={active === "roadmap" ? "active" : ""}
+            aria-current={active === "roadmap" ? "page" : undefined}
           >
-            <Icon name="mic" />
-            Speaking practice
-            {active === "speaking" && <span className="nav-dot" />}
+            <Icon name="target" />
+            Lộ trình của tôi{active === "roadmap" && <span className="nav-dot" />}
           </Link>
           <Link
             href="/onboarding/goals"
