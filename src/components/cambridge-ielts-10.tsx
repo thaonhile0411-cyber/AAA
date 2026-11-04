@@ -172,6 +172,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
   const isWritingOrSpeaking = active.section.skill === "writing" || active.section.skill === "speaking";
+  const isListening = active.section.skill === "listening";
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -229,6 +230,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const acceptedAnswers = answerKeyFor(active.test.id, active.section.skill);
   const answerGroups = answerGroupsFor(active.test.id, active.section.skill);
   const scoredNumbers = numbers.filter((number) => acceptedAnswers?.[number]);
+  const answeredNumbers = scoredNumbers.filter((number) => answers[String(number)]?.trim());
   const correct = scoredNumbers.filter((number) => {
     const group = answerGroups.find((item) => item.numbers.includes(number));
     if (group) {
@@ -240,6 +242,8 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
       (answer) => normaliseAnswer(answer) === normaliseAnswer(answers[String(number)] ?? ""),
     );
   });
+  const unansweredCount = scoredNumbers.length - answeredNumbers.length;
+  const incorrectCount = answeredNumbers.length - correct.length;
 
   return (
     <div className="exam-modal-backdrop" role="presentation">
@@ -256,8 +260,20 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
         </div>
         <div ref={bodyRef} className={`exam-modal-body show-${mobilePane}`} style={{ gridTemplateColumns: `minmax(0, ${split}fr) 8px minmax(0, ${100 - split}fr)` }}>
           <section className="exam-source-pane" aria-label="Nội dung từ Cambridge IELTS 10">
+            {isListening && (
+              <p className="exam-audio-unavailable" role="note">
+                No audio file was provided with this Cambridge IELTS 10 source package. Audio playback is unavailable for this section.
+              </p>
+            )}
             {active.part.sourcePages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10, source page ${page}`} />)}
             {submitted && answerKey && <Image className="exam-answer-key" src={assetForPage(answerKey)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt="Answer key from Cambridge IELTS 10" />}
+            {submitted && isListening && active.test.transcriptPages && (
+              <section className="exam-transcript" aria-label="Audioscript from Cambridge IELTS 10">
+                <h2>Audioscript</h2>
+                <p>The book audioscript is shown after submission. It is provided as source scans because no audio file was supplied.</p>
+                {active.test.transcriptPages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10 audioscript, source page ${page}`} />)}
+              </section>
+            )}
           </section>
           <button type="button" className="exam-divider" aria-label="Kéo để đổi độ rộng hai cột" onPointerDown={() => setResizing(true)} />
           <section className="exam-answer-pane" aria-label="Khu vực trả lời">
@@ -287,7 +303,9 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
               </>
             )}
             {submitted && <p className="exam-submitted" role="status">
-              {acceptedAnswers ? `${correct.length}/${scoredNumbers.length} correct. ` : "Your response has been submitted. "}
+              {acceptedAnswers
+                ? `${correct.length}/${scoredNumbers.length} correct · ${incorrectCount} incorrect · ${unansweredCount} unanswered. `
+                : "Your response has been submitted. "}
               The source Answer Key is now available in the content pane.
             </p>}
           </section>

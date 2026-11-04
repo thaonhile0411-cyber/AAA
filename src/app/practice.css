@@ -938,6 +938,10 @@
 .exam-source-pane { padding: 22px; background: #f8f8f8; }
 .exam-source-pane img { display: block; max-width: 100%; margin: 0 auto 18px; box-shadow: 0 1px 4px #192f4b26; }
 .exam-source-pane .exam-answer-key { border-top: 8px solid #1e5fc8; padding-top: 18px; }
+.exam-audio-unavailable, .exam-transcript { margin: 0 0 16px; border: 1px solid #d8e1ee; border-radius: 8px; padding: 12px 14px; background: #f7f9fc; color: #43536a; line-height: 1.5; }
+.exam-transcript { margin-top: 22px; background: #fff; }
+.exam-transcript h2 { margin: 0 0 5px; color: #1d3557; font-size: 18px; }
+.exam-transcript p { margin: 0 0 14px; }
 .exam-divider { grid-column: 2; grid-row: 1; cursor: col-resize; background: #9ca1a8; border: 0; z-index: 1; touch-action: none; }
 .exam-divider:focus-visible { outline: 3px solid #2c84dc; outline-offset: -2px; }
 .exam-answer-pane { grid-column: 3; grid-row: 1; padding: 34px 40px; }

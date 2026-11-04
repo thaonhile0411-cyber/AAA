@@ -19,6 +19,8 @@ export type CambridgeTest = {
   title: string;
   edition: "academic" | "general";
   sourcePages: number[];
+  /** Scan pages from the book's Audioscripts section; reveal only after submission. */
+  transcriptPages?: number[];
   skills: CambridgeSkillSection[];
 };
 
@@ -77,6 +79,68 @@ export const cambridgeAnswerKeys: Partial<Record<string, Partial<Record<"listeni
       38: ["YES"], 39: ["NOT GIVEN"], 40: ["NO"],
     },
   },
+  "academic-test-3": {
+    listening: {
+      1: ["4", "four"], 2: ["46 Wombat"], 3: ["Thursday"], 4: ["8.30", "8:30"],
+      5: ["red"], 6: ["lunch"], 7: ["glasses"], 8: ["BALL", "ball"], 9: ["aunt"], 10: ["month"],
+      11: ["C", "E"], 12: ["C", "E"], 13: ["B"], 14: ["A"], 15: ["C"], 16: ["B"], 17: ["C"],
+      18: ["B"], 19: ["D"], 20: ["A"], 21: ["C"], 22: ["A"], 23: ["A"], 24: ["B"], 25: ["B"],
+      26: ["E"], 27: ["D"], 28: ["A"], 29: ["G"], 30: ["C"],
+      31: ["achievement", "achievements"], 32: ["personality", "character"], 33: ["situational"],
+      34: ["friend"], 35: ["aspirations", "ambitions"], 36: ["style"], 37: ["development"],
+      38: ["vision"], 39: ["structures"], 40: ["innovation", "innovations"],
+    },
+    reading: {
+      1: ["ii"], 2: ["i"], 3: ["viii"], 4: ["vii"], 5: ["TRUE"], 6: ["NOT GIVEN"],
+      7: ["NOT GIVEN"], 8: ["TRUE"], 9: ["NOT GIVEN"], 10: ["FALSE"],
+      11: ["source of income", "industry"], 12: ["employer"], 13: ["domestic tourism"],
+      14: ["C"], 15: ["B"], 16: ["H"], 17: ["B"], 18: ["E"], 19: ["sun", "light"], 20: ["upper"],
+      21: ["dry"], 22: ["north"], 23: ["FALSE"], 24: ["TRUE"], 25: ["NOT GIVEN"], 26: ["B"],
+      27: ["C"], 28: ["F"], 29: ["I"], 30: ["G"], 31: ["D"], 32: ["C"], 33: ["A"], 34: ["D"],
+      35: ["C"], 36: ["NO"], 37: ["YES"], 38: ["NOT GIVEN"], 39: ["YES"], 40: ["NOT GIVEN"],
+    },
+  },
+  "academic-test-4": {
+    listening: {
+      1: ["Pargetter"], 2: ["East"], 3: ["library"], 4: ["morning", "mornings"], 5: ["postbox"],
+      6: ["prices"], 7: ["glass"], 8: ["cooker"], 9: ["week"], 10: ["fence"], 11: ["B"], 12: ["B"],
+      13: ["A"], 14: ["A"], 15: ["C"], 16: ["trains"], 17: ["dark"], 18: ["games"], 19: ["guided tour"],
+      20: ["ladder", "ladders"], 21: ["A", "E"], 22: ["A", "E"], 23: ["B", "C"], 24: ["B", "C"],
+      25: ["D"], 26: ["F"], 27: ["G"], 28: ["B"], 29: ["E"], 30: ["C"], 31: ["C"], 32: ["B"],
+      33: ["C"], 34: ["metal", "metals"], 35: ["space"], 36: ["memory"], 37: ["solar"], 38: ["oil"],
+      39: ["waste"], 40: ["tests"],
+    },
+    reading: {
+      1: ["spread"], 2: ["10", "ten times"], 3: ["below"], 4: ["fuel"], 5: ["seasons"],
+      6: ["homes", "housing"], 7: ["TRUE"], 8: ["FALSE"], 9: ["TRUE"], 10: ["TRUE"], 11: ["NOT GIVEN"],
+      12: ["FALSE"], 13: ["FALSE"], 14: ["transformation", "change"], 15: ["young age"], 16: ["optimism"],
+      17: ["skills", "techniques"], 18: ["negative emotions", "feelings"], 19: ["E"], 20: ["C"], 21: ["G"],
+      22: ["A"], 23: ["E"], 24: ["C"], 25: ["G"], 26: ["H"], 27: ["C"], 28: ["D"], 29: ["C"],
+      30: ["B"], 31: ["A"], 32: ["F"], 33: ["G"], 34: ["A"], 35: ["B"], 36: ["D"], 37: ["NOT GIVEN"],
+      38: ["YES"], 39: ["NO"], 40: ["YES"],
+    },
+  },
+  "general-test-a": {
+    reading: {
+      1: ["TRUE"], 2: ["FALSE"], 3: ["NOT GIVEN"], 4: ["TRUE"], 5: ["FALSE"], 6: ["TRUE"],
+      7: ["NOT GIVEN"], 8: ["C"], 9: ["E"], 10: ["D"], 11: ["E"], 12: ["C"], 13: ["A"], 14: ["G"],
+      15: ["decision maker"], 16: ["impact"], 17: ["opening"], 18: ["white envelope"], 19: ["brochure"],
+      20: ["free sample"], 21: ["response rate"], 22: ["international profile"], 23: ["publication"],
+      24: ["website content"], 25: ["audience"], 26: ["purpose"], 27: ["post-graduate"],
+      28: ["E"], 29: ["A"], 30: ["A"], 31: ["B"], 32: ["E"], 33: ["F"], 34: ["A"], 35: ["B"],
+      36: ["D"], 37: ["E"], 38: ["I"], 39: ["G"], 40: ["B"],
+    },
+  },
+  "general-test-b": {
+    reading: {
+      1: ["FALSE"], 2: ["FALSE"], 3: ["TRUE"], 4: ["NOT GIVEN"], 5: ["NOT GIVEN"], 6: ["TRUE"],
+      7: ["FALSE"], 8: ["ii"], 9: ["x"], 10: ["v"], 11: ["iii"], 12: ["ix"], 13: ["vi"], 14: ["iv"],
+      15: ["FALSE"], 16: ["FALSE"], 17: ["NOT GIVEN"], 18: ["TRUE"], 19: ["TRUE"], 20: ["FALSE"],
+      21: ["E"], 22: ["B"], 23: ["G"], 24: ["H"], 25: ["C"], 26: ["G"], 27: ["D"], 28: ["C"],
+      29: ["F"], 30: ["A"], 31: ["E"], 32: ["A"], 33: ["B"], 34: ["C"], 35: ["B"], 36: ["C"],
+      37: ["C"], 38: ["prepared mind"], 39: ["iodine vapour", "iodine vapor"], 40: ["chemical", "chemicals"],
+    },
+  },
 };
 
 /** Groups explicitly marked IN EITHER ORDER in the book's answer key. */
@@ -88,6 +152,15 @@ export const cambridgeAnswerGroups: Partial<Record<string, Partial<Record<"liste
     listening: [
       { numbers: [21, 22], accepted: ["B", "C"] },
       { numbers: [23, 24], accepted: ["B", "E"] },
+    ],
+  },
+  "academic-test-3": {
+    listening: [{ numbers: [11, 12], accepted: ["C", "E"] }],
+  },
+  "academic-test-4": {
+    listening: [
+      { numbers: [21, 22], accepted: ["A", "E"] },
+      { numbers: [23, 24], accepted: ["B", "C"] },
     ],
   },
 };
@@ -133,6 +206,10 @@ function academicTest(
     title: `Cambridge IELTS 10 – Test ${number}`,
     edition: "academic",
     sourcePages: pages(pageStart, speakingPage),
+    // Test 3 ends and Test 4 begins on scan page 146, so that page belongs
+    // to both transcript ranges. These are scan-page numbers, not printed page labels.
+    transcriptPages:
+      number === 3 ? pages(141, 146) : number === 4 ? pages(146, 151) : pages(131 + (number - 1) * 5, 135 + (number - 1) * 5),
     skills: [
       {
         skill: "listening",
