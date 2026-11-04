@@ -8,6 +8,10 @@ import {
   updateEvaluationJob,
 } from "@/lib/ai-evaluation-queue";
 import { getWritingTask } from "@/data/placement-test-data";
+import {
+  createMockWritingAssessment,
+  isMockAiEvaluationEnabled,
+} from "@/lib/development-mock-ai";
 
 export const maxDuration = 60; // 60 seconds timeout for AI evaluation
 
@@ -134,12 +138,15 @@ export async function POST(request: Request) {
       },
     });
 
-    // 4. Multi-Provider Evaluation with Failover
-    // Gemini (primary) -> OpenAI (secondary) -> Groq (third)
-    const result = await evaluateWritingWithFailover({
-      essayText: essay!,
-      taskPrompt: effectiveTaskPrompt,
-    });
+    // 4. In development, an explicit server-side flag can return a labelled
+    // mock result so teammates can exercise the roadmap flow without an AI key.
+    // Production always uses real providers.
+    const result = isMockAiEvaluationEnabled()
+      ? createMockWritingAssessment(wordCount)
+      : await evaluateWritingWithFailover({
+          essayText: essay!,
+          taskPrompt: effectiveTaskPrompt,
+        });
 
     // 5. Update Persistent Job Status
     if (result.status === "success") {

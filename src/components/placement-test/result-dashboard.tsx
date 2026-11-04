@@ -25,6 +25,13 @@ const SKILL_NAMES: Record<TestSkill, string> = {
   speaking: "Speaking",
 };
 
+function providerLabel(provider?: string) {
+  if (provider === "mock") return "Điểm mô phỏng (Development)";
+  if (provider === "openai") return "OpenAI";
+  if (provider === "groq") return "Groq";
+  return "Google Gemini";
+}
+
 export function ResultDashboard({
   result,
   isReassessment = false,
@@ -289,11 +296,7 @@ export function ResultDashboard({
                             <>
                               <span className="text-[10px] font-semibold text-[#175cdd] bg-[#eff5ff] border border-[#d6e4fd] px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <Icon name="sparkle" size={10} />
-                                {s.provider === "openai"
-                                  ? "OpenAI"
-                                  : s.provider === "groq"
-                                    ? "Groq"
-                                    : "Google Gemini"}
+                                {providerLabel(s.provider)}
                               </span>
                               <span className="text-[10px] font-semibold text-[#147054] bg-[#f0faf5] border border-[#bce4d6] px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <Icon name="check" size={10} />
@@ -534,7 +537,7 @@ export function ResultDashboard({
                   </h3>
                   <span className="text-xs text-[#64748b]">
                     Overall Skill Band: <strong>{selectedSkillData.band !== null ? selectedSkillData.band.toFixed(1) : "—"}</strong>
-                    {selectedSkillData.provider && ` • Đánh giá bởi ${selectedSkillData.provider === "openai" ? "OpenAI" : selectedSkillData.provider === "groq" ? "Groq" : "Google Gemini"}`}
+                    {selectedSkillData.provider && ` • Đánh giá bởi ${providerLabel(selectedSkillData.provider)}`}
                     {selectedSkillData.modelUsed && ` (${selectedSkillData.modelUsed})`}
                   </span>
                 </div>

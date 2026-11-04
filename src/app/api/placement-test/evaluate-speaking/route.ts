@@ -9,6 +9,10 @@ import {
   createEvaluationJob,
   updateEvaluationJob,
 } from "@/lib/ai-evaluation-queue";
+import {
+  createMockSpeakingAssessment,
+  isMockAiEvaluationEnabled,
+} from "@/lib/development-mock-ai";
 
 export const maxDuration = 60; // 60 seconds timeout for audio AI analysis
 
@@ -96,11 +100,11 @@ export async function POST(request: Request) {
       attemptCount: job.attemptCount + 1,
     });
 
-    // 3. Multi-Provider Audio Evaluation with Failover
-    // Primary: Google Gemini (Multimodal inlineData) -> Secondary: OpenAI Audio
-    const result = await evaluateSpeakingWithFailover({
-      recordings,
-    });
+    // 3. The development-only mock still requires a valid recording, but never
+    // uploads it to an AI provider. Production always uses real providers.
+    const result = isMockAiEvaluationEnabled()
+      ? createMockSpeakingAssessment(validKeys.length)
+      : await evaluateSpeakingWithFailover({ recordings });
 
     // 4. Update Persistent Job Status
     if (result.status === "success") {

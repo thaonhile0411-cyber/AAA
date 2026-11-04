@@ -468,7 +468,9 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
 
       if (writingJson.status === "success" && writingJson.overallBand !== null) {
         const providerName =
-          writingJson.provider === "openai"
+          writingJson.provider === "mock"
+            ? "Điểm mô phỏng (Development)"
+            : writingJson.provider === "openai"
             ? "OpenAI"
             : writingJson.provider === "groq"
               ? "Groq"
@@ -516,7 +518,7 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
             weaknesses: writingJson.feedback?.weaknesses,
             improvementSuggestions: writingJson.feedback?.improvements,
             evaluationSummary: writingJson.feedback?.summary,
-            isAiEvaluated: true,
+            isAiEvaluated: writingJson.provider !== "mock",
           },
         };
       }
@@ -584,7 +586,11 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
 
       if (speakingJson.status === "success" && speakingJson.overallBand !== null) {
         const providerName =
-          speakingJson.provider === "openai" ? "OpenAI" : "Google Gemini";
+          speakingJson.provider === "mock"
+            ? "Điểm mô phỏng (Development)"
+            : speakingJson.provider === "openai"
+              ? "OpenAI"
+              : "Google Gemini";
 
         return {
           skill: "speaking",
@@ -628,7 +634,7 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
             weaknesses: speakingJson.feedback?.weaknesses,
             improvementSuggestions: speakingJson.feedback?.improvements,
             evaluationSummary: speakingJson.feedback?.summary,
-            isAiEvaluated: true,
+            isAiEvaluated: speakingJson.provider !== "mock",
           },
         };
       }
