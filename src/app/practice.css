@@ -755,6 +755,115 @@
   text-align: center;
   margin: 12px 0 0;
 }
+.practice-finish .primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.answer-evidence {
+  background: #ffe682;
+  color: #263a59;
+  padding: 2px 3px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px #f5ca3b55;
+  scroll-margin: 120px;
+  animation: evidence-pulse 0.9s ease-out;
+}
+.answer-evidence:focus-visible {
+  outline: 3px solid #286bc5;
+  outline-offset: 3px;
+}
+.answer-transcript {
+  padding: 22px 26px;
+  border-top: 1px solid #dce6f5;
+  background: #f8fbff;
+}
+.answer-transcript > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #315f9d;
+}
+.answer-transcript h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.answer-transcript p {
+  margin: 14px 0 8px;
+  color: #3b4760;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.9;
+}
+.answer-transcript small {
+  color: #8190a7;
+  font-size: 10px;
+}
+.grading-feedback {
+  margin: 0 0 24px;
+  padding: 18px;
+  border: 1px solid;
+  border-radius: 10px;
+}
+.grading-feedback.correct {
+  color: #24674f;
+  border-color: #b9e2d1;
+  background: #f0faf5;
+}
+.grading-feedback.incorrect {
+  color: #8a4a2c;
+  border-color: #efd0bc;
+  background: #fff7f1;
+}
+.grading-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.grading-title > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.grading-title strong {
+  font-size: 14px;
+}
+.grading-title span {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.grading-feedback dl {
+  margin: 16px 0;
+}
+.grading-feedback dl > div + div {
+  margin-top: 12px;
+}
+.grading-feedback dt {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.grading-feedback dd {
+  margin: 4px 0 0;
+  color: #3f4f68;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.grading-feedback .text-link {
+  padding: 0;
+  font-size: 11px;
+}
+@keyframes evidence-pulse {
+  from {
+    background: #ffcb3d;
+    box-shadow: 0 0 0 8px #f5ca3b30;
+  }
+  to {
+    background: #ffe682;
+    box-shadow: 0 0 0 2px #f5ca3b55;
+  }
+}
 .audio-panel {
   padding: 28px 26px;
   background: linear-gradient(145deg, #f3f7ff, #eaf1ff);
