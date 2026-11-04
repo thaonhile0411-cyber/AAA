@@ -14,6 +14,7 @@ export function PracticeAudio({
   speed,
   onPosition,
   onSpeed,
+  caption,
 }: {
   source: string;
   title: string;
@@ -21,6 +22,7 @@ export function PracticeAudio({
   speed: number;
   onPosition: (time: number) => void;
   onSpeed: (speed: number) => void;
+  caption?: string;
 }) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -159,7 +161,7 @@ export function PracticeAudio({
         ))}
       </fieldset>
       <p className="audio-caption">
-        Audio mẫu tiếng Anh được tổng hợp cho AAA · MP3 dưới 15 MB
+        {caption ?? "Audio mẫu tiếng Anh được tổng hợp cho AAA · MP3 dưới 15 MB"}
       </p>
       {error && (
         <div className="error-box" role="alert">

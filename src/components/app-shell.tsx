@@ -7,7 +7,7 @@ export function AppShell({
   demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "practice" | "roadmap" | "test";
+  active?: "goals" | "settings" | "test" | "practice" | "speaking" | "roadmap";
   demoMode?: boolean;
 }) {
   return (
@@ -28,10 +28,11 @@ export function AppShell({
             href="/practice"
             className={active === "practice" ? "active" : ""}
             aria-current={active === "practice" ? "page" : undefined}
-            aria-label="Kho bài luyện Reading và Listening"
+            aria-label="Kho tài liệu IELTS"
           >
             <Icon name="book" />
-            Kho bài luyện{active === "practice" && <span className="nav-dot" />}
+            Kho tài liệu
+            {active === "practice" && <span className="nav-dot" />}
           </Link>
           <Link
             href="/roadmap"
@@ -43,6 +44,7 @@ export function AppShell({
           </Link>
           <Link
             href="/onboarding/goals"
+            aria-label="Mục tiêu học tập"
             className={active === "goals" ? "active" : ""}
             aria-current={active === "goals" ? "page" : undefined}
           >
@@ -52,6 +54,7 @@ export function AppShell({
           </Link>
           <Link
             href="/profile"
+            aria-label="Cài đặt tài khoản"
             className={active === "settings" ? "active" : ""}
             aria-current={active === "settings" ? "page" : undefined}
           >

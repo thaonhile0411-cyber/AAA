@@ -28,14 +28,12 @@ async function Dashboard() {
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          {["Listening", "Reading", "Writing", "Speaking"].map((skill) => (
+          {["Listening", "Reading", "Writing"].map((skill) => (
             <section
               key={skill}
               className="rounded-xl border border-slate-200 bg-white p-6"
             >
-              <h2 className="text-xl font-semibold text-slate-900">
-                {skill}
-              </h2>
+              <h2 className="text-xl font-semibold text-slate-900">{skill}</h2>
               <p className="mt-2 text-sm text-slate-500">
                 Chức năng luyện tập sẽ được nhóm phát triển.
               </p>

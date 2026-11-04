@@ -58,13 +58,3 @@ export async function authenticatedClient() {
   return { supabase, userId: data.claims.sub };
 }
 
-/** Compatibility helper retained for the US-101 account module. */
-export async function authenticatedAccountClient() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Bạn cần đăng nhập để tiếp tục.");
-  return { supabase, userId: user.id };
-}

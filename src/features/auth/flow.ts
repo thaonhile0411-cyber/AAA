@@ -5,7 +5,9 @@ export function applicationOrigin() {
 }
 
 export async function destination(client: Awaited<ReturnType<typeof supabaseServer>>, userId: string) {
-  const { data } = await client.from("learning_goals")
+  await client.from("learning_goals")
     .select("id").eq("user_id", userId).maybeSingle();
-  return data ? "/dashboard" : "/onboarding/goals";
+  // AAA currently begins its authenticated journey at the goal survey; there
+  // is no standalone /dashboard route in this application.
+  return "/onboarding/goals";
 }

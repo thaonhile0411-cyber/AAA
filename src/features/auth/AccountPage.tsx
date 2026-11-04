@@ -87,7 +87,7 @@ async function PrivateScreen() {
         <NewPassword />
       </AccountForm>
       <Link href="/forgot-password" className="text-sm text-blue-800 underline">Quên mật khẩu hiện tại?</Link>
-      <Link href="/dashboard" className="block text-sm text-blue-800 underline">Về Dashboard</Link>
+      <Link href="/onboarding/goals" className="block text-sm text-blue-800 underline">Về mục tiêu học tập</Link>
       <form action={signOut}>
         <button className="text-blue-800 underline">Đăng xuất</button>
       </form>

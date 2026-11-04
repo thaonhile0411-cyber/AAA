@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/icon";
 import { SPEAKING_CONTENT } from "@/data/placement-test-data";
 import { uploadSpeakingAudio } from "@/lib/supabase-client";
+import {
+  sanitizeAudioBase64,
+  sanitizeAudioMimeType,
+} from "@/lib/placement-ai-validation";
 import type { SpeakingRecordingInfo } from "@/types/placement-test";
 
 type SpeakingSectionProps = {
@@ -14,24 +18,27 @@ type SpeakingSectionProps = {
       blobUrl: string;
       duration: number;
       audioBase64?: string;
+      mimeType?: string;
       storagePath?: string;
     },
   ) => void;
   onOpenReviewModal: () => void;
+  disabled?: boolean;
 };
+
+const getCurrentTimestamp = () => Date.now();
 
 export function SpeakingSection({
   recordings,
   onRecordingComplete,
   onOpenReviewModal,
+  disabled = false,
 }: SpeakingSectionProps) {
   const [activePartIndex, setActivePartIndex] = useState<1 | 2 | 3>(1);
+  const [maxVisitedPart, setMaxVisitedPart] = useState<1 | 2 | 3>(1);
   const [micPermissionError, setMicPermissionError] = useState<string>("");
   const [activeRecordingKey, setActiveRecordingKey] = useState<string | null>(null);
   const [recordingElapsed, setRecordingElapsed] = useState(0);
-
-  // Incomplete warning modal state
-  const [incompleteWarning, setIncompleteWarning] = useState<string | null>(null);
 
   // Audio playback state
   const [playingKey, setPlayingKey] = useState<string | null>(null);
@@ -46,6 +53,7 @@ export function SpeakingSection({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const recordStartTimeRef = useRef<number>(0);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Completion check per part
@@ -61,6 +69,19 @@ export function SpeakingSection({
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
+    }
+  }
+
+  function stopRecording() {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
+      mediaRecorderRef.current.stop();
+    }
+    if (recordIntervalRef.current) {
+      clearInterval(recordIntervalRef.current);
+      recordIntervalRef.current = null;
     }
   }
 
@@ -94,9 +115,15 @@ export function SpeakingSection({
     }, 1000);
   }
 
+  // Automatically finalize any active recording when disabled (e.g. timeout or submit)
+  useEffect(() => {
+    if (disabled && activeRecordingKey) {
+      stopRecording();
+    }
+  }, [disabled, activeRecordingKey]);
+
   // Start recording
   async function startRecording(questionKey: string, maxDuration = 120) {
-    let elapsedSeconds = 0;
     setMicPermissionError("");
     if (playingKey) {
       stopPlayingAudio();
@@ -114,9 +141,27 @@ export function SpeakingSection({
       });
 
       streamRef.current = stream;
-      const mediaRecorder = new MediaRecorder(stream);
+
+      // Detect supported audio MIME type across browsers (Chrome, Safari, Firefox)
+      let chosenMimeType = "audio/webm";
+      if (typeof MediaRecorder !== "undefined") {
+        if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+          chosenMimeType = "audio/webm;codecs=opus";
+        } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+          chosenMimeType = "audio/webm";
+        } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          chosenMimeType = "audio/mp4";
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(
+        stream,
+        chosenMimeType ? { mimeType: chosenMimeType } : undefined,
+      );
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
+      const startTime = getCurrentTimestamp();
+      recordStartTimeRef.current = startTime;
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -125,23 +170,31 @@ export function SpeakingSection({
       };
 
       mediaRecorder.onstop = () => {
+        // Calculate exact duration using timestamp difference to avoid React stale closure bugs
+        const actualDuration = Math.max(
+          1,
+          Math.round((getCurrentTimestamp() - recordStartTimeRef.current) / 1000),
+        );
+        const recordedMime = mediaRecorder.mimeType || chosenMimeType || "audio/webm";
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
+          type: recordedMime,
         });
         const blobUrl = URL.createObjectURL(audioBlob);
-        const finalDuration = elapsedSeconds;
 
         // Convert to base64 for real AI evaluation
         const reader = new FileReader();
         reader.onloadend = () => {
-          const base64Data = reader.result as string;
+          const rawBase64 = reader.result as string;
+          const cleanBase64 = sanitizeAudioBase64(rawBase64);
+          const cleanMime = sanitizeAudioMimeType(recordedMime);
 
           // Asynchronously attempt upload to Supabase Storage
           uploadSpeakingAudio(audioBlob, questionKey).then((uploadRes) => {
             onRecordingComplete(questionKey, {
               blobUrl,
-              duration: finalDuration,
-              audioBase64: base64Data,
+              duration: actualDuration,
+              audioBase64: cleanBase64,
+              mimeType: cleanMime,
               storagePath: uploadRes.storagePath,
             });
           });
@@ -158,6 +211,7 @@ export function SpeakingSection({
       setRecordingElapsed(0);
 
       if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
+      let elapsedSeconds = 0;
       recordIntervalRef.current = setInterval(() => {
         elapsedSeconds += 1;
         setRecordingElapsed(elapsedSeconds);
@@ -179,19 +233,6 @@ export function SpeakingSection({
       );
       setActiveRecordingKey(null);
       setRecordingElapsed(0);
-    }
-  }
-
-  function stopRecording() {
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
-      mediaRecorderRef.current.stop();
-    }
-    if (recordIntervalRef.current) {
-      clearInterval(recordIntervalRef.current);
-      recordIntervalRef.current = null;
     }
   }
 
@@ -235,67 +276,25 @@ export function SpeakingSection({
 
   // Part switching handlers
   function handleGoToPart(targetPart: 1 | 2 | 3) {
-    // Can always access Part 1
-    if (targetPart === 1) {
-      setActivePartIndex(1);
-      return;
-    }
-    // Can access Part 2 only if Part 1 is complete
-    if (targetPart === 2) {
-      if (!isPart1Complete) {
-        const missing = SPEAKING_CONTENT.part1.questions.filter(
-          (q) => !recordings[q.id]?.hasRecorded,
-        ).length;
-        setIncompleteWarning(`Bạn còn ${missing} câu hỏi Speaking Part 1 chưa ghi âm.`);
-        return;
-      }
-      setActivePartIndex(2);
-      return;
-    }
-    // Can access Part 3 only if Part 1 and Part 2 are complete
-    if (targetPart === 3) {
-      if (!isPart1Complete) {
-        setIncompleteWarning("Vui lòng hoàn thành Part 1 trước.");
-        return;
-      }
-      if (!isPart2Complete) {
-        setIncompleteWarning("Bạn chưa hoàn thành bản ghi âm Cue Card của Part 2.");
-        return;
-      }
-      setActivePartIndex(3);
-      return;
+    if (targetPart <= maxVisitedPart) {
+      setActivePartIndex(targetPart);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
   function handleFinishPart1() {
-    if (!isPart1Complete) {
-      const missing = SPEAKING_CONTENT.part1.questions.filter(
-        (q) => !recordings[q.id]?.hasRecorded,
-      ).length;
-      setIncompleteWarning(`Bạn còn ${missing} câu hỏi Speaking Part 1 chưa ghi âm.`);
-      return;
-    }
+    setMaxVisitedPart((prev) => (Math.max(prev, 2) as 1 | 2 | 3));
     setActivePartIndex(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleFinishPart2() {
-    if (!isPart2Complete) {
-      setIncompleteWarning("Bạn chưa hoàn thành bản ghi âm Cue Card của Part 2.");
-      return;
-    }
+    setMaxVisitedPart(3);
     setActivePartIndex(3);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleFinishPart3() {
-    if (!isPart3Complete) {
-      const missing = SPEAKING_CONTENT.part3.questions.filter(
-        (q) => !recordings[q.id]?.hasRecorded,
-      ).length;
-      setIncompleteWarning(`Bạn còn ${missing} câu hỏi Speaking Part 3 chưa ghi âm.`);
-      return;
-    }
     onOpenReviewModal();
   }
 
@@ -353,10 +352,10 @@ export function SpeakingSection({
         {/* Part 2 */}
         <button
           type="button"
-          disabled={!isPart1Complete}
+          disabled={maxVisitedPart < 2}
           onClick={() => handleGoToPart(2)}
           className={`p-3 rounded-xl border flex items-center justify-between transition-all text-left ${
-            !isPart1Complete
+            maxVisitedPart < 2
               ? "bg-[#f8fafc] border-[#e6eaf1] opacity-50 cursor-not-allowed"
               : activePartIndex === 2
                 ? "bg-white border-[#175cdd] ring-2 ring-[#175cdd]/15 shadow-sm cursor-pointer"
@@ -389,10 +388,10 @@ export function SpeakingSection({
         {/* Part 3 */}
         <button
           type="button"
-          disabled={!isPart1Complete || !isPart2Complete}
+          disabled={maxVisitedPart < 3}
           onClick={() => handleGoToPart(3)}
           className={`p-3 rounded-xl border flex items-center justify-between transition-all text-left ${
-            !isPart1Complete || !isPart2Complete
+            maxVisitedPart < 3
               ? "bg-[#f8fafc] border-[#e6eaf1] opacity-50 cursor-not-allowed"
               : activePartIndex === 3
                 ? "bg-white border-[#175cdd] ring-2 ring-[#175cdd]/15 shadow-sm cursor-pointer"
@@ -464,8 +463,11 @@ export function SpeakingSection({
                       {!isRecording ? (
                         <button
                           type="button"
+                          disabled={disabled}
                           onClick={() => startRecording(q.id, 60)}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#eff5ff] hover:bg-[#dbeafe] text-[#175cdd] text-xs font-bold rounded-lg border border-[#bed7ff] transition-all cursor-pointer"
+                          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#eff5ff] hover:bg-[#dbeafe] text-[#175cdd] text-xs font-bold rounded-lg border border-[#bed7ff] transition-all ${
+                            disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                          }`}
                         >
                           <Icon name="mic" size={14} />
                           <span>{rec?.hasRecorded ? "Ghi âm lại" : "Bắt đầu ghi âm"}</span>
@@ -481,7 +483,7 @@ export function SpeakingSection({
                         </button>
                       )}
 
-                      {/* Playback Button */}
+                      {/* Playback Button - without (0s) */}
                       {rec?.hasRecorded && rec.blobUrl && !isRecording && (
                         <button
                           type="button"
@@ -489,7 +491,7 @@ export function SpeakingSection({
                           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#cbd5e1] hover:bg-gray-50 text-[#334155] text-xs font-semibold rounded-lg transition-all cursor-pointer"
                         >
                           <Icon name={isPlaying ? "pause" : "play"} size={13} />
-                          <span>{isPlaying ? "Tạm dừng" : "Nghe lại"} ({rec.durationSeconds}s)</span>
+                          <span>{isPlaying ? "Tạm dừng" : "Nghe lại"}</span>
                         </button>
                       )}
                     </div>
@@ -573,8 +575,11 @@ export function SpeakingSection({
                   {!isRecording ? (
                     <button
                       type="button"
+                      disabled={disabled}
                       onClick={() => startRecording("part2_cue_card", 120)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#eff5ff] hover:bg-[#dbeafe] text-[#175cdd] text-xs font-bold rounded-lg border border-[#bed7ff] transition-all cursor-pointer"
+                      className={`inline-flex items-center gap-1.5 px-4 py-2 bg-[#eff5ff] hover:bg-[#dbeafe] text-[#175cdd] text-xs font-bold rounded-lg border border-[#bed7ff] transition-all ${
+                        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                      }`}
                     >
                       <Icon name="mic" size={14} />
                       <span>{rec?.hasRecorded ? "Ghi âm lại Cue Card" : "Bắt đầu bài nói (Tối đa 2 phút)"}</span>
@@ -597,7 +602,7 @@ export function SpeakingSection({
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-[#cbd5e1] hover:bg-gray-50 text-[#334155] text-xs font-semibold rounded-lg transition-all cursor-pointer"
                     >
                       <Icon name={isPlaying ? "pause" : "play"} size={13} />
-                      <span>{isPlaying ? "Tạm dừng" : "Nghe lại"} ({rec.durationSeconds}s)</span>
+                      <span>{isPlaying ? "Tạm dừng" : "Nghe lại"}</span>
                     </button>
                   )}
                 </div>
@@ -659,8 +664,11 @@ export function SpeakingSection({
                       {!isRecording ? (
                         <button
                           type="button"
+                          disabled={disabled}
                           onClick={() => startRecording(q.id, 90)}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#eff5ff] hover:bg-[#dbeafe] text-[#175cdd] text-xs font-bold rounded-lg border border-[#bed7ff] transition-all cursor-pointer"
+                          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#eff5ff] hover:bg-[#dbeafe] text-[#175cdd] text-xs font-bold rounded-lg border border-[#bed7ff] transition-all ${
+                            disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                          }`}
                         >
                           <Icon name="mic" size={14} />
                           <span>{rec?.hasRecorded ? "Ghi âm lại" : "Bắt đầu ghi âm"}</span>
@@ -683,7 +691,7 @@ export function SpeakingSection({
                           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#cbd5e1] hover:bg-gray-50 text-[#334155] text-xs font-semibold rounded-lg transition-all cursor-pointer"
                         >
                           <Icon name={isPlaying ? "pause" : "play"} size={13} />
-                          <span>{isPlaying ? "Tạm dừng" : "Nghe lại"} ({rec.durationSeconds}s)</span>
+                          <span>{isPlaying ? "Tạm dừng" : "Nghe lại"}</span>
                         </button>
                       )}
                     </div>
@@ -710,32 +718,6 @@ export function SpeakingSection({
               <Icon name="check" size={15} />
               <span>Xem lại & Nộp bài</span>
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Incomplete Warning Modal */}
-      {incompleteWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-2xl border border-[#e6eaf1] shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center gap-3 text-amber-600">
-              <Icon name="alert" size={24} />
-              <h3 className="text-base font-bold text-[#11213f] m-0">
-                Chưa hoàn thành phần nói
-              </h3>
-            </div>
-            <p className="text-xs md:text-sm text-[#475569] leading-relaxed m-0">
-              {incompleteWarning}
-            </p>
-            <div className="flex items-center justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setIncompleteWarning(null)}
-                className="px-5 py-2.5 bg-[#175cdd] hover:bg-[#104dc1] text-white text-xs font-bold rounded-xl cursor-pointer"
-              >
-                Ở lại làm tiếp
-              </button>
-            </div>
           </div>
         </div>
       )}

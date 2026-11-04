@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { OriginalPracticeTestPage } from "@/components/original-practice-test";
+import { PracticeWorkspace } from "@/components/practice-workspace";
+import { findOriginalPracticeTest } from "@/data/original-practice-tests";
 export const metadata: Metadata = { title: "Bài luyện IELTS | AAA" };
 
 export default function ExercisePage({
@@ -21,5 +23,9 @@ async function ExerciseContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <OriginalPracticeTestPage key={slug} slug={slug} />;
+  return findOriginalPracticeTest(slug) ? (
+    <OriginalPracticeTestPage key={slug} slug={slug} />
+  ) : (
+    <PracticeWorkspace key={slug} slug={slug} />
+  );
 }

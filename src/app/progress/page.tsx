@@ -4,6 +4,8 @@ import { ProgressWorkspace } from "@/components/progress-workspace";
 import { loadAssessmentComparison } from "@/lib/assessment-comparison";
 import { authenticatedClient } from "@/lib/supabase/server";
 
+export const instant = false;
+
 export const metadata: Metadata = { title: "Tiến bộ của tôi | AAA" };
 
 export default async function ProgressPage() {

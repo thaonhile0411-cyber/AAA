@@ -1,0 +1,354 @@
+.page {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+}
+.heading {
+  margin: 20px 0 28px;
+}
+.heading h1 {
+  font-size: clamp(28px, 3vw, 38px);
+  color: var(--navy);
+  font-weight: 750;
+  letter-spacing: -1px;
+  margin: 10px 0;
+}
+.heading > p:last-child {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.eyebrow {
+  color: var(--blue);
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  font-weight: 700;
+}
+.back {
+  font-size: 12px;
+  color: var(--blue);
+}
+.mediaNotice {
+  font-size: 12px;
+  line-height: 1.9;
+  background: #edf3ff;
+  border: 1px solid #dbe6fb;
+  border-radius: 10px;
+  padding: 18px 21px;
+  color: #53739f;
+  margin-bottom: 25px;
+}
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.columns > div,
+.columns > aside {
+  min-width: 0;
+}
+.panel {
+  background: white;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 22px;
+  min-width: 0;
+}
+.panel h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+.panel h3 {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--navy);
+}
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.panelHeader span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.prompt {
+  font-size: 16px;
+  color: #2c476c;
+  line-height: 1.9;
+  margin: 12px 0;
+}
+.cues {
+  list-style: disc;
+  padding-left: 22px;
+  color: #7688a1;
+  font-size: 12px;
+  line-height: 2;
+}
+.settings {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 14px;
+  margin: 20px 0;
+}
+.settings label {
+  display: grid;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 650;
+  color: #72839e;
+}
+.settings select {
+  padding: 10px;
+  border: 1px solid #dce4ef;
+  border-radius: 7px;
+  font-size: 12px;
+  width: 100%;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+.primaryButton,
+.secondaryButton,
+.textButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 11px 14px;
+  border-radius: 7px;
+}
+.primaryButton {
+  color: white;
+  background: var(--blue);
+}
+.primaryButton:hover {
+  background: #124fbe;
+}
+.secondaryButton {
+  background: #f0f5ff;
+  color: var(--blue);
+  border: 1px solid #dce6f8;
+}
+.textButton {
+  color: var(--blue);
+  background: transparent;
+  padding: 7px 0;
+}
+.textButton:hover,
+.back:hover {
+  text-decoration: underline;
+}
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.textButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.muted {
+  font-size: 11px;
+  color: #7f8fa5;
+  line-height: 1.9;
+  margin: 12px 0;
+}
+.waiting {
+  padding: 13px 16px;
+  background: #fff4dc;
+  color: #8a651b;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.9;
+  margin: 17px 0;
+}
+.error {
+  padding: 12px;
+  background: #fff0f0;
+  color: #aa3838;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.9;
+  margin-top: 14px;
+}
+.success {
+  color: #24745e;
+  background: #edf8f2;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.9;
+}
+.transcript {
+  display: grid;
+  gap: 7px;
+  margin-top: 18px;
+}
+.sentence {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 12px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+.sentence > button {
+  font-size: 10px;
+  color: #8fa0b7;
+  background: #f3f6fb;
+  padding: 6px;
+  border-radius: 5px;
+  margin-top: 4px;
+}
+.sentence p {
+  font-size: 15px;
+  line-height: 2;
+  color: #60748e;
+  white-space: pre-wrap;
+}
+.activeSentence {
+  border-left-color: var(--blue);
+  background: #eef4ff;
+}
+.activeSentence p {
+  color: #244a7c;
+}
+.activeSentence > button {
+  background: var(--blue);
+  color: white;
+}
+.activeWord {
+  background: #c9e6a4;
+  color: #294d13;
+  border-radius: 3px;
+}
+.recorderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--navy);
+  font-size: 14px;
+}
+.recorderHeader span {
+  font-size: 11px;
+  color: #8292a8;
+  font-variant-numeric: tabular-nums;
+}
+.waveform {
+  display: block;
+  width: 100%;
+  height: 90px;
+  border: 1px solid #e0e8f5;
+  border-radius: 9px;
+  background: repeating-linear-gradient(
+    0deg,
+    #f7faff,
+    #f7faff 29px,
+    #eaf0f9 30px
+  );
+  margin: 19px 0;
+}
+.ownRecording {
+  border-top: 1px solid var(--border);
+  margin-top: 22px;
+  padding-top: 20px;
+}
+.ownRecording audio {
+  width: 100%;
+  height: 43px;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  color: #60768f;
+  line-height: 1.9;
+  margin: 17px 0;
+}
+.check input {
+  margin-top: 5px;
+}
+.panel summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--navy);
+}
+.reference {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  margin-top: 18px;
+}
+.reference strong {
+  display: block;
+  font-size: 13px;
+  color: #34577f;
+}
+.reference > span {
+  font-size: 11px;
+  color: var(--muted);
+}
+.reference a {
+  color: var(--blue);
+  font-size: 11px;
+}
+.video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+  border-radius: 8px;
+}
+.modelGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.modelGrid .panel {
+  display: flex;
+  flex-direction: column;
+}
+.modelGrid .primaryButton {
+  align-self: flex-start;
+  margin-top: auto;
+}
+@media (max-width: 1200px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+  .modelGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .modelGrid {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .heading h1 {
+    font-size: 28px;
+  }
+  .sentence {
+    padding: 11px 7px;
+    gap: 8px;
+  }
+  .sentence p {
+    font-size: 14px;
+  }
+  .settings {
+    grid-template-columns: 1fr 90px;
+    gap: 10px;
+  }
+}

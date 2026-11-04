@@ -6,6 +6,11 @@ import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 import { PracticeAudio } from "./practice-audio";
 import { createClient } from "@/lib/supabase/client";
+import { evidenceParts } from "@/lib/practice-grading";
+import type {
+  PracticeQuestionResult,
+  PracticeResult,
+} from "@/lib/practice-results";
 import {
   AUTO_SAVE_MS,
   BAND_GROUPS,
@@ -26,6 +31,60 @@ type Loaded = {
   context: PracticeContext;
   offline: boolean;
 };
+
+function EvidenceText({ text, evidence }: { text: string; evidence: string }) {
+  const parts = evidenceParts(text, evidence);
+  if (!parts) return text;
+  return (
+    <>
+      {parts.before}
+      <mark className="answer-evidence">{parts.match}</mark>
+      {parts.after}
+    </>
+  );
+}
+
+function SegmentReplayButton({
+  source,
+  start,
+  end,
+}: {
+  source: string;
+  start: number;
+  end: number;
+}) {
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  useEffect(
+    () => () => {
+      audio.current?.pause();
+      audio.current = null;
+    },
+    [],
+  );
+  function replay() {
+    audio.current?.pause();
+    const player = new Audio(source);
+    audio.current = player;
+    player.currentTime = start;
+    player.ontimeupdate = () => {
+      if (player.currentTime >= end) {
+        player.pause();
+        setPlaying(false);
+      }
+    };
+    player.onended = () => setPlaying(false);
+    player.onerror = () => setPlaying(false);
+    setPlaying(true);
+    void player.play().catch(() => setPlaying(false));
+  }
+  return (
+    <button type="button" className="secondary-button" onClick={replay}>
+      <Icon name={playing ? "pause" : "play"} size={15} />
+      {playing ? "Đang phát đoạn đáp án" : "Phát lại đoạn chứa đáp án"}
+    </button>
+  );
+}
 export function PracticeWorkspace({ slug }: { slug: string }) {
   const [data, setData] = useState<Loaded | null>(null);
   const [error, setError] = useState("");
@@ -178,9 +237,22 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [selectionInfo, setSelectionInfo] = useState("");
   const passage = useRef<HTMLDivElement>(null);
+  const paragraphRefs = useRef(new Map<number, HTMLParagraphElement>());
+  const transcriptRef = useRef<HTMLElement>(null);
+  const submissionId = useRef("");
+  const [result, setResult] = useState<PracticeResult | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [reviewQuestionId, setReviewQuestionId] = useState<string | null>(null);
   const answered = exercise.questions.filter((question) =>
     draft.answers[question.id]?.trim(),
   ).length;
+  const resultByQuestion = new Map(
+    result?.questions.map((item) => [item.questionId, item]) ?? [],
+  );
+  const reviewedQuestion = result?.questions.find(
+    (item) => item.questionId === reviewQuestionId,
+  );
 
   const persist = useCallback(
     (value: Draft) => {
@@ -207,6 +279,71 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
     // Persist answer/annotation edits immediately for crashes between 15s ticks.
     // Audio time is checkpointed every 15s and on visibility/pagehide instead.
     if (immediate) persist(value);
+  }
+
+  function updateAnswer(questionId: string, answer: string) {
+    update({
+      answers: { ...current.current.answers, [questionId]: answer },
+    });
+    setResult(null);
+    setReviewQuestionId(null);
+    setSubmitError("");
+    submissionId.current = crypto.randomUUID();
+  }
+
+  async function submitAnswers() {
+    if (submitting) return;
+    if (!context.userId) {
+      setSubmitError("Bạn cần đăng nhập để nộp bài và xem kết quả riêng tư.");
+      return;
+    }
+    if (!online) {
+      setSubmitError("Hãy kết nối mạng trước khi nộp bài. Bản nháp vẫn được giữ trên thiết bị.");
+      return;
+    }
+    persist(current.current);
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const response = await fetch(
+        `/api/practice/${encodeURIComponent(exercise.slug)}/submit`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            submissionId:
+              submissionId.current || (submissionId.current = crypto.randomUUID()),
+            answers: current.current.answers,
+          }),
+        },
+      );
+      const body = (await response.json()) as PracticeResult & { error?: string };
+      if (!response.ok) throw new Error(body.error ?? "Chưa thể chấm bài.");
+      setResult(body);
+      const firstReview =
+        body.questions.find((item) => item.unanswered || !item.correct) ??
+        body.questions[0];
+      setReviewQuestionId(firstReview?.questionId ?? null);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Chưa thể chấm bài. Hãy thử lại.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function showExplanation(item: PracticeQuestionResult) {
+    setReviewQuestionId(item.questionId);
+    window.requestAnimationFrame(() => {
+      if (exercise.skill === "reading" && item.evidenceParagraph !== null)
+        paragraphRefs.current.get(item.evidenceParagraph)?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      else
+        transcriptRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   }
   useEffect(() => {
     const timer = window.setInterval(
@@ -464,7 +601,20 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
               >
                 <h2>{exercise.title}</h2>
                 {exercise.passage?.map((text, paragraph) => (
-                  <p key={paragraph} data-paragraph={paragraph} tabIndex={0}>
+                  <p
+                    key={paragraph}
+                    ref={(node) => {
+                      if (node) paragraphRefs.current.set(paragraph, node);
+                      else paragraphRefs.current.delete(paragraph);
+                    }}
+                    data-paragraph={paragraph}
+                    tabIndex={0}
+                    className={
+                      reviewedQuestion?.evidenceParagraph === paragraph
+                        ? "answer-paragraph"
+                        : ""
+                    }
+                  >
                     {passageSegments(text, paragraph, draft.highlights).map(
                       (segment, index) =>
                         segment.highlight ? (
@@ -553,6 +703,37 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                   Câu trả lời vẫn được lưu nếu audio mất kết nối.
                 </p>
               </div>
+              {result?.transcript && (
+                <section
+                  ref={transcriptRef}
+                  className="answer-transcript"
+                  aria-label="Audio transcript"
+                >
+                  <div>
+                    <Icon name="fileText" size={18} />
+                    <h3>Audio transcript</h3>
+                  </div>
+                  <p lang="en">
+                    {reviewedQuestion ? (
+                      <EvidenceText
+                        text={result.transcript}
+                        evidence={reviewedQuestion.evidenceText}
+                      />
+                    ) : (
+                      result.transcript
+                    )}
+                  </p>
+                  {reviewedQuestion?.audioStartSeconds !== null &&
+                    reviewedQuestion?.audioStartSeconds !== undefined &&
+                    reviewedQuestion.audioEndSeconds !== null && (
+                      <SegmentReplayButton
+                        source={exercise.audio_path!}
+                        start={reviewedQuestion.audioStartSeconds}
+                        end={reviewedQuestion.audioEndSeconds}
+                      />
+                    )}
+                </section>
+              )}
             </>
           )}
           <section className="practice-notes">
@@ -597,12 +778,54 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
               }}
             />
           </div>
+          {result && (
+            <section className="practice-result-summary" aria-label="Kết quả bài luyện">
+              <div
+                className="score-ring"
+                style={{
+                  background: `conic-gradient(#2166c2 ${result.percentage}%, #e7edf6 0)`,
+                }}
+                aria-label={`${result.percentage}%`}
+              >
+                <span>{result.percentage}%</span>
+              </div>
+              <div className="score-details">
+                <h3>
+                  {result.correctCount}/{result.totalQuestions} câu đúng
+                </h3>
+                <ul>
+                  <li className="correct">Đúng: {result.correctCount}</li>
+                  <li className="incorrect">Sai: {result.incorrectCount}</li>
+                  <li>Chưa trả lời: {result.unansweredCount}</li>
+                </ul>
+                <p>
+                  {result.estimatedBand === null
+                    ? result.bandMessage
+                    : `Estimated band: ${result.estimatedBand.toFixed(1)}`}
+                </p>
+                {result.processingMs !== undefined && (
+                  <small>
+                    Server grading: {result.processingMs.toFixed(0)} ms
+                    {result.processingMs <= 500 ? " · đạt mục tiêu <500 ms" : ""}
+                  </small>
+                )}
+              </div>
+            </section>
+          )}
           <div className="question-jump" aria-label="Đi đến câu hỏi">
             {exercise.questions.map((question) => (
               <a
                 key={question.id}
                 href={`#question-${question.id}`}
-                className={draft.answers[question.id]?.trim() ? "answered" : ""}
+                className={
+                  resultByQuestion.get(question.id)
+                    ? resultByQuestion.get(question.id)!.correct
+                      ? "result-correct"
+                      : "result-incorrect"
+                    : draft.answers[question.id]?.trim()
+                      ? "answered"
+                      : ""
+                }
                 aria-label={`Câu ${question.position}${draft.answers[question.id]?.trim() ? ", đã điền" : ""}`}
               >
                 {question.position}
@@ -610,11 +833,19 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
             ))}
           </div>
           <div className="question-list" lang="en">
-            {exercise.questions.map((question) => (
+            {exercise.questions.map((question) => {
+              const questionResult = resultByQuestion.get(question.id);
+              return (
               <fieldset
                 key={question.id}
                 id={`question-${question.id}`}
-                className="practice-question"
+                className={`practice-question ${
+                  questionResult
+                    ? questionResult.correct
+                      ? "question-correct"
+                      : "question-incorrect"
+                    : ""
+                }`}
               >
                 <legend>
                   <span>{question.position}</span>
@@ -638,12 +869,7 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                       value={draft.answers[question.id] ?? ""}
                       placeholder="Type your answer…"
                       onChange={(event) =>
-                        update({
-                          answers: {
-                            ...current.current.answers,
-                            [question.id]: event.target.value,
-                          },
-                        })
+                        updateAnswer(question.id, event.target.value)
                       }
                     />
                   </>
@@ -663,14 +889,7 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                           type="radio"
                           value={option}
                           checked={draft.answers[question.id] === option}
-                          onChange={() =>
-                            update({
-                              answers: {
-                                ...current.current.answers,
-                                [question.id]: option,
-                              },
-                            })
-                          }
+                          onChange={() => updateAnswer(question.id, option)}
                         />
                         <span>
                           {question.type !== "true_false_not_given" && (
@@ -682,20 +901,60 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                     ))}
                   </div>
                 )}
+                {questionResult && (
+                  <div
+                    className={`question-result ${
+                      questionResult.correct ? "correct" : "incorrect"
+                    }`}
+                    role="status"
+                  >
+                    <strong>
+                      {questionResult.correct
+                        ? "Đúng"
+                        : questionResult.unanswered
+                          ? "Chưa trả lời"
+                          : "Sai"}
+                    </strong>
+                    {!questionResult.correct && (
+                      <p>
+                        Đáp án đúng: <b>{questionResult.correctAnswer}</b>
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      className="text-link"
+                      onClick={() => showExplanation(questionResult)}
+                    >
+                      Xem giải thích
+                    </button>
+                    {reviewQuestionId === question.id && (
+                      <p className="question-explanation">
+                        {questionResult.explanation}
+                      </p>
+                    )}
+                  </div>
+                )}
               </fieldset>
-            ))}
+              );
+            })}
           </div>
           <div className="practice-finish">
             <button
               className="primary-button"
-              onClick={() => persist(current.current)}
+              disabled={submitting}
+              onClick={submitAnswers}
             >
               <Icon name="check" size={18} />
-              Lưu bài luyện
+              {submitting ? "Đang chấm bài…" : result ? "Nộp lại bài" : "Nộp bài"}
             </button>
+            {submitError && (
+              <p className="field-error" role="alert">
+                {submitError}
+              </p>
+            )}
             <p>
               Bạn đã điền {answered}/{exercise.question_count} câu. Bạn có thể
-              quay lại cùng trình duyệt để tiếp tục bài luyện.
+              để trống câu chưa chắc chắn; hệ thống sẽ đánh dấu là chưa trả lời.
             </p>
           </div>
         </section>

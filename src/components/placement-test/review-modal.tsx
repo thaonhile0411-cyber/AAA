@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Icon } from "@/components/icon";
-import { countWords } from "@/lib/placement-scoring";
+import { getCompletionStatus } from "@/lib/placement-progress";
 import type { PlacementTestAnswers, TestSkill } from "@/types/placement-test";
 
 type ReviewModalProps = {
@@ -14,6 +14,17 @@ type ReviewModalProps = {
   isSubmitting?: boolean;
   evaluationStep?: string;
 };
+
+const SKILL_ROWS: {
+  key: TestSkill;
+  name: string;
+  badgeLetter: string;
+}[] = [
+  { key: "listening", name: "Listening", badgeLetter: "L" },
+  { key: "reading", name: "Reading", badgeLetter: "R" },
+  { key: "writing", name: "Writing", badgeLetter: "W" },
+  { key: "speaking", name: "Speaking", badgeLetter: "S" },
+];
 
 export function ReviewModal({
   isOpen,
@@ -36,33 +47,7 @@ export function ReviewModal({
 
   if (!isOpen) return null;
 
-  // Counts
-  const listeningAnswered = Object.values(answers.listening).filter((v) =>
-    Boolean(v?.trim()),
-  ).length;
-  const listeningTotal = 10;
-  const listeningRemaining = listeningTotal - listeningAnswered;
-
-  const readingAnswered = Object.values(answers.reading).filter((v) =>
-    Boolean(v?.trim()),
-  ).length;
-  const readingTotal = 12;
-  const readingRemaining = readingTotal - readingAnswered;
-
-  const t2Words = countWords(answers.writing.task2 || "");
-  const writingIncomplete = t2Words < 150; // At least reasonable essay substance
-
-  const speakingRecordingsCount = Object.values(
-    answers.speakingRecordings,
-  ).filter((v) => v?.hasRecorded).length;
-  const speakingTotal = 6;
-  const speakingRemaining = speakingTotal - speakingRecordingsCount;
-
-  const hasIncomplete =
-    listeningRemaining > 0 ||
-    readingRemaining > 0 ||
-    writingIncomplete ||
-    speakingRemaining > 0;
+  const { hasIncomplete, skills } = getCompletionStatus(answers);
 
   return (
     <div
@@ -81,11 +66,11 @@ export function ReviewModal({
             <div>
               <h3
                 id="review-modal-title"
-                className="text-base font-bold text-[#11213f]"
+                className="text-base font-bold text-[#11213f] m-0"
               >
                 Kiểm tra bài làm trước khi nộp
               </h3>
-              <p className="text-xs text-[#64748b]">
+              <p className="text-xs text-[#64748b] m-0 mt-0.5">
                 Xác nhận hoàn thành 4 kỹ năng IELTS Academic
               </p>
             </div>
@@ -121,204 +106,69 @@ export function ReviewModal({
           </div>
         ) : (
           <>
-            {/* Warning if incomplete */}
+            {/* Notice if incomplete: 7.5 requirement */}
             {hasIncomplete && (
               <div className="p-3.5 bg-[#fff8eb] border border-[#f5dfb8] rounded-xl flex items-start gap-2.5 text-xs text-[#925507]">
                 <Icon name="alert" size={16} className="flex-shrink-0 mt-0.5" />
-                <div>
-                  <strong className="block font-bold">Chưa hoàn thành:</strong>
-                  <span>
-                    Bạn vẫn còn câu hỏi hoặc phần thi chưa hoàn thành. Vui lòng kiểm tra lại để hệ thống có thể chấm điểm chính xác.
-                  </span>
-                </div>
+                <p className="m-0 leading-relaxed">
+                  Bạn vẫn còn một số câu chưa hoàn thành. Bạn có thể quay lại kiểm tra hoặc nộp bài ngay.
+                </p>
               </div>
             )}
 
-            {/* Breakdown of 4 Skills */}
+            {/* Breakdown of 4 Skills: 7.2 & 7.3 simplified single line with 'Kiểm tra' button */}
             <div className="space-y-2.5">
-              {/* Listening */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fafbfd] border border-[#f1f4f9]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-lg bg-[#eff5ff] text-[#175cdd] flex items-center justify-center text-xs font-bold">
-                    L
-                  </span>
-                  <div>
-                    <span className="text-xs font-bold text-[#1e293b] block">
-                      Listening
-                    </span>
-                    <span className="text-[11px] text-[#64748b]">
-                      {listeningAnswered}/{listeningTotal} câu
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {listeningRemaining > 0 ? (
-                    <span className="text-[11px] font-semibold text-[#dc2626] bg-[#fef2f2] px-2.5 py-1 rounded-full">
-                      Còn {listeningRemaining} câu
-                    </span>
-                  ) : (
-                    <span className="text-[11px] font-semibold text-[#147054] bg-[#eefaf4] px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <Icon name="check" size={12} />
-                      10/10
-                    </span>
-                  )}
-                  {onNavigateSkill && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onNavigateSkill("listening");
-                        onClose();
-                      }}
-                      className="text-xs font-semibold text-[#175cdd] hover:underline px-2 py-1 cursor-pointer"
-                    >
-                      Kiểm tra
-                    </button>
-                  )}
-                </div>
-              </div>
+              {SKILL_ROWS.map((row) => {
+                const info = skills[row.key];
+                return (
+                  <div
+                    key={row.key}
+                    className="flex items-center justify-between p-3.5 rounded-xl bg-[#fafbfd] border border-[#f1f4f9]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-[#eff5ff] text-[#175cdd] flex items-center justify-center text-xs font-bold flex-shrink-0">
+                        {row.badgeLetter}
+                      </span>
+                      <div>
+                        <span className="text-xs font-bold text-[#1e293b] block">
+                          {row.name}
+                        </span>
+                        <span className="text-xs text-[#64748b]">
+                          {info.detailText}
+                        </span>
+                      </div>
+                    </div>
 
-              {/* Reading */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fafbfd] border border-[#f1f4f9]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-lg bg-[#eff5ff] text-[#175cdd] flex items-center justify-center text-xs font-bold">
-                    R
-                  </span>
-                  <div>
-                    <span className="text-xs font-bold text-[#1e293b] block">
-                      Reading
-                    </span>
-                    <span className="text-[11px] text-[#64748b]">
-                      {readingAnswered}/{readingTotal} câu
-                    </span>
+                    {onNavigateSkill && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onNavigateSkill(row.key);
+                          onClose();
+                        }}
+                        className="text-xs font-semibold text-[#175cdd] hover:text-[#104dc1] hover:underline px-3 py-1.5 rounded-lg border border-[#d4e2f8] bg-white cursor-pointer transition-all"
+                      >
+                        Kiểm tra
+                      </button>
+                    )}
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {readingRemaining > 0 ? (
-                    <span className="text-[11px] font-semibold text-[#dc2626] bg-[#fef2f2] px-2.5 py-1 rounded-full">
-                      Còn {readingRemaining} câu
-                    </span>
-                  ) : (
-                    <span className="text-[11px] font-semibold text-[#147054] bg-[#eefaf4] px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <Icon name="check" size={12} />
-                      12/12
-                    </span>
-                  )}
-                  {onNavigateSkill && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onNavigateSkill("reading");
-                        onClose();
-                      }}
-                      className="text-xs font-semibold text-[#175cdd] hover:underline px-2 py-1 cursor-pointer"
-                    >
-                      Kiểm tra
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Writing */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fafbfd] border border-[#f1f4f9]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-lg bg-[#eff5ff] text-[#175cdd] flex items-center justify-center text-xs font-bold">
-                    W
-                  </span>
-                  <div>
-                    <span className="text-xs font-bold text-[#1e293b] block">
-                      Writing (Task 2)
-                    </span>
-                    <span className="text-[11px] text-[#64748b]">
-                      {t2Words}/250 từ
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {writingIncomplete ? (
-                    <span className="text-[11px] font-semibold text-[#dc2626] bg-[#fef2f2] px-2.5 py-1 rounded-full">
-                      Chưa đủ bài ({t2Words} từ)
-                    </span>
-                  ) : (
-                    <span className="text-[11px] font-semibold text-[#147054] bg-[#eefaf4] px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <Icon name="check" size={12} />
-                      Đã hoàn thành
-                    </span>
-                  )}
-                  {onNavigateSkill && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onNavigateSkill("writing");
-                        onClose();
-                      }}
-                      className="text-xs font-semibold text-[#175cdd] hover:underline px-2 py-1 cursor-pointer"
-                    >
-                      Kiểm tra
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Speaking */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fafbfd] border border-[#f1f4f9]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-lg bg-[#eff5ff] text-[#175cdd] flex items-center justify-center text-xs font-bold">
-                    S
-                  </span>
-                  <div>
-                    <span className="text-xs font-bold text-[#1e293b] block">
-                      Speaking
-                    </span>
-                    <span className="text-[11px] text-[#64748b]">
-                      {speakingRecordingsCount}/{speakingTotal} phần đã ghi âm
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {speakingRemaining > 0 ? (
-                    <span className="text-[11px] font-semibold text-[#dc2626] bg-[#fef2f2] px-2.5 py-1 rounded-full">
-                      Còn {speakingRemaining} phần
-                    </span>
-                  ) : (
-                    <span className="text-[11px] font-semibold text-[#147054] bg-[#eefaf4] px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <Icon name="check" size={12} />
-                      6/6
-                    </span>
-                  )}
-                  {onNavigateSkill && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onNavigateSkill("speaking");
-                        onClose();
-                      }}
-                      className="text-xs font-semibold text-[#175cdd] hover:underline px-2 py-1 cursor-pointer"
-                    >
-                      Kiểm tra
-                    </button>
-                  )}
-                </div>
-              </div>
+                );
+              })}
             </div>
 
-            {/* Modal Buttons */}
+            {/* Modal Buttons: 7.5 Allows submitting incomplete */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#f1f5f9]">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-semibold text-[#52637a] bg-white border border-[#d8e0ec] rounded-lg hover:bg-[#f8fafc] transition-colors cursor-pointer"
+                className="px-4 py-2.5 text-xs font-semibold text-[#52637a] bg-white border border-[#d8e0ec] rounded-xl hover:bg-[#f8fafc] transition-colors cursor-pointer"
               >
                 Kiểm tra lại
               </button>
               <button
                 type="button"
-                disabled={hasIncomplete}
                 onClick={onConfirmSubmit}
-                className={`px-5 py-2 text-xs font-bold rounded-lg shadow-sm transition-all flex items-center gap-1.5 ${
-                  hasIncomplete
-                    ? "bg-[#94a3b8] text-white cursor-not-allowed opacity-60"
-                    : "bg-[#175cdd] hover:bg-[#104dc1] text-white cursor-pointer"
-                }`}
+                className="px-5 py-2.5 text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5 bg-[#175cdd] hover:bg-[#104dc1] text-white cursor-pointer"
               >
                 <span>Xác nhận nộp bài</span>
                 <Icon name="arrow" size={14} />

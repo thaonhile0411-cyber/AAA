@@ -1,0 +1,143 @@
+{
+    "language":  "en-US",
+    "kind":  "synthetic",
+    "engine":  "Windows System.Speech",
+    "voice":  "Microsoft Zira Desktop",
+    "recordings":  [
+                       {
+                           "id":  "hometown-p1-01",
+                           "text":  "Where is your hometown?",
+                           "audioSrc":  "/audio/speaking/hometown-p1-01.wav"
+                       },
+                       {
+                           "id":  "hometown-p1-02",
+                           "text":  "What do you like most about your hometown?",
+                           "audioSrc":  "/audio/speaking/hometown-p1-02.wav"
+                       },
+                       {
+                           "id":  "hometown-p1-03",
+                           "text":  "Has your hometown changed much in recent years?",
+                           "audioSrc":  "/audio/speaking/hometown-p1-03.wav"
+                       },
+                       {
+                           "id":  "hometown-p1-04",
+                           "text":  "Would you like to live in your hometown in the future?",
+                           "audioSrc":  "/audio/speaking/hometown-p1-04.wav"
+                       },
+                       {
+                           "id":  "hometown-p2-01",
+                           "text":  "Describe a place in your hometown that you enjoy visiting. You should say: where it is. what it is like. what you do there. and explain why you enjoy visiting it. You have one minute to prepare. You should speak for one to two minutes.",
+                           "audioSrc":  "/audio/speaking/hometown-p2-01.wav"
+                       },
+                       {
+                           "id":  "hometown-p3-01",
+                           "text":  "Why do some people prefer living in small towns to large cities?",
+                           "audioSrc":  "/audio/speaking/hometown-p3-01.wav"
+                       },
+                       {
+                           "id":  "hometown-p3-02",
+                           "text":  "How can urban development affect local communities?",
+                           "audioSrc":  "/audio/speaking/hometown-p3-02.wav"
+                       },
+                       {
+                           "id":  "hometown-p3-03",
+                           "text":  "Should governments protect old buildings in growing cities?",
+                           "audioSrc":  "/audio/speaking/hometown-p3-03.wav"
+                       },
+                       {
+                           "id":  "hometown-p3-04",
+                           "text":  "How might people\u0027s preferences about where to live change in the future?",
+                           "audioSrc":  "/audio/speaking/hometown-p3-04.wav"
+                       },
+                       {
+                           "id":  "study-p1-01",
+                           "text":  "Do you work or are you a student?",
+                           "audioSrc":  "/audio/speaking/study-p1-01.wav"
+                       },
+                       {
+                           "id":  "study-p1-02",
+                           "text":  "What do you enjoy most about your work or studies?",
+                           "audioSrc":  "/audio/speaking/study-p1-02.wav"
+                       },
+                       {
+                           "id":  "study-p1-03",
+                           "text":  "Do you prefer working alone or with other people?",
+                           "audioSrc":  "/audio/speaking/study-p1-03.wav"
+                       },
+                       {
+                           "id":  "study-p1-04",
+                           "text":  "What would you like to do after you finish your current work or studies?",
+                           "audioSrc":  "/audio/speaking/study-p1-04.wav"
+                       },
+                       {
+                           "id":  "study-p2-01",
+                           "text":  "Describe a useful skill that you learned from another person. You should say: what the skill was. who you learned it from. how you learned it. and explain why this skill has been useful to you. You have one minute to prepare. You should speak for one to two minutes.",
+                           "audioSrc":  "/audio/speaking/study-p2-01.wav"
+                       },
+                       {
+                           "id":  "study-p3-01",
+                           "text":  "What skills do young people need before starting their first job?",
+                           "audioSrc":  "/audio/speaking/study-p3-01.wav"
+                       },
+                       {
+                           "id":  "study-p3-02",
+                           "text":  "Is practical experience more valuable than academic qualifications?",
+                           "audioSrc":  "/audio/speaking/study-p3-02.wav"
+                       },
+                       {
+                           "id":  "study-p3-03",
+                           "text":  "How can employers encourage their staff to keep learning?",
+                           "audioSrc":  "/audio/speaking/study-p3-03.wav"
+                       },
+                       {
+                           "id":  "study-p3-04",
+                           "text":  "How might the skills needed at work change in the future?",
+                           "audioSrc":  "/audio/speaking/study-p3-04.wav"
+                       },
+                       {
+                           "id":  "technology-p1-01",
+                           "text":  "What technology do you use every day?",
+                           "audioSrc":  "/audio/speaking/technology-p1-01.wav"
+                       },
+                       {
+                           "id":  "technology-p1-02",
+                           "text":  "When did you first start using a computer?",
+                           "audioSrc":  "/audio/speaking/technology-p1-02.wav"
+                       },
+                       {
+                           "id":  "technology-p1-03",
+                           "text":  "Do you find it easy to learn how to use new devices?",
+                           "audioSrc":  "/audio/speaking/technology-p1-03.wav"
+                       },
+                       {
+                           "id":  "technology-p1-04",
+                           "text":  "Would you like to spend less time using your phone?",
+                           "audioSrc":  "/audio/speaking/technology-p1-04.wav"
+                       },
+                       {
+                           "id":  "technology-p2-01",
+                           "text":  "Describe a piece of technology that you find useful. You should say: what it is. when you started using it. how you use it. and explain why you find it useful. You have one minute to prepare. You should speak for one to two minutes.",
+                           "audioSrc":  "/audio/speaking/technology-p2-01.wav"
+                       },
+                       {
+                           "id":  "technology-p3-01",
+                           "text":  "How has technology changed the way people communicate?",
+                           "audioSrc":  "/audio/speaking/technology-p3-01.wav"
+                       },
+                       {
+                           "id":  "technology-p3-02",
+                           "text":  "Why do some people find it difficult to use new technology?",
+                           "audioSrc":  "/audio/speaking/technology-p3-02.wav"
+                       },
+                       {
+                           "id":  "technology-p3-03",
+                           "text":  "Should schools teach children how to protect their privacy online?",
+                           "audioSrc":  "/audio/speaking/technology-p3-03.wav"
+                       },
+                       {
+                           "id":  "technology-p3-04",
+                           "text":  "Do you think people will become more dependent on technology in the future?",
+                           "audioSrc":  "/audio/speaking/technology-p3-04.wav"
+                       }
+                   ]
+}

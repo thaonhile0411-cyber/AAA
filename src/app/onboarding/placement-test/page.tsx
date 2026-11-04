@@ -1,6 +1,10 @@
 import { DiagnosticTest } from "@/components/diagnostic-test";
 import { connection } from "next/server";
 
+// This page reads request-specific search params to select placement or
+// reassessment mode, so it must be allowed to render as a blocking route.
+export const instant = false;
+
 export const metadata = {
   title: "IELTS Diagnostic Placement Test | AAA",
   description:

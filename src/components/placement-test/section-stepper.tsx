@@ -6,7 +6,11 @@ import type { TestSkill } from "@/types/placement-test";
 type SectionStepperProps = {
   currentSkill: TestSkill;
   completedSkills: TestSkill[];
-  answeredCountMap: Record<TestSkill, { answered: number; total: number }>;
+  unlockedSkills?: TestSkill[];
+  answeredCountMap: Record<
+    TestSkill,
+    { answered: number; total: number; label?: string }
+  >;
   onSelectSkill?: (skill: TestSkill) => void;
 };
 
@@ -32,19 +36,20 @@ const SKILL_INFO: {
     key: "writing",
     label: "Writing",
     icon: "edit",
-    subtitle: "1 Task · Essay",
+    subtitle: "1 Task · ≥ 250 từ",
   },
   {
     key: "speaking",
     label: "Speaking",
     icon: "mic",
-    subtitle: "3 Parts · Ghi âm",
+    subtitle: "6 phần ghi âm",
   },
 ];
 
 export function SectionStepper({
   currentSkill,
   completedSkills,
+  unlockedSkills,
   answeredCountMap,
   onSelectSkill,
 }: SectionStepperProps) {
@@ -56,8 +61,11 @@ export function SectionStepper({
       {SKILL_INFO.map((item, index) => {
         const isCompleted = completedSkills.includes(item.key);
         const isActive = item.key === currentSkill;
-        const isAccessible = isCompleted || isActive;
+        const isAccessible = unlockedSkills
+          ? unlockedSkills.includes(item.key)
+          : isCompleted || isActive;
         const counts = answeredCountMap[item.key] || { answered: 0, total: 1 };
+        const displayCounter = counts.label || `${counts.answered}/${counts.total}`;
 
         return (
           <button
@@ -122,7 +130,7 @@ export function SectionStepper({
             <div className="flex items-center justify-between text-xs text-[#6d7890] mt-auto pt-1 w-full">
               <span>{item.subtitle}</span>
               <span className="font-semibold text-[#1e2c46]">
-                {!isAccessible ? "—" : `${counts.answered}/${counts.total}`}
+                {!isAccessible ? "—" : displayCounter}
               </span>
             </div>
 

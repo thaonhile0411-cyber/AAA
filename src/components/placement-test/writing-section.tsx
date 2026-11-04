@@ -12,17 +12,18 @@ type WritingSectionProps = {
   };
   onWritingChange: (task: "task1" | "task2", content: string) => void;
   onNextSection: () => void;
+  disabled?: boolean;
 };
 
 export function WritingSection({
   writingAnswers,
   onWritingChange,
   onNextSection,
+  disabled = false,
 }: WritingSectionProps) {
   const [prevTask2, setPrevTask2] = useState(writingAnswers.task2);
   const [localText, setLocalText] = useState(writingAnswers.task2 || "");
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
-  const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync state during render when prop changes externally
@@ -53,12 +54,7 @@ export function WritingSection({
   }
 
   function handleCompleteSection() {
-    // If essay is too short or empty, prevent moving forward
-    if (wordCount < 100) {
-      setShowIncompleteWarning(true);
-      return;
-    }
-    // Flush any pending save
+    // Flush any pending save and proceed directly
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
@@ -151,9 +147,12 @@ export function WritingSection({
           <div className="p-4 flex-1 flex flex-col">
             <textarea
               value={localText}
+              disabled={disabled}
               onChange={(e) => handleTextChange(e.target.value)}
               placeholder="Write your essay here in English... (Aim for at least 250 words)&#10;&#10;Introduction: Paraphrase topic & state your thesis&#10;Body Paragraph 1: Discuss first viewpoint with examples&#10;Body Paragraph 2: Discuss second viewpoint & your stance&#10;Conclusion: Summarize key arguments & final thoughts"
-              className="w-full flex-1 p-4 rounded-xl border border-[#dce3ee] text-sm text-[#1e2c46] leading-relaxed resize-none focus:border-[#175cdd] focus:ring-2 focus:ring-[#175cdd]/15 outline-none font-sans bg-white transition-all"
+              className={`w-full flex-1 p-4 rounded-xl border border-[#dce3ee] text-sm text-[#1e2c46] leading-relaxed resize-none focus:border-[#175cdd] focus:ring-2 focus:ring-[#175cdd]/15 outline-none font-sans bg-white transition-all ${
+                disabled ? "bg-gray-100 cursor-not-allowed opacity-65" : ""
+              }`}
             />
           </div>
 
@@ -186,32 +185,6 @@ export function WritingSection({
           <Icon name="arrow" size={16} />
         </button>
       </div>
-
-      {/* Incomplete Warning Modal (Strict validation) */}
-      {showIncompleteWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-2xl border border-[#e6eaf1] shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center gap-3 text-amber-600">
-              <Icon name="alert" size={24} />
-              <h3 className="text-base font-bold text-[#11213f] m-0">
-                Bài viết chưa hoàn thành
-              </h3>
-            </div>
-            <p className="text-xs md:text-sm text-[#475569] leading-relaxed m-0">
-              Bài viết của bạn hiện mới có <strong>{wordCount} từ</strong> (yêu cầu tối thiểu 250 từ). Vui lòng hoàn thiện thêm bài viết để hệ thống có đủ dữ liệu đánh giá 4 tiêu chí IELTS.
-            </p>
-            <div className="flex items-center justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setShowIncompleteWarning(false)}
-                className="px-5 py-2.5 bg-[#175cdd] hover:bg-[#104dc1] text-white text-xs font-bold rounded-xl cursor-pointer"
-              >
-                Ở lại làm tiếp
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
