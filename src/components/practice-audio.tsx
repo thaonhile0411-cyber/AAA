@@ -15,6 +15,7 @@ export function PracticeAudio({
   onPosition,
   onSpeed,
   caption,
+  seekRequest,
 }: {
   source: string;
   title: string;
@@ -23,6 +24,8 @@ export function PracticeAudio({
   onPosition: (time: number) => void;
   onSpeed: (speed: number) => void;
   caption?: string;
+  /** An explicit external seek (for example, selecting a transcript cue). */
+  seekRequest?: { id: number; time: number } | null;
 }) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -32,6 +35,18 @@ export function PracticeAudio({
   useEffect(() => {
     if (audio.current) audio.current.playbackRate = speed;
   }, [speed]);
+  useEffect(() => {
+    if (!seekRequest || !audio.current) return;
+    const player = audio.current;
+    const position = Number.isFinite(player.duration)
+      ? Math.min(player.duration, Math.max(0, seekRequest.time))
+      : Math.max(0, seekRequest.time);
+    player.currentTime = position;
+    setTime(position);
+    onPosition(position);
+  // A request ID means selecting the same cue twice remains intentional.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seekRequest?.id]);
   function seek(value: number) {
     if (!audio.current || !Number.isFinite(duration) || duration <= 0) return;
     const position = Math.min(duration, Math.max(0, value));

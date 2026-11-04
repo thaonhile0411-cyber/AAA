@@ -17,7 +17,7 @@ import {
   BAND_GROUPS,
   QUESTION_TYPES,
   applyHighlight,
-  passageSegments,
+  passageSegmentsWithEvidence,
   draftKey,
   newDraft,
   restoreDraft,
@@ -64,10 +64,18 @@ function SegmentReplayButton({
     [],
   );
   function replay() {
+    if (playing) {
+      audio.current?.pause();
+      setPlaying(false);
+      return;
+    }
     audio.current?.pause();
     const player = new Audio(source);
     audio.current = player;
-    player.currentTime = start;
+    const beginSegment = () => {
+      player.currentTime = start;
+      void player.play().catch(() => setPlaying(false));
+    };
     player.ontimeupdate = () => {
       if (player.currentTime >= end) {
         player.pause();
@@ -77,7 +85,8 @@ function SegmentReplayButton({
     player.onended = () => setPlaying(false);
     player.onerror = () => setPlaying(false);
     setPlaying(true);
-    void player.play().catch(() => setPlaying(false));
+    if (player.readyState >= HTMLMediaElement.HAVE_METADATA) beginSegment();
+    else player.onloadedmetadata = beginSegment;
   }
   return (
     <button type="button" className="secondary-button" onClick={replay}>
@@ -618,7 +627,14 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                         : ""
                     }
                   >
-                    {passageSegments(text, paragraph, draft.highlights).map(
+                    {passageSegmentsWithEvidence(
+                      text,
+                      paragraph,
+                      draft.highlights,
+                      reviewedQuestion?.evidenceParagraph === paragraph
+                        ? reviewedQuestion.evidenceText
+                        : undefined,
+                    ).map(
                       (segment, index) =>
                         segment.highlight ? (
                           <mark
@@ -626,7 +642,7 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                             tabIndex={0}
                             role="button"
                             aria-label={`Highlight ${segment.highlight.color === "yellow" ? "vàng" : "xanh"}${segment.highlight.note ? ": " + segment.highlight.note : ""}. Nhấn để chỉnh sửa.`}
-                            className={`mark-${segment.highlight.color} ${selectedMark === segment.highlight.id ? "mark-active" : ""}`}
+                            className={`mark-${segment.highlight.color} ${segment.evidence ? "answer-evidence" : ""} ${selectedMark === segment.highlight.id ? "mark-active" : ""}`}
                             onClick={() => {
                               if (!window.getSelection()?.isCollapsed) return;
                               setSelectedMark(segment.highlight!.id);
@@ -640,6 +656,10 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
                               }
                             }}
                           >
+                            {segment.text}
+                          </mark>
+                        ) : segment.evidence ? (
+                          <mark key={index} className="answer-evidence">
                             {segment.text}
                           </mark>
                         ) : (
@@ -820,6 +840,15 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
               <a
                 key={question.id}
                 href={`#question-${question.id}`}
+                onClick={(event) => {
+                  const questionResult = resultByQuestion.get(question.id);
+                  // On the review screen, question navigation is also passage
+                  // navigation: selecting a result takes the learner straight
+                  // to the evidence and opens its explanation.
+                  if (!questionResult) return;
+                  event.preventDefault();
+                  showExplanation(questionResult);
+                }}
                 className={
                   resultByQuestion.get(question.id)
                     ? resultByQuestion.get(question.id)!.correct

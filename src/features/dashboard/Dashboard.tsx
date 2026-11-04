@@ -13,6 +13,7 @@ import {
   type Overview,
 } from "./model";
 import styles from "./dashboard.module.css";
+import { syncUserTimeZone } from "@/lib/user-time-zone";
 
 export function Dashboard({
   initial,
@@ -34,6 +35,15 @@ export function Dashboard({
     setData(await response.json());
     setError(false);
   }, [router]);
+  useEffect(() => {
+    let cancelled = false;
+    void syncUserTimeZone().then((saved) => {
+      if (saved && !cancelled) void reload().catch(() => setError(true));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [reload]);
   useEffect(() => {
     let running = false;
     const refresh = () => {
@@ -125,6 +135,7 @@ export function Dashboard({
   const percentage = progress(data.completed, data.total);
   const time = studyTime(data.totalSeconds);
   const assessment = currentAssessment(data);
+  const streak = data.streak;
   const date = (value: string) =>
     new Date(value).toLocaleDateString("vi-VN", {
       timeZone: "Asia/Ho_Chi_Minh",
@@ -205,6 +216,47 @@ export function Dashboard({
             Điểm ước tính, không phải chứng chỉ IELTS
           </span>
         </article>
+        <article className={`${styles.panel} ${styles.streakCard}`}>
+          <span className={styles.symbol} aria-hidden="true">🔥</span>
+          <h2>Chuỗi học tập</h2>
+          <div className={styles.value} aria-label={`${streak?.current ?? 0} ngày liên tiếp`}>
+            {streak?.current ?? 0}
+            <small>ngày liên tiếp</small>
+          </div>
+          <p>
+            {streak?.todayActive
+              ? "Hôm nay đã hoàn thành ít nhất một bài"
+              : streak?.current
+                ? "Hoàn thành một bài hôm nay để tiếp tục chuỗi"
+                : "Hoàn thành một bài để bắt đầu chuỗi"}
+          </p>
+          <span className={styles.caption}>{streak?.timeZone ?? "Đang đồng bộ múi giờ"}</span>
+        </article>
+      </section>
+      <section className={`${styles.panel} ${styles.activityPanel}`} aria-labelledby="weekly-activity">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.eyebrow}>THÓI QUEN HỌC TẬP</p>
+            <h2 id="weekly-activity">Hoạt động 7 ngày gần nhất</h2>
+          </div>
+          <span className={styles.caption}>Mỗi cột có màu khi có bài hoàn thành</span>
+        </div>
+        <div className={styles.weekChart} role="list" aria-label="Biểu đồ hoạt động 7 ngày">
+          {(streak?.week ?? []).map((day) => {
+            const label = new Date(`${day.date}T12:00:00`).toLocaleDateString("vi-VN", { weekday: "short" });
+            const height = day.active ? Math.min(100, 32 + day.completions * 22) : 8;
+            return (
+              <div className={styles.weekDay} key={day.date} role="listitem">
+                <span className={styles.barTrack} aria-label={`${label}: ${day.completions} bài hoàn thành`}>
+                  <span className={day.active ? styles.barActive : styles.barInactive} style={{ height: `${height}%` }} />
+                </span>
+                <strong>{label.replace("Thứ ", "T")}</strong>
+                <small>{day.active ? `${day.completions} bài` : "—"}</small>
+              </div>
+            );
+          })}
+          {!streak?.week.length && <p className={styles.chartEmpty}>Chưa có dữ liệu hoạt động trong 7 ngày gần nhất.</p>}
+        </div>
       </section>
       <section className={styles.panel} aria-labelledby="daily-tasks">
         <div className={styles.sectionHeading}>

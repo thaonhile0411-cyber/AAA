@@ -8,6 +8,7 @@ import {
   restoreDraft,
   applyHighlight,
   passageSegments,
+  passageSegmentsWithEvidence,
   PLAYBACK_SPEEDS,
   AUTO_SAVE_MS,
   type Exercise,
@@ -162,6 +163,24 @@ test("highlight recolouring and partial removal preserve text offsets and outsid
       .join(""),
     exercise.passage![0],
   );
+});
+test("answer evidence is highlighted without discarding a learner annotation", () => {
+  const text = "A short garden passage for careful reading.";
+  const segments = passageSegmentsWithEvidence(
+    text,
+    0,
+    [{ id: "note", paragraph: 0, start: 2, end: 14, color: "yellow", note: "word" }],
+    "garden passage",
+  );
+  assert.equal(segments.map((segment) => segment.text).join(""), text);
+  assert.equal(
+    segments
+      .filter((segment) => segment.evidence)
+      .map((segment) => segment.text)
+      .join(""),
+    "garden passage",
+  );
+  assert.ok(segments.some((segment) => segment.evidence && segment.highlight?.id === "note"));
 });
 test("repository content covers both skills in every band and every audio is a real MP3 below 15 MB", () => {
   const records = JSON.parse(

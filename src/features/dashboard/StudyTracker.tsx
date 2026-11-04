@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActiveClock } from "./active-time";
 import { notifyStudyUpdate } from "./notify";
+import { syncUserTimeZone } from "@/lib/user-time-zone";
 
 type StudyEvent = {
   resourceSlug: string;
@@ -20,6 +21,9 @@ export function StudyTracker({
   const pending = useRef<StudyEvent[]>([]);
   const sending = useRef<Promise<boolean> | null>(null);
   const seconds = useRef(0);
+  useEffect(() => {
+    void syncUserTimeZone();
+  }, []);
   const flush = useCallback((): Promise<boolean> => {
     if (sending.current) return sending.current;
     sending.current = (async () => {

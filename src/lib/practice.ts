@@ -198,19 +198,55 @@ export function passageSegments(
   paragraph: number,
   highlights: Highlight[],
 ) {
+  return passageSegmentsWithEvidence(text, paragraph, highlights);
+}
+
+/**
+ * Keep learner annotations intact while also marking the evidence returned by
+ * the server after grading. The evidence is only supplied after submission;
+ * answer keys therefore remain private before a learner submits an attempt.
+ */
+export function passageSegmentsWithEvidence(
+  text: string,
+  paragraph: number,
+  highlights: Highlight[],
+  evidence?: string,
+) {
   const ranges = highlights
     .filter((item) => item.paragraph === paragraph)
     .sort((a, b) => a.start - b.start);
-  const result: { text: string; highlight: Highlight | null }[] = [];
-  let cursor = 0;
+  const normalisedEvidence = evidence?.toLocaleLowerCase("en");
+  const evidenceStart = normalisedEvidence
+    ? text.toLocaleLowerCase("en").indexOf(normalisedEvidence)
+    : -1;
+  const evidenceEnd = evidenceStart < 0 ? -1 : evidenceStart + evidence!.length;
+  const boundaries = new Set<number>([0, text.length]);
+
   for (const range of ranges) {
-    if (range.start < cursor) continue;
-    if (range.start > cursor)
-      result.push({ text: text.slice(cursor, range.start), highlight: null });
-    result.push({ text: text.slice(range.start, range.end), highlight: range });
-    cursor = range.end;
+    if (range.end <= 0 || range.start >= text.length) continue;
+    boundaries.add(Math.max(0, range.start));
+    boundaries.add(Math.min(text.length, range.end));
   }
-  if (cursor < text.length)
-    result.push({ text: text.slice(cursor), highlight: null });
+  if (evidenceStart >= 0) {
+    boundaries.add(evidenceStart);
+    boundaries.add(evidenceEnd);
+  }
+
+  const points = [...boundaries].sort((a, b) => a - b);
+  const result: {
+    text: string;
+    highlight: Highlight | null;
+    evidence: boolean;
+  }[] = [];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const start = points[index];
+    const end = points[index + 1];
+    if (start === end) continue;
+    result.push({
+      text: text.slice(start, end),
+      highlight: ranges.find((range) => range.start <= start && range.end >= end) ?? null,
+      evidence: evidenceStart >= 0 && start >= evidenceStart && end <= evidenceEnd,
+    });
+  }
   return result;
 }

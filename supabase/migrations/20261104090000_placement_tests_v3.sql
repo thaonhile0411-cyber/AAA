@@ -45,6 +45,12 @@ CREATE TRIGGER set_placement_tests_updated_at
 -- 4. Row Level Security (RLS)
 ALTER TABLE public.placement_tests ENABLE ROW LEVEL SECURITY;
 
+-- This migration can be applied to projects that already received the same
+-- policies manually. Recreate them so their ownership rule is deterministic.
+DROP POLICY IF EXISTS "Users can select own placement tests" ON public.placement_tests;
+DROP POLICY IF EXISTS "Users can insert own placement tests" ON public.placement_tests;
+DROP POLICY IF EXISTS "Users can update own placement tests" ON public.placement_tests;
+
 -- Policy: Users can select their own tests
 CREATE POLICY "Users can select own placement tests"
   ON public.placement_tests
@@ -87,6 +93,7 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage Policy: Users can upload audio to their own directory
+DROP POLICY IF EXISTS "Users can upload speaking recordings" ON storage.objects;
 CREATE POLICY "Users can upload speaking recordings"
   ON storage.objects
   FOR INSERT
@@ -97,6 +104,7 @@ CREATE POLICY "Users can upload speaking recordings"
   );
 
 -- Storage Policy: Users can read their own audio recordings
+DROP POLICY IF EXISTS "Users can read own speaking recordings" ON storage.objects;
 CREATE POLICY "Users can read own speaking recordings"
   ON storage.objects
   FOR SELECT
