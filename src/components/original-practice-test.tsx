@@ -157,7 +157,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
             </div>
           </div>
           {isChoice ? (
-            <div className="question-list" lang="en">
+            <div className="question-list original-question-list" lang="en">
               <fieldset className="practice-question">
                 <legend>
                   <span>1</span> Choose one answer
