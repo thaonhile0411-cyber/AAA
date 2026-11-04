@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 import {
@@ -34,6 +35,7 @@ export function GoalSurvey({
 }: {
   mode?: "onboarding" | "settings";
 }) {
+  const router = useRouter();
   const settings = mode === "settings";
   const formId = useId();
   const [targetBand, setTargetBand] = useState("");
@@ -162,6 +164,7 @@ export function GoalSurvey({
         return;
       }
       setSaved(true);
+      if (!settings) router.push("/onboarding/placement-test");
     } catch (err) {
       setError(
         err instanceof Error
