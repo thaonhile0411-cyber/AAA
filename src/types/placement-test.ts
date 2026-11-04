@@ -71,6 +71,7 @@ export type WritingTaskChart = {
 };
 
 export type WritingTaskData = {
+  id?: string;
   taskNumber: 1 | 2;
   title: string;
   type: "academic_chart" | "essay";
@@ -126,6 +127,7 @@ export type SpeakingRecordingInfo = {
   timestamp: string;
   blobUrl?: string;
   audioBase64?: string;
+  mimeType?: string;
   storagePath?: string;
 };
 
@@ -146,6 +148,8 @@ export type SkillScoreResult = {
   band: number | null;
   status?: AssessmentStatus;
   statusMessage?: string;
+  provider?: string;
+  modelUsed?: string;
   rawScore?: number;
   totalQuestions?: number;
   percentage?: number;
