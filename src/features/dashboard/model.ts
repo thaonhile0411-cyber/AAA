@@ -6,6 +6,13 @@ export type Task = {
   resource_slug: string | null;
   scheduled_date: string | null;
 };
+export type StreakOverview = {
+  current: number;
+  todayActive: boolean;
+  localDate: string;
+  timeZone: string;
+  week: Array<{ date: string; completions: number; active: boolean }>;
+};
 export type Overview = {
   totalSeconds: number;
   total: number;
@@ -28,6 +35,7 @@ export type Overview = {
       >;
     };
   } | null;
+  streak?: StreakOverview;
   tasks: Task[];
   unscheduled: Task[];
 };

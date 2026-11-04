@@ -165,6 +165,34 @@ await assert.rejects(
     [crypto.randomUUID(), exactTask],
   ),
 );
+// US-401.2: completed events are grouped by the learner's own IANA timezone.
+// Two completions today count as one active day/streak increment.
+const streakUser = "66666666-6666-4666-8666-666666666666";
+await db.exec(`
+  reset role;
+  insert into auth.users(id) values('${streakUser}');
+  insert into public.user_activity_logs(user_id,resource_slug,event_id,event_type,occurred_at) values
+    ('${streakUser}','streak-test',gen_random_uuid(),'completed',
+      (date_trunc('day', now() at time zone 'Pacific/Auckland') - interval '2 days' + interval '12 hours') at time zone 'Pacific/Auckland'),
+    ('${streakUser}','streak-test',gen_random_uuid(),'completed',
+      (date_trunc('day', now() at time zone 'Pacific/Auckland') - interval '1 day' + interval '12 hours') at time zone 'Pacific/Auckland'),
+    ('${streakUser}','streak-test',gen_random_uuid(),'completed',
+      (date_trunc('day', now() at time zone 'Pacific/Auckland') + interval '8 hours') at time zone 'Pacific/Auckland'),
+    ('${streakUser}','streak-test',gen_random_uuid(),'completed',
+      (date_trunc('day', now() at time zone 'Pacific/Auckland') + interval '10 hours') at time zone 'Pacific/Auckland');
+  select set_config('request.jwt.claim.sub','${streakUser}',false); set role authenticated;
+`);
+await db.query("select public.set_user_time_zone('Pacific/Auckland')");
+const streakOverview = (await db.query("select public.dashboard_overview() data")).rows[0].data;
+assert.equal(streakOverview.streak.timeZone, "Pacific/Auckland");
+assert.equal(streakOverview.streak.current, 3);
+assert.equal(streakOverview.streak.todayActive, true);
+assert.equal(streakOverview.streak.week.length, 7);
+assert.equal(
+  streakOverview.streak.week.find((day) => day.date === streakOverview.streak.localDate).completions,
+  2,
+);
+await assert.rejects(db.query("select public.set_user_time_zone('Not/A_Real_Zone')"));
 const samples = [];
 for (let i = 0; i < 30; i++) {
   const start = performance.now();
@@ -177,7 +205,7 @@ console.log(
     {
       passed: true,
       scenario:
-        "15/60, 450 min; completion retry; active-time retry; RLS; US-302 outbox",
+        "15/60, 450 min; completion retry; active-time retry; RLS; US-302 outbox; US-401.2 streak/timezone",
       databaseP95Ms: Number(samples[28].toFixed(2)),
       conditions:
         "PGlite in-memory, 60 roadmap tasks, 900 time events, 30 warm reads; excludes network/browser",
