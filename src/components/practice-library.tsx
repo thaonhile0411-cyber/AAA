@@ -9,6 +9,16 @@ import {
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 
+function skillLabel(skills: string[]) {
+  return skills.map((skill) => skill.toUpperCase()).join(" & ");
+}
+
+function skillIcon(skills: string[]): "book" | "headphones" | "pen" {
+  if (skills.includes("writing")) return "pen";
+  if (skills.includes("speaking")) return "headphones";
+  return "book";
+}
+
 export function PracticeLibrary() {
   const [collection, setCollection] = useState("Tất cả");
   const resources = useMemo(
@@ -36,8 +46,7 @@ export function PracticeLibrary() {
             Luyện theo bộ đề, <span>tiến bộ mỗi ngày.</span>
           </h1>
           <p>
-            Chọn bộ tài liệu phù hợp và mở nguồn để bắt đầu luyện Reading hoặc
-            Listening.
+            Chọn tài liệu phù hợp và mở nguồn để luyện đủ bốn kỹ năng IELTS.
           </p>
         </div>
         <span className="heading-detail">
@@ -62,7 +71,7 @@ export function PracticeLibrary() {
           <Icon name="book" size={27} />
           <small>TÀI LIỆU CÓ SẴN</small>
           <strong>{practiceResources.length}</strong>
-          <span>Reading & Listening</span>
+          <span>4 kỹ năng IELTS</span>
         </div>
       </section>
       <section
@@ -106,13 +115,17 @@ export function PracticeLibrary() {
         </div>
         <div className="exercise-grid">
           {resources.map((resource, index) => (
-            <article className="exercise-card resource-card" key={resource.title}>
+            <article
+              className="exercise-card resource-card"
+              key={resource.title}
+            >
               <div className="exercise-cover reading">
                 <span className="exercise-skill">
-                  <Icon name="book" size={15} /> READING & LISTENING
+                  <Icon name={skillIcon(resource.skills)} size={15} />
+                  {skillLabel(resource.skills)}
                 </span>
                 <span className="exercise-cover-symbol" aria-hidden="true">
-                  <Icon name="book" size={56} />
+                  <Icon name={skillIcon(resource.skills)} size={56} />
                 </span>
                 <span className="exercise-cover-number" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
