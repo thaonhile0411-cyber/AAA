@@ -24,6 +24,7 @@ export async function POST(
       p_slug: slug,
       p_submission_id: parsed.data.submissionId,
       p_answers: parsed.data.answers,
+      p_task_id: parsed.data.taskId ?? null,
     });
     if (error) {
       if (error.message.includes("EXERCISE_NOT_FOUND"))

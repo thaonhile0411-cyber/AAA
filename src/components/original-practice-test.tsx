@@ -134,6 +134,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
     setSaved(true);
     setAnswerError("");
     setGrade(gradePracticeAnswer(answerToGrade, question));
+    window.dispatchEvent(new CustomEvent('practice-completed', { detail: { resourceSlug: slug } }));
   }
 
   return (
