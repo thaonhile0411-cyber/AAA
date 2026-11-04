@@ -2,19 +2,20 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { OriginalPracticeTestPage } from "@/components/original-practice-test";
 export const metadata: Metadata = { title: "Bài luyện IELTS | AAA" };
+
 export default function ExercisePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <Suspense fallback={<div className="loading-card">Đang mở bài luyện…</div>}>
-      <ResolvedExercise params={params} />
+    <Suspense fallback={<p role="status">Đang tải bài luyện…</p>}>
+      <ExerciseContent params={params} />
     </Suspense>
   );
 }
 
-async function ResolvedExercise({
+async function ExerciseContent({
   params,
 }: {
   params: Promise<{ slug: string }>;

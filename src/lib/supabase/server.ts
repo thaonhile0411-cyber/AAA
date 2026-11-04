@@ -42,8 +42,10 @@ export async function supabaseServer() {
   return client;
 }
 
-// Compatibility name used by the goals and practice Route Handlers.
-export const createClient = supabaseServer;
+/** Compatibility helper used by Route Handlers that need the authenticated server client. */
+export async function createClient() {
+  return supabaseServer();
+}
 
 export async function authenticatedClient() {
   await connection();
