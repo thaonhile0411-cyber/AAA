@@ -6,6 +6,11 @@ export const metadata = {
     "Xác định trình độ IELTS đầu vào với bài kiểm tra 4 kỹ năng Listening, Reading, Writing và Speaking.",
 };
 
-export default function PlacementTestPage() {
-  return <DiagnosticTest />;
+export default async function PlacementTestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const { mode } = await searchParams;
+  return <DiagnosticTest reassessment={mode === "reassessment"} />;
 }

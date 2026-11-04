@@ -8,6 +8,7 @@ export const PLACEMENT_ANSWERS_KEY = "aaa:us103:placement:answers:v1";
 export const PLACEMENT_SECTION_KEY = "aaa:us103:placement:section:v1";
 export const PLACEMENT_COMPLETED_KEY = "aaa:us103:placement:completed:v1";
 export const PLACEMENT_RESULT_KEY = "aaa:us103:placement:result:v1";
+export const PLACEMENT_CLOUD_TEST_ID_KEY = "aaa:us103:placement:test_id";
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
@@ -148,5 +149,8 @@ export function clearPlacementTestStorage(
     storage.removeItem(PLACEMENT_SECTION_KEY);
     storage.removeItem(PLACEMENT_COMPLETED_KEY);
     storage.removeItem(PLACEMENT_RESULT_KEY);
+    // Only removes the browser pointer to the current attempt. The completed
+    // placement_tests row in Supabase remains available for later comparison.
+    storage.removeItem(PLACEMENT_CLOUD_TEST_ID_KEY);
   } catch {}
 }

@@ -52,7 +52,7 @@ const DEFAULT_ANSWERS: PlacementTestAnswers = {
 const SKILL_ORDER: TestSkill[] = ["listening", "reading", "writing", "speaking"];
 const emptySubscribe = () => () => {};
 
-export function PlacementTestContainer() {
+export function PlacementTestContainer({ reassessment = false }: { reassessment?: boolean }) {
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const [stage, setStage] = useState<"intro" | "testing" | "result">("intro");
@@ -75,6 +75,18 @@ export function PlacementTestContainer() {
     let cancelled = false;
     Promise.resolve().then(() => {
       if (cancelled) return;
+      if (reassessment) {
+        // A reassessment must start a new local/cloud attempt, while the
+        // original completed result remains stored in Supabase.
+        clearPlacementTestStorage();
+        setAnswers(DEFAULT_ANSWERS);
+        setCompletedSkills([]);
+        setResult(null);
+        setTimeRemainingSeconds(3300);
+        setCurrentSkill("listening");
+        window.history.replaceState({}, "", "/onboarding/placement-test");
+        return;
+      }
       const savedRes = loadSavedResult();
       if (savedRes) {
         setResult(savedRes);
@@ -113,7 +125,7 @@ export function PlacementTestContainer() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reassessment]);
 
   // Timer countdown while testing
   useEffect(() => {
@@ -604,6 +616,7 @@ export function PlacementTestContainer() {
         speaking_recordings: answers.speakingRecordings,
         assessment_results: evaluated,
         overall_band: evaluated.overallBand,
+      assessment_kind: reassessment ? "reassessment" : "placement",
         status: "completed",
       });
       if (!saveResult.success) {
@@ -818,6 +831,7 @@ export function PlacementTestContainer() {
       {stage === "result" && result && (
         <ResultDashboard
           result={result}
+          isReassessment={reassessment}
           onRetakeTest={handleRetakeTest}
           onRetryAssessment={handleSubmitTest}
           isRetrying={isSubmitting}
