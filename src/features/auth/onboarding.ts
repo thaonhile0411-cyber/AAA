@@ -1,6 +1,6 @@
 "use server";
 
-import { addDays, goalWarning, overallBand, todayInVietnam, validateGoals, type GoalInput, type GoalResponse, type Scores } from "@/lib/goals";
+import { addDays, overallBand, todayInVietnam, validateGoals, type GoalInput, type GoalResponse, type Scores } from "@/lib/goals";
 import { authenticatedClient } from "@/lib/supabase/server";
 
 export async function loadGoals(): Promise<GoalResponse> {
@@ -11,13 +11,14 @@ export async function loadGoals(): Promise<GoalResponse> {
   if (error) throw new Error("Không thể tải mục tiêu học tập.");
   const scores = data?.self_reported_scores as Scores | null | undefined;
   const today = todayInVietnam();
+  const nextStep = scores ? "roadmap" : "placement";
   return {
     demoMode: false,
-    warning: data ? goalWarning(Number(data.target_band), scores ? overallBand(scores) : null) : null,
-    nextStep: scores ? "roadmap" : "placement",
-    nextPath: null,
     today,
     minExamDate: addDays(today, 7),
+    warning: null,
+    nextStep,
+    nextPath: nextStep === "placement" ? "/onboarding/placement-test" : "/practice",
     profile: data ? {
       targetBand: Number(data.target_band),
       examDate: data.expected_exam_date,
