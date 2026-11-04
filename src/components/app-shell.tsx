@@ -7,7 +7,7 @@ export function AppShell({
   demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings";
+  active?: "goals" | "settings" | "test";
   demoMode?: boolean;
 }) {
   return (
