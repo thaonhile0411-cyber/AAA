@@ -31,6 +31,7 @@ export type PracticeResult = {
 };
 
 export type PracticeSubmission = {
+  taskId?: string | null;
   submissionId: string;
   answers: Record<string, string>;
 };
@@ -46,6 +47,7 @@ export function validatePracticeSubmission(value: unknown):
   if (typeof candidate.submissionId !== "string" || !UUID.test(candidate.submissionId))
     return { ok: false, error: "Mã lần nộp không hợp lệ." };
   const answers = candidate.answers;
+  if (candidate.taskId != null && (typeof candidate.taskId !== 'string' || !UUID.test(candidate.taskId))) return { ok: false, error: 'Mã nhiệm vụ không hợp lệ.' };
   if (!answers || typeof answers !== "object" || Array.isArray(answers))
     return { ok: false, error: "Danh sách câu trả lời không hợp lệ." };
   const entries = Object.entries(answers);
@@ -57,6 +59,6 @@ export function validatePracticeSubmission(value: unknown):
   }
   return {
     ok: true,
-    data: { submissionId: candidate.submissionId, answers: answers as Record<string, string> },
+    data: { submissionId: candidate.submissionId, answers: answers as Record<string, string>, ...(candidate.taskId ? { taskId: candidate.taskId as string } : {}) },
   };
 }

@@ -1,4 +1,5 @@
 "use client";
+import { notifyStudyUpdate } from '@/features/dashboard/notify';
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -323,12 +324,14 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
             submissionId:
               submissionId.current || (submissionId.current = crypto.randomUUID()),
             answers: current.current.answers,
+            taskId: new URLSearchParams(window.location.search).get('task'),
           }),
         },
       );
       const body = (await response.json()) as PracticeResult & { error?: string };
       if (!response.ok) throw new Error(body.error ?? "Chưa thể chấm bài.");
       setResult(body);
+      notifyStudyUpdate();
       const firstReview =
         body.questions.find((item) => item.unanswered || !item.correct) ??
         body.questions[0];
