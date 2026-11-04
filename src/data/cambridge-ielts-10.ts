@@ -41,6 +41,14 @@ export type CambridgeListeningReview = {
   audioEndSeconds: number;
 };
 
+/** A timestamped audioscript cue. Cues are kept separate from the scanned
+ * book pages so the player can follow the supplied audio in real time. */
+export type CambridgeTranscriptCue = {
+  startSeconds: number;
+  endSeconds: number;
+  text: string;
+};
+
 export const cambridgeAnswerKeys: Partial<Record<string, Partial<Record<"listening" | "reading", CambridgeAnswerKey>>>> = {
   "academic-test-1": {
     listening: {
@@ -255,6 +263,49 @@ const cambridgeListeningReviews: Record<string, Record<number, CambridgeListenin
 
 export function listeningReviewFor(partId: string, questionNumber: number) {
   return cambridgeListeningReviews[partId]?.[questionNumber];
+}
+
+/**
+ * This first timed audioscript was reviewed against the supplied Test 1,
+ * Section 1 MP3. Do not infer a transcript for another section: its source
+ * scan remains available after submission until its timestamps are reviewed.
+ */
+const cambridgeListeningTranscripts: Record<string, CambridgeTranscriptCue[]> = {
+  "academic-test-1-listening-1": [
+    { startSeconds: 0, endSeconds: 7.12, text: "Cambridge English, IELTS 10, published by Cambridge University Press and Cambridge English Language Assessment 2015." },
+    { startSeconds: 20.8, endSeconds: 34.64, text: "You will hear a number of different recordings and you will have to answer questions on what you hear. There will be time for you to read the instructions and questions and you will have a chance to check your work." },
+    { startSeconds: 35.84, endSeconds: 50.88, text: "All the recordings will be played once only. The test is in four sections. At the end of the test, you will be given 10 minutes to transfer your answers to an answer sheet." },
+    { startSeconds: 50.88, endSeconds: 61.52, text: "Now turn to Section 1. You will hear a telephone conversation between a travel agent and a customer." },
+    { startSeconds: 61.52, endSeconds: 108.22, text: "First, you have some time to look at questions 1 to 6. You will see that there is an example that has been done for you. On this occasion only, the conversation relating to this will be played first." },
+    { startSeconds: 108.54, endSeconds: 117.3, text: "Travel agent: Good morning. World Tours. My name is Jamie. How can I help you?" },
+    { startSeconds: 117.94, endSeconds: 124.58, text: "Customer: Good morning. I want some information on self-drive tours in the USA. Could you send me a brochure?" },
+    { startSeconds: 124.58, endSeconds: 134.58, text: "Travel agent: Of course. Could I have your name, please? Customer: Andrea Brown. Narrator: The customer's name is Andrea Brown." },
+    { startSeconds: 135.3, endSeconds: 148.34, text: "So Brown has been written in the space. Now we shall begin. You should answer the questions as you listen because you will not hear the recording a second time." },
+    { startSeconds: 149.94, endSeconds: 160.56, text: "Listen carefully and answer questions 1 to 6. Travel agent: Good morning. World Tours. My name is Jamie. How can I help you?" },
+    { startSeconds: 160.56, endSeconds: 174, text: "Customer: Good morning. I want some information on self-drive tours in the USA. Could you send me a brochure? Travel agent: Of course. Could I have your name, please? Customer: Andrea Brown. Travel agent: Thank you. And your address?" },
+    { startSeconds: 174, endSeconds: 192.16, text: "Customer: 24 Ardleigh Road. Travel agent: Can you spell that? Customer: A-R-D-L-E-I-G-H Road. Travel agent: Postcode? Customer: B-H5 2OP. Travel agent: Thanks. And can I have your phone number?" },
+    { startSeconds: 192.16, endSeconds: 207.2, text: "Customer: Is a mobile all right? Travel agent: Fine. Customer: It is 0786 643091. Travel agent: Thank you. And can I ask you where you heard about World Tours? From a friend, or did you see an advert somewhere?" },
+    { startSeconds: 207.2, endSeconds: 218.08, text: "Customer: No, I read about you in the newspaper. Travel agent: Okay. I will get the brochures in the post to you, but can I give you some information over the phone?" },
+    { startSeconds: 218.08, endSeconds: 230.96, text: "Travel agent: What kinds of things do you want to do on your holiday? Customer: I am interested in going to California with my family. I have got two children and we want to hire a car. Travel agent: Okay, we have a couple of self-drive tours there, visiting different places of interest in California." },
+    { startSeconds: 230.96, endSeconds: 241.76, text: "Travel agent: The first one begins in Los Angeles and there is plenty of time to visit some of the theme parks there. Customer: Oh, that is something on my children's list, so I would want to include that." },
+    { startSeconds: 241.76, endSeconds: 253.2, text: "Travel agent: Good. Then you drive to San Francisco. From San Francisco, you can drive to Yosemite Park, where you spend a couple of nights. You can choose to stay in a lodge or on the campsite." },
+    { startSeconds: 253.76, endSeconds: 261.04, text: "Customer: I do not like the idea of staying in a tent. It would be too hot. Travel agent: Right. And the tour ends in Las Vegas." },
+    { startSeconds: 261.04, endSeconds: 279.6, text: "Travel agent: Okay. The other trip we can arrange is slightly different. It starts in San Francisco. Then you drive south to Cambria. Customer: Someone told me there is a really nice castle near Cambria. Will we go near that? Travel agent: Hearst Castle is on that road, so you could stop there. Customer: Good. I would like to do that." },
+    { startSeconds: 280.24, endSeconds: 291.2, text: "Customer: Does this trip also go into the desert? Travel agent: No. It continues to Santa Monica, where most people like to stop and do some shopping. Customer: We have enough of that at home, so that does not interest us." },
+    { startSeconds: 291.84, endSeconds: 307.92, text: "Travel agent: Okay. Well, you could go straight on to San Diego. Customer: That is good for beaches, isn't it? Travel agent: That is right. That is a good place to relax, and your children might like to visit the zoo before flying home. Customer: No, I do not think so. We want some time for sunbathing and swimming." },
+    { startSeconds: 311.31, endSeconds: 317.79, text: "Before you hear the rest of the conversation, you have some time to look at questions 7 to 10." },
+    { startSeconds: 338.27, endSeconds: 349.52, text: "Now listen and answer questions 7 to 10. Customer: So, how many days are the trips, and how much do they cost?" },
+    { startSeconds: 349.52, endSeconds: 365.52, text: "Travel agent: The first one I told you about is a self-drive tour through California, which lasts 12 days and covers 2,020 kilometres. The shortest journey is 206 kilometres and the longest is 632 kilometres." },
+    { startSeconds: 366.08, endSeconds: 374.48, text: "Travel agent: The cost is 525 pounds per person. That includes accommodation, car rental and a flight, but no meals." },
+    { startSeconds: 374.48, endSeconds: 387.6, text: "Customer: Okay. And the other trip? Travel agent: That lasts nine days, but you spend only three days on the road. You cover about 980 kilometres altogether. Customer: So is that cheaper then? Travel agent: Yes, it is almost 100 pounds cheaper." },
+    { startSeconds: 387.6, endSeconds: 400.64, text: "Travel agent: It is 429 pounds per person, which is a good deal. Customer: So that covers accommodation and car hire. What about flights? Travel agent: They are not included, but these hotels offer dinner in the price." },
+    { startSeconds: 401.44, endSeconds: 417.33, text: "Customer: Okay. Well, thank you very much. I will be in touch when I have had a chance to look at the brochure. Travel agent: I am pleased to help. Goodbye. Customer: Goodbye. Narrator: That is the end of Section 1." },
+    { startSeconds: 417.33, endSeconds: 457.71, text: "You now have half a minute to check your answers. Now turn to Section 2." },
+  ],
+};
+
+export function listeningTranscriptFor(partId: string) {
+  return cambridgeListeningTranscripts[partId] ?? [];
 }
 
 function pages(start: number, end: number) {

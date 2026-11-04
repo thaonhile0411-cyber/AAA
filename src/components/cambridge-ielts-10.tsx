@@ -11,6 +11,7 @@ import {
   answerKeyFor,
   answerGroupsFor,
   listeningReviewFor,
+  listeningTranscriptFor,
   type CambridgePart,
   type CambridgeSkill,
   type CambridgeSkillSection,
@@ -176,6 +177,58 @@ function SegmentReplayButton({ source, start, end }: { source: string; start: nu
   </button>;
 }
 
+function transcriptTimestamp(seconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(safeSeconds / 60)}:${String(safeSeconds % 60).padStart(2, "0")}`;
+}
+
+function ListeningTranscript({
+  cues,
+  currentTime,
+  onSeek,
+}: {
+  cues: ReturnType<typeof listeningTranscriptFor>;
+  currentTime: number;
+  onSeek: (seconds: number) => void;
+}) {
+  const activeIndex = cues.reduce<number>((current, cue, index) => {
+    if (currentTime >= cue.startSeconds && currentTime < cue.endSeconds) return index;
+    return current;
+  }, -1);
+  const activeCueRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    activeCueRef.current?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
+  return (
+    <section className="cambridge-timed-transcript" aria-label="Full timed audioscript">
+      <div className="cambridge-timed-transcript-heading">
+        <div>
+          <span>FULL AUDIOSCRIPT</span>
+          <h2>Read along with the audio</h2>
+        </div>
+        <small>Available after submission · Click a line to jump the player</small>
+      </div>
+      <div className="cambridge-timed-transcript-cues" aria-live="polite">
+        {cues.map((cue, index) => (
+          <button
+            key={`${cue.startSeconds}-${cue.endSeconds}`}
+            type="button"
+            ref={index === activeIndex ? activeCueRef : null}
+            className={index === activeIndex ? "active" : ""}
+            onClick={() => onSeek(cue.startSeconds)}
+            aria-current={index === activeIndex ? "true" : undefined}
+          >
+            <time dateTime={`PT${Math.floor(cue.startSeconds)}S`}>{transcriptTimestamp(cue.startSeconds)}</time>
+            <span>{cue.text}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function CambridgeIelts10() {
   const [selectedTestId, setSelectedTestId] = useState(cambridgeIelts10Tests[0].id);
   const [selectedSkill, setSelectedSkill] = useState<CambridgeSkill | null>(null);
@@ -292,6 +345,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const [resizing, setResizing] = useState(false);
   const [audioPosition, setAudioPosition] = useState(() => Number(answers.__audioPosition) || 0);
   const [audioSpeed, setAudioSpeed] = useState(() => Number(answers.__audioSpeed) || 1);
+  const [transcriptSeekRequest, setTranscriptSeekRequest] = useState<{ id: number; time: number } | null>(null);
   const [hasSpeakingRecording, setHasSpeakingRecording] = useState(false);
   const [reviewedNumber, setReviewedNumber] = useState<number | null>(null);
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
@@ -377,6 +431,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const reviewedListeningAnswer = isListening && reviewedNumber
     ? listeningReviewFor(active.part.id, reviewedNumber)
     : undefined;
+  const listeningTranscript = isListening ? listeningTranscriptFor(active.part.id) : [];
 
   function showListeningReview(number: number) {
     setReviewedNumber(number);
@@ -420,7 +475,19 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                   setAudioSpeed(speed);
                   persist({ ...answers, __audioSpeed: String(speed) });
                 }}
+                seekRequest={transcriptSeekRequest}
                 caption="Official Cambridge IELTS 10 audio supplied with this book."
+              />
+            )}
+            {submitted && listeningTranscript.length > 0 && (
+              <ListeningTranscript
+                cues={listeningTranscript}
+                currentTime={audioPosition}
+                onSeek={(time) => {
+                  setTranscriptSeekRequest((previous) => ({ id: (previous?.id ?? 0) + 1, time }));
+                  setAudioPosition(time);
+                  persist({ ...answers, __audioPosition: String(time) });
+                }}
               />
             )}
             {active.part.sourcePages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10, source page ${page}`} />)}

@@ -5,6 +5,7 @@ import {
   answerKeyFor,
   cambridgeIelts10Tests,
   listeningReviewFor,
+  listeningTranscriptFor,
 } from "../src/data/cambridge-ielts-10.ts";
 
 test("Cambridge IELTS 10 has a complete 40-question key for every supplied Reading/Listening test", () => {
@@ -53,5 +54,16 @@ test("Test 1 Section 1 exposes reviewed answer evidence for every question", () 
     assert.ok(review.evidence.length > 0);
     assert.ok(review.explanation.length > 0);
     assert.ok(review.audioEndSeconds > review.audioStartSeconds);
+  }
+});
+
+test("Test 1 Section 1 provides a timestamped full audioscript for read-along playback", () => {
+  const cues = listeningTranscriptFor("academic-test-1-listening-1");
+  assert.ok(cues.length >= 20);
+  assert.equal(cues[0]?.startSeconds, 0);
+  assert.ok(cues.at(-1)!.endSeconds > 450);
+  for (const cue of cues) {
+    assert.ok(cue.text.trim().length > 0);
+    assert.ok(cue.endSeconds > cue.startSeconds);
   }
 });
