@@ -12,7 +12,10 @@ import {
   answerGroupsFor,
   listeningReviewFor,
   listeningTranscriptFor,
+  readingPassageFor,
+  readingReviewFor,
   type CambridgePart,
+  type CambridgeReadingPassage,
   type CambridgeSkill,
   type CambridgeSkillSection,
   type CambridgeTest,
@@ -229,6 +232,67 @@ function ListeningTranscript({
   );
 }
 
+function passageTextWithEvidence(text: string, evidence?: string) {
+  if (!evidence) return text;
+  const start = text.toLocaleLowerCase().indexOf(evidence.toLocaleLowerCase());
+  if (start < 0) return text;
+  const end = start + evidence.length;
+  return <>{text.slice(0, start)}<mark>{text.slice(start, end)}</mark>{text.slice(end)}</>;
+}
+
+function ReadingPassageLocator({
+  partId,
+  passage,
+  reviewedNumber,
+}: {
+  partId: string;
+  passage: CambridgeReadingPassage;
+  reviewedNumber: number | null;
+}) {
+  const review = reviewedNumber ? readingReviewFor(partId, reviewedNumber) : undefined;
+  const paragraphRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    if (!review) return;
+    const frame = window.requestAnimationFrame(() =>
+      paragraphRefs.current[review.paragraphId]?.scrollIntoView({ behavior: "smooth", block: "center" }),
+    );
+    return () => window.cancelAnimationFrame(frame);
+  }, [review, reviewedNumber]);
+
+  return (
+    <section className="cambridge-reading-locator" aria-label="Reading passage locator">
+      <div className="cambridge-reading-locator-heading">
+        <span>PASSAGE LOCATOR</span>
+        <h2>{passage.title}</h2>
+        <p>After submitting, choose “View explanation” to jump to the source paragraph. The original book scan remains below.</p>
+      </div>
+      <div className="cambridge-reading-paragraphs">
+        {passage.paragraphs.map((paragraph) => {
+          const isTarget = review?.paragraphId === paragraph.id;
+          return (
+            <article
+              key={paragraph.id}
+              ref={(element) => { paragraphRefs.current[paragraph.id] = element; }}
+              className={isTarget ? "active" : ""}
+              aria-current={isTarget ? "true" : undefined}
+            >
+              <header><strong>Paragraph {paragraph.id}</strong><small>Source scan p. {paragraph.sourcePage}</small></header>
+              <p>{passageTextWithEvidence(paragraph.text, isTarget ? review?.evidence : undefined)}</p>
+              {isTarget && review && (
+                <aside className="cambridge-reading-explanation" aria-live="polite">
+                  <strong>Question {reviewedNumber} · Why this answer is correct</strong>
+                  <p>{review.explanation}</p>
+                </aside>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function CambridgeIelts10() {
   const [selectedTestId, setSelectedTestId] = useState(cambridgeIelts10Tests[0].id);
   const [selectedSkill, setSelectedSkill] = useState<CambridgeSkill | null>(null);
@@ -348,11 +412,13 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const [transcriptSeekRequest, setTranscriptSeekRequest] = useState<{ id: number; time: number } | null>(null);
   const [hasSpeakingRecording, setHasSpeakingRecording] = useState(false);
   const [reviewedNumber, setReviewedNumber] = useState<number | null>(null);
+  const [reviewedReadingNumber, setReviewedReadingNumber] = useState<number | null>(null);
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
   const reviewRef = useRef<HTMLElement>(null);
   const isWriting = active.section.skill === "writing";
   const isSpeaking = active.section.skill === "speaking";
+  const isReading = active.section.skill === "reading";
   const isWritingOrSpeaking = isWriting || isSpeaking;
   const isListening = active.section.skill === "listening";
 
@@ -432,9 +498,15 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
     ? listeningReviewFor(active.part.id, reviewedNumber)
     : undefined;
   const listeningTranscript = isListening ? listeningTranscriptFor(active.part.id) : [];
+  const readingPassage = isReading ? readingPassageFor(active.part.id) : undefined;
 
   function showListeningReview(number: number) {
     setReviewedNumber(number);
+    setMobilePane("source");
+  }
+
+  function showReadingReview(number: number) {
+    setReviewedReadingNumber(number);
     setMobilePane("source");
   }
 
@@ -490,6 +562,9 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                 }}
               />
             )}
+            {submitted && readingPassage && (
+              <ReadingPassageLocator partId={active.part.id} passage={readingPassage} reviewedNumber={reviewedReadingNumber} />
+            )}
             {active.part.sourcePages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10, source page ${page}`} />)}
             {submitted && answerKey && <Image className="exam-answer-key" src={assetForPage(answerKey)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt="Answer key from Cambridge IELTS 10" />}
             {submitted && isListening && active.test.transcriptPages && (
@@ -542,6 +617,11 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                               View explanation
                             </button>
                           )}
+                          {isReading && readingReviewFor(active.part.id, number) && (
+                            <button type="button" className="text-link" onClick={() => showReadingReview(number)}>
+                              View explanation
+                            </button>
+                          )}
                         </div>
                       )}
                     </label>
@@ -559,8 +639,8 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
         </div>
         <footer className="exam-modal-footer">
           <span>{active.part.label}</span>
-          {!isWritingOrSpeaking && <nav aria-label="Question navigation">{numbers.map((number) => <button key={number} type="button" className={`${selectedQuestion === number ? "current" : ""} ${answers[String(number)]?.trim() ? "answered" : ""}`} onClick={() => { setSelectedQuestion(number); if (submitted && isListening && listeningReviewFor(active.part.id, number)) showListeningReview(number); else { setMobilePane("answers"); requestAnimationFrame(() => answersRef.current[String(number)]?.focus()); } }}>{number}</button>)}</nav>}
-          <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => { setSubmitted(true); const initialReview = numbers.find((number) => !correct.includes(number)) ?? numbers[0]; if (isListening && initialReview !== undefined) showListeningReview(initialReview); }}>{submitted ? "Submitted" : "Submit"}</button></div>
+          {!isWritingOrSpeaking && <nav aria-label="Question navigation">{numbers.map((number) => <button key={number} type="button" className={`${selectedQuestion === number ? "current" : ""} ${answers[String(number)]?.trim() ? "answered" : ""}`} onClick={() => { setSelectedQuestion(number); if (submitted && isListening && listeningReviewFor(active.part.id, number)) showListeningReview(number); else if (submitted && isReading && readingReviewFor(active.part.id, number)) showReadingReview(number); else { setMobilePane("answers"); requestAnimationFrame(() => answersRef.current[String(number)]?.focus()); } }}>{number}</button>)}</nav>}
+          <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => { setSubmitted(true); const initialReview = numbers.find((number) => !correct.includes(number)) ?? numbers[0]; if (isListening && initialReview !== undefined) showListeningReview(initialReview); else if (isReading && initialReview !== undefined) showReadingReview(initialReview); }}>{submitted ? "Submitted" : "Submit"}</button></div>
           <small>{submitted && acceptedAnswers ? `${correct.length}/${scoredNumbers.length} correct` : typeof completed === "number" ? `${completed}/${numbers.length} answered` : completed ? "Response saved" : "No response yet"}</small>
         </footer>
       </section>

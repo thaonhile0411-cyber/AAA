@@ -49,6 +49,23 @@ export type CambridgeTranscriptCue = {
   text: string;
 };
 
+export type CambridgeReadingParagraph = {
+  id: string;
+  sourcePage: number;
+  text: string;
+};
+
+export type CambridgeReadingPassage = {
+  title: string;
+  paragraphs: CambridgeReadingParagraph[];
+};
+
+export type CambridgeReadingReview = {
+  paragraphId: string;
+  evidence: string;
+  explanation: string;
+};
+
 export const cambridgeAnswerKeys: Partial<Record<string, Partial<Record<"listening" | "reading", CambridgeAnswerKey>>>> = {
   "academic-test-1": {
     listening: {
@@ -306,6 +323,57 @@ const cambridgeListeningTranscripts: Record<string, CambridgeTranscriptCue[]> = 
 
 export function listeningTranscriptFor(partId: string) {
   return cambridgeListeningTranscripts[partId] ?? [];
+}
+
+/**
+ * Reviewed text version of the printed source. It is only exposed after
+ * submission, alongside the original scan, so a learner can locate the
+ * answer evidence without relying on a guessed page position.
+ */
+const cambridgeReadingPassages: Record<string, CambridgeReadingPassage> = {
+  "academic-test-1-reading-1": {
+    title: "Stepwells",
+    paragraphs: [
+      { id: "A", sourcePage: 18, text: "During the sixth and seventh centuries, the inhabitants of the modern-day states of Gujarat and Rajasthan in north-western India developed a method of gaining access to clean, fresh groundwater during the dry season for drinking, bathing, watering animals and irrigation. However, the significance of this invention — the stepwell — goes beyond its utilitarian application." },
+      { id: "B", sourcePage: 18, text: "Unique to this region, stepwells are often architecturally complex and vary widely in size and shape. During their heyday, they were places of gathering, of leisure and relaxation and of worship for villagers of all but the lowest classes. Most stepwells are found dotted around the desert areas of Gujarat (where they are called vav) and Rajasthan (where they are called baori), while a few also survive in Delhi. Some were located in or near villages as public spaces for the community; others were positioned beside roads as resting places for travellers." },
+      { id: "C", sourcePage: 18, text: "As their name suggests, stepwells comprise a series of stone steps descending from ground level to the water source (normally an underground aquifer) as it recedes following the rains. When the water level was high, the user needed only to descend a few steps to reach it; when the water levels were low, several levels would have to be negotiated." },
+      { id: "D", sourcePage: 18, text: "Some wells are vast, open craters with hundreds of steps paving each sloping side, often in tiers. Others are more elaborate, with long stepped passages leading to the water via several storeys. Built from stone and supported by pillars, they also included pavilions that sheltered visitors from the relentless heat. But perhaps the most impressive features are the intricate decorative sculptures that embellish many stepwells, showing activities from fighting and dancing to everyday acts such as women combing their hair or churning butter." },
+      { id: "E", sourcePage: 18, text: "Down the centuries, thousands of wells were constructed throughout north-western India, but the majority have now fallen into disuse; many are derelict and dry, as groundwater has been diverted for industrial use and the wells no longer reach the water table. Their condition hasn't been helped by recent dry spells: southern Rajasthan suffered an eight-year drought between 1996 and 2004." },
+      { id: "F", sourcePage: 19, text: "However, some important sites in Gujarat have recently undergone major restoration, and the state government announced last year that it will undertake plans to restore the stepwells throughout the state." },
+      { id: "G", sourcePage: 19, text: "In Patan, the state's ancient capital, the stepwell of Rani Ki Vav (Queen's Stepwell) is perhaps the finest current example. It was built by Queen Udayamati during the late 11th century, but became silted up following a flood during the 13th century. But the Archaeological Survey of India began restoring it in the 1960s, and today it is in pristine condition. At 65 metres long, 20 metres wide and 27 metres deep, Rani Ki Vav features 500 sculptures carved into niches throughout the monument. Incredibly, in January 2001, this ancient structure survived an earthquake that measured 7.6 on the Richter scale." },
+      { id: "H", sourcePage: 19, text: "Another example is the Surya Kund in Modhera, northern Gujarat, next to the Sun Temple, built by King Bhima I in 1026 to honour the sun god Surya. It actually resembles a tank (kund means reservoir or pond) rather than a well, but displays the hallmarks of stepwell architecture, including four sides of steps that descend to the bottom in a stunning geometrical formation. The terraces house 108 small, intricately carved shrines between the sets of steps." },
+      { id: "I", sourcePage: 19, text: "Rajasthan also has a wealth of wells. The ancient city of Bundi, 200 kilometres south of Jaipur, is renowned for its architecture, including its stepwells. One of the larger examples is Raniji Ki Baori, which was built by the queen of the region, Nathavati, in 1699. At 46 metres deep, 20 metres wide and 40 metres long, the intricately carved monument is one of 21 baoris commissioned in the Bundi area by Nathavati." },
+      { id: "J", sourcePage: 19, text: "In the old ruined town of Abhaneri, about 95 kilometres east of Jaipur, is Chand Baori, one of India's oldest and deepest wells; aesthetically it is perhaps one of the most dramatic. Built in around 850 AD next to the temple of Harshat Mata, the baori comprises hundreds of zigzagging steps that run along three of its sides, steeply descending 11 storeys, resulting in a striking pattern when seen from afar. On the fourth side, verandas which are supported by ornate pillars overlook the steps." },
+      { id: "K", sourcePage: 19, text: "Still in public use is Neemrana Ki Baori, located just off the Jaipur-Delhi highway. Constructed in around 1700, it is nine storeys deep, with the last two being underwater. At ground level, there are 86 colonnaded openings from where the visitor descends 170 steps to the deepest water source." },
+      { id: "L", sourcePage: 19, text: "Today, following years of neglect, many of these monuments to medieval engineering have been saved by the Archaeological Survey of India, which has recognised the importance of preserving them as part of the country's rich history. Tourists flock to wells in far-flung corners of north-western India to gaze in wonder at these architectural marvels from hundreds of years ago, which serve as a reminder of both the ingenuity and artistry of ancient civilisation and of the value of water to human existence." },
+    ],
+  },
+};
+
+const cambridgeReadingReviews: Record<string, Record<number, CambridgeReadingReview>> = {
+  "academic-test-1-reading-1": {
+    1: { paragraphId: "B", evidence: "Unique to this region", explanation: "The passage says stepwells are unique to this region, so it contradicts the claim that they can be found all over the world." },
+    2: { paragraphId: "B", evidence: "places of gathering, of leisure and relaxation and of worship", explanation: "These functions are additional to collecting water, so the statement agrees with the passage." },
+    3: { paragraphId: "B", evidence: "a few also survive in Delhi", explanation: "The passage only says that some survive in Delhi; it does not compare their attractiveness with stepwells elsewhere." },
+    4: { paragraphId: "C", evidence: "a series of stone steps descending from ground level", explanation: "The text describes the stone steps but gives no information about how many years workers took to build them." },
+    5: { paragraphId: "C", evidence: "When the water level was high ... when the water levels were low", explanation: "The number of steps needed changes with the water level, which varies after the rains and in dry periods." },
+    6: { paragraphId: "D", evidence: "pavilions that sheltered visitors from the relentless heat", explanation: "Pavilions are the part that provided shade/shelter for visitors." },
+    7: { paragraphId: "E", evidence: "an eight-year drought between 1996 and 2004", explanation: "The serious climatic event named in the article is a drought." },
+    8: { paragraphId: "L", evidence: "Tourists flock to wells", explanation: "The passage explicitly identifies tourists as frequent present-day visitors." },
+    9: { paragraphId: "G", evidence: "survived an earthquake", explanation: "Rani Ki Vav remained intact despite the earthquake in January 2001." },
+    10: { paragraphId: "H", evidence: "four sides of steps", explanation: "The Surya Kund has steps on four sides, creating the geometrical pattern." },
+    11: { paragraphId: "H", evidence: "resembles a tank ... rather than a well", explanation: "The text calls Surya Kund a tank (a reservoir or pond), rather than a well." },
+    12: { paragraphId: "J", evidence: "verandas ... overlook the steps", explanation: "The verandas on the fourth side provide the view of the steps." },
+    13: { paragraphId: "K", evidence: "the last two being underwater", explanation: "The final two levels of Neemrana Ki Baori are underwater." },
+  },
+};
+
+export function readingPassageFor(partId: string) {
+  return cambridgeReadingPassages[partId];
+}
+
+export function readingReviewFor(partId: string, questionNumber: number) {
+  return cambridgeReadingReviews[partId]?.[questionNumber];
 }
 
 function pages(start: number, end: number) {

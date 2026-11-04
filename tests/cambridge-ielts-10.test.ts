@@ -6,6 +6,8 @@ import {
   cambridgeIelts10Tests,
   listeningReviewFor,
   listeningTranscriptFor,
+  readingPassageFor,
+  readingReviewFor,
 } from "../src/data/cambridge-ielts-10.ts";
 
 test("Cambridge IELTS 10 has a complete 40-question key for every supplied Reading/Listening test", () => {
@@ -65,5 +67,21 @@ test("Test 1 Section 1 provides a timestamped full audioscript for read-along pl
   for (const cue of cues) {
     assert.ok(cue.text.trim().length > 0);
     assert.ok(cue.endSeconds > cue.startSeconds);
+  }
+});
+
+test("Test 1 Reading Passage 1 provides source locations and explanations for every question", () => {
+  const partId = "academic-test-1-reading-1";
+  const passage = readingPassageFor(partId);
+  assert.ok(passage);
+  assert.equal(passage.title, "Stepwells");
+  assert.ok(passage.paragraphs.length >= 10);
+
+  for (let number = 1; number <= 13; number += 1) {
+    const review = readingReviewFor(partId, number);
+    assert.ok(review, `question ${number} must have a reading review`);
+    assert.ok(passage.paragraphs.some((paragraph) => paragraph.id === review.paragraphId));
+    assert.ok(review.evidence.length > 0);
+    assert.ok(review.explanation.length > 0);
   }
 });
