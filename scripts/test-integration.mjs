@@ -215,6 +215,56 @@ try {
   assert.match(exercise.body.exercise.source_url, /^https:\/\//);
   assert.ok(!JSON.stringify(exercise.body).includes('"correct_answer"'));
   assert.ok(!JSON.stringify(exercise.body).includes('"transcript"'));
+  const answersByPosition = {
+    1: "Schools may begin very early.",
+    2: "false",
+    3: "  MINUTES  ",
+    4: "TRUE",
+    5: "mood",
+  };
+  const answers = Object.fromEntries(
+    exercise.body.exercise.questions.map((question) => [
+      question.id,
+      answersByPosition[question.position],
+    ]),
+  );
+  const submissionId = crypto.randomUUID();
+  const graded = await request(
+    "/api/practice/voa-sleepy-teens-reading/submit",
+    { method: "POST", body: JSON.stringify({ submissionId, answers }) },
+    one.cookie,
+  );
+  assert.equal(graded.status, 200, JSON.stringify(graded.body));
+  assert.equal(graded.body.correctCount, 5);
+  assert.equal(graded.body.incorrectCount, 0);
+  assert.equal(graded.body.unansweredCount, 0);
+  assert.equal(graded.body.percentage, 100);
+  assert.equal(graded.body.estimatedBand, null);
+  assert.equal(graded.body.questions.length, 5);
+  assert.ok(graded.body.processingMs < 500, `grading took ${graded.body.processingMs}ms`);
+  assert.match(graded.headers.get("Server-Timing"), /grade;dur=/);
+  const retried = await request(
+    "/api/practice/voa-sleepy-teens-reading/submit",
+    { method: "POST", body: JSON.stringify({ submissionId, answers }) },
+    one.cookie,
+  );
+  assert.equal(retried.body.attemptId, graded.body.attemptId);
+  const attemptRows = await admin
+    .from("practice_attempts")
+    .select("id")
+    .eq("user_id", one.id)
+    .eq("submission_id", submissionId);
+  assert.equal(attemptRows.data.length, 1, "retry must not duplicate an attempt");
+  assert.equal(
+    (await request(`/api/practice/results/${graded.body.attemptId}`, {}, one.cookie)).status,
+    200,
+  );
+  assert.equal(
+    (await request(`/api/practice/results/${graded.body.attemptId}`, {}, two.cookie)).status,
+    404,
+  );
+  const privateKeys = await one.client.from("practice_answer_keys").select("question_id");
+  assert.ok(privateKeys.error, "answer keys must not be readable by browser clients");
   const protectedWrite = await one.client
     .from("practice_exercises")
     .update({ title: "overwrite" })
@@ -251,6 +301,19 @@ try {
   const audioExercise = await request(
     "/api/practice/voa-sleepy-teens-listening",
   );
+  const blankListening = await request(
+    "/api/practice/voa-sleepy-teens-listening/submit",
+    {
+      method: "POST",
+      body: JSON.stringify({ submissionId: crypto.randomUUID(), answers: {} }),
+    },
+    one.cookie,
+  );
+  assert.equal(blankListening.status, 200, JSON.stringify(blankListening.body));
+  assert.equal(blankListening.body.unansweredCount, 5);
+  assert.equal(blankListening.body.incorrectCount, 0);
+  assert.ok(blankListening.body.transcript.length > 100);
+  assert.ok(blankListening.body.questions.every((item) => item.audioEndSeconds > item.audioStartSeconds));
   const audio = await fetch(
     `http://localhost:${port}${audioExercise.body.exercise.audio_path}`,
     { headers: { Range: "bytes=0-1023" } },
@@ -260,7 +323,7 @@ try {
   const header = new Uint8Array(await audio.arrayBuffer());
   assert.equal(header.length, 1024);
   console.log(
-    "PASS: real local APIs, session cookies, US-102 CRUD/validation, band recommendation, filtered bank, RLS isolation, unpublished content, and MP3 byte-range streaming.",
+    "PASS: real local APIs, US-102, US-302 server grading under 500ms, idempotency, private keys/results, transcripts, filtered bank, RLS, and MP3 streaming.",
   );
 } finally {
   for (const id of users) await admin.auth.admin.deleteUser(id);
