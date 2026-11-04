@@ -176,8 +176,17 @@ export function ResultDashboard({
               "Hệ thống không sử dụng điểm giả lập. Một số kỹ năng chưa có điểm số AI hợp lệ do thiếu cấu hình GEMINI_API_KEY hoặc nội dung không hợp lệ. Vui lòng xem chi tiết từng kỹ năng bên dưới."}
           </p>
 
-          {onRetryAssessment && (
-            <div className="pt-1">
+          <div className="pt-1 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onRetakeTest}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-[#fffbeb] text-[#925507] border border-[#e9c778] font-bold rounded-lg transition-all cursor-pointer"
+            >
+              <Icon name="refresh" size={13} />
+              <span>Làm lại và bổ sung Writing/Speaking</span>
+            </button>
+
+            {onRetryAssessment && (
               <button
                 type="button"
                 disabled={isRetrying}
@@ -187,8 +196,8 @@ export function ResultDashboard({
                 <Icon name="refresh" size={13} className={isRetrying ? "animate-spin" : ""} />
                 <span>{isRetrying ? "Đang chấm lại..." : "Thử chấm lại với AI"}</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
