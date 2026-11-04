@@ -4,6 +4,7 @@ import {
   answerGroupsFor,
   answerKeyFor,
   cambridgeIelts10Tests,
+  listeningReviewFor,
 } from "../src/data/cambridge-ielts-10.ts";
 
 test("Cambridge IELTS 10 has a complete 40-question key for every supplied Reading/Listening test", () => {
@@ -43,4 +44,14 @@ test("Academic listening transcripts remain separately sourced until submission"
     [141, 142, 143, 144, 145, 146],
     [146, 147, 148, 149, 150, 151],
   ]);
+});
+
+test("Test 1 Section 1 exposes reviewed answer evidence for every question", () => {
+  for (let number = 1; number <= 10; number += 1) {
+    const review = listeningReviewFor("academic-test-1-listening-1", number);
+    assert.ok(review, `question ${number} must have a review record`);
+    assert.ok(review.evidence.length > 0);
+    assert.ok(review.explanation.length > 0);
+    assert.ok(review.audioEndSeconds > review.audioStartSeconds);
+  }
 });

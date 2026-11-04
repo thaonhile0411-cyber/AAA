@@ -10,6 +10,7 @@ import {
   cambridgeSkillLabels,
   answerKeyFor,
   answerGroupsFor,
+  listeningReviewFor,
   type CambridgePart,
   type CambridgeSkill,
   type CambridgeSkillSection,
@@ -137,6 +138,44 @@ function normaliseAnswer(value: string) {
   return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
 
+function SegmentReplayButton({ source, start, end }: { source: string; start: number; end: number }) {
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => () => audio.current?.pause(), []);
+
+  function replay() {
+    if (playing) {
+      audio.current?.pause();
+      setPlaying(false);
+      return;
+    }
+    audio.current?.pause();
+    const player = new Audio(source);
+    audio.current = player;
+    const begin = () => {
+      player.currentTime = start;
+      void player.play().catch(() => setPlaying(false));
+    };
+    player.onloadedmetadata = begin;
+    player.ontimeupdate = () => {
+      if (player.currentTime >= end) {
+        player.pause();
+        setPlaying(false);
+      }
+    };
+    player.onended = () => setPlaying(false);
+    player.onerror = () => setPlaying(false);
+    setPlaying(true);
+    if (player.readyState >= HTMLMediaElement.HAVE_METADATA) begin();
+  }
+
+  return <button type="button" className="secondary-button" onClick={replay}>
+    <Icon name={playing ? "pause" : "play"} size={15} />
+    {playing ? "Pause answer segment" : "Replay answer segment"}
+  </button>;
+}
+
 export function CambridgeIelts10() {
   const [selectedTestId, setSelectedTestId] = useState(cambridgeIelts10Tests[0].id);
   const [selectedSkill, setSelectedSkill] = useState<CambridgeSkill | null>(null);
@@ -254,6 +293,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const [audioPosition, setAudioPosition] = useState(() => Number(answers.__audioPosition) || 0);
   const [audioSpeed, setAudioSpeed] = useState(() => Number(answers.__audioSpeed) || 1);
   const [hasSpeakingRecording, setHasSpeakingRecording] = useState(false);
+  const [reviewedNumber, setReviewedNumber] = useState<number | null>(null);
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
   const isWriting = active.section.skill === "writing";
@@ -333,6 +373,14 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   });
   const unansweredCount = scoredNumbers.length - answeredNumbers.length;
   const incorrectCount = answeredNumbers.length - correct.length;
+  const reviewedListeningAnswer = isListening && reviewedNumber
+    ? listeningReviewFor(active.part.id, reviewedNumber)
+    : undefined;
+
+  function showListeningReview(number: number) {
+    setReviewedNumber(number);
+    setMobilePane("source");
+  }
 
   return (
     <div className="exam-modal-backdrop" role="presentation">
@@ -375,6 +423,19 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                 {active.test.transcriptPages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10 audioscript, source page ${page}`} />)}
               </section>
             )}
+            {submitted && reviewedListeningAnswer && active.part.audioPath && (
+              <section className="cambridge-answer-review" aria-live="polite">
+                <span>QUESTION {reviewedNumber} · ANSWER EVIDENCE</span>
+                <h2>Why this answer is correct</h2>
+                <p lang="en"><mark>{reviewedListeningAnswer.evidence}</mark></p>
+                <p>{reviewedListeningAnswer.explanation}</p>
+                <SegmentReplayButton
+                  source={active.part.audioPath}
+                  start={reviewedListeningAnswer.audioStartSeconds}
+                  end={reviewedListeningAnswer.audioEndSeconds}
+                />
+              </section>
+            )}
           </section>
           <button type="button" className="exam-divider" aria-label="Kéo để đổi độ rộng hai cột" onPointerDown={() => setResizing(true)} />
           <section className="exam-answer-pane" aria-label="Khu vực trả lời">
@@ -396,9 +457,16 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                       <span>{number}</span>
                       <input id={`exam-answer-${number}`} ref={(element) => { answersRef.current[String(number)] = element; }} value={answers[String(number)] ?? ""} onFocus={() => setSelectedQuestion(number)} onChange={(event) => persist({ ...answers, [number]: event.target.value })} autoComplete="off" disabled={submitted} />
                       {submitted && acceptedAnswers?.[number] && (
-                        <small className={correct.includes(number) ? "exam-answer-result correct" : "exam-answer-result incorrect"}>
-                          {correct.includes(number) ? "Correct" : `Accepted answer: ${acceptedAnswers[number].join(" / ")}`}
-                        </small>
+                        <div className="exam-answer-result">
+                          <small className={correct.includes(number) ? "correct" : "incorrect"}>
+                            {correct.includes(number) ? "Correct" : `Accepted answer: ${acceptedAnswers[number].join(" / ")}`}
+                          </small>
+                          {isListening && listeningReviewFor(active.part.id, number) && (
+                            <button type="button" className="text-link" onClick={() => showListeningReview(number)}>
+                              View explanation
+                            </button>
+                          )}
+                        </div>
                       )}
                     </label>
                   ))}
@@ -415,8 +483,8 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
         </div>
         <footer className="exam-modal-footer">
           <span>{active.part.label}</span>
-          {!isWritingOrSpeaking && <nav aria-label="Question navigation">{numbers.map((number) => <button key={number} type="button" className={`${selectedQuestion === number ? "current" : ""} ${answers[String(number)]?.trim() ? "answered" : ""}`} onClick={() => { setSelectedQuestion(number); setMobilePane("answers"); requestAnimationFrame(() => answersRef.current[String(number)]?.focus()); }}>{number}</button>)}</nav>}
-          <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => setSubmitted(true)}>{submitted ? "Submitted" : "Submit"}</button></div>
+          {!isWritingOrSpeaking && <nav aria-label="Question navigation">{numbers.map((number) => <button key={number} type="button" className={`${selectedQuestion === number ? "current" : ""} ${answers[String(number)]?.trim() ? "answered" : ""}`} onClick={() => { setSelectedQuestion(number); if (submitted && isListening && listeningReviewFor(active.part.id, number)) showListeningReview(number); else { setMobilePane("answers"); requestAnimationFrame(() => answersRef.current[String(number)]?.focus()); } }}>{number}</button>)}</nav>}
+          <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => { setSubmitted(true); const initialReview = numbers.find((number) => !correct.includes(number)) ?? numbers[0]; if (isListening && initialReview !== undefined) showListeningReview(initialReview); }}>{submitted ? "Submitted" : "Submit"}</button></div>
           <small>{submitted && acceptedAnswers ? `${correct.length}/${scoredNumbers.length} correct` : typeof completed === "number" ? `${completed}/${numbers.length} answered` : completed ? "Response saved" : "No response yet"}</small>
         </footer>
       </section>

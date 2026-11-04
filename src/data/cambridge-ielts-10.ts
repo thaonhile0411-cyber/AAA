@@ -34,6 +34,13 @@ export type CambridgeAnswerGroup = {
   accepted: string[];
 };
 
+export type CambridgeListeningReview = {
+  evidence: string;
+  explanation: string;
+  audioStartSeconds: number;
+  audioEndSeconds: number;
+};
+
 export const cambridgeAnswerKeys: Partial<Record<string, Partial<Record<"listening" | "reading", CambridgeAnswerKey>>>> = {
   "academic-test-1": {
     listening: {
@@ -174,6 +181,80 @@ export function answerKeyFor(testId: string, skill: CambridgeSkill) {
 export function answerGroupsFor(testId: string, skill: CambridgeSkill) {
   if (skill !== "listening" && skill !== "reading") return [];
   return cambridgeAnswerGroups[testId]?.[skill] ?? [];
+}
+
+/**
+ * Evidence is transcribed directly from the supplied Cambridge audio and then
+ * checked against the printed answer key. Add a record only after that review;
+ * an absent record intentionally means the UI does not invent an explanation.
+ */
+const cambridgeListeningReviews: Record<string, Record<number, CambridgeListeningReview>> = {
+  "academic-test-1-listening-1": {
+    1: {
+      evidence: "A-R-D-L-E-I-G-H Road.",
+      explanation: "The caller spells the road name letter by letter, so the required answer is Ardleigh.",
+      audioStartSeconds: 179.44,
+      audioEndSeconds: 192.16,
+    },
+    2: {
+      evidence: "No, I read about you in the newspaper.",
+      explanation: "The caller says the advertisement was read in a newspaper.",
+      audioStartSeconds: 207.2,
+      audioEndSeconds: 213.12,
+    },
+    3: {
+      evidence: "there's plenty of time to visit some of the theme parks there",
+      explanation: "The first California tour includes time to visit theme parks in Los Angeles.",
+      audioStartSeconds: 230.96,
+      audioEndSeconds: 241.76,
+    },
+    4: {
+      evidence: "I don't like the idea of staying in a tent.",
+      explanation: "The caller rejects the campsite option because it would mean staying in a tent.",
+      audioStartSeconds: 248.32,
+      audioEndSeconds: 261.04,
+    },
+    5: {
+      evidence: "Hearst Castle is on that road, so you could stop there.",
+      explanation: "The agent confirms that the route passes Hearst Castle; the answer key accepts castle.",
+      audioStartSeconds: 267.76,
+      audioEndSeconds: 279.6,
+    },
+    6: {
+      evidence: "That's good for beaches, isn't it?",
+      explanation: "San Diego is described as a good place for beaches, so beach/beaches is accepted.",
+      audioStartSeconds: 291.84,
+      audioEndSeconds: 302.64,
+    },
+    7: {
+      evidence: "covers 2,020 kilometers.",
+      explanation: "The agent gives the first tour's total distance as 2,020 kilometres.",
+      audioStartSeconds: 349.52,
+      audioEndSeconds: 365.52,
+    },
+    8: {
+      evidence: "That includes accommodation, car rental and a flight but no meals.",
+      explanation: "The first tour price includes a flight; meals are specifically excluded.",
+      audioStartSeconds: 366.08,
+      audioEndSeconds: 374.48,
+    },
+    9: {
+      evidence: "It's 429 pounds per person.",
+      explanation: "The agent states the price of the second trip as 429 pounds per person.",
+      audioStartSeconds: 387.6,
+      audioEndSeconds: 394.72,
+    },
+    10: {
+      evidence: "these hotels offer dinner in the price.",
+      explanation: "Although flights are not included in the second trip, dinner is included by the hotels.",
+      audioStartSeconds: 394.72,
+      audioEndSeconds: 400.64,
+    },
+  },
+};
+
+export function listeningReviewFor(partId: string, questionNumber: number) {
+  return cambridgeListeningReviews[partId]?.[questionNumber];
 }
 
 function pages(start: number, end: number) {
