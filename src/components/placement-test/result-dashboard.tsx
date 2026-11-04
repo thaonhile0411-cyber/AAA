@@ -54,7 +54,7 @@ export function ResultDashboard({
   const userProfile = profileState.profile;
   const profileLoaded = profileState.loaded;
 
-  const { overallBand, skills, evaluationStatus, errorMessage } = result;
+  const { overallBand, skills, errorMessage } = result;
 
   // Has any AI skill failed?
   const hasUnassessedAiSkill =
@@ -122,7 +122,7 @@ export function ResultDashboard({
         <div className="p-4 bg-[#fff8eb] border border-[#f5dfb8] rounded-xl text-xs text-[#925507] space-y-2">
           <div className="flex items-center gap-2 font-bold text-amber-900">
             <Icon name="alert" size={16} />
-            <span>Thông báo trạng thái đánh giá AI (Version 3.1):</span>
+            <span>Thông báo trạng thái đánh giá AI:</span>
           </div>
           <p className="leading-relaxed">
             {errorMessage ||
@@ -228,17 +228,34 @@ export function ResultDashboard({
                       </div>
 
                       {isAiSkill && (
-                        isSuccess ? (
-                          <span className="text-[10px] font-semibold text-[#175cdd] bg-[#eff5ff] border border-[#d6e4fd] px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <Icon name="sparkle" size={10} />
-                            AI Evaluated
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold text-[#b45309] bg-[#fef3c7] border border-[#fde68a] px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <Icon name="alert" size={10} />
-                            Chưa có điểm AI
-                          </span>
-                        )
+                        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                          {isSuccess ? (
+                            <>
+                              <span className="text-[10px] font-semibold text-[#175cdd] bg-[#eff5ff] border border-[#d6e4fd] px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <Icon name="sparkle" size={10} />
+                                {s.provider === "openai"
+                                  ? "OpenAI"
+                                  : s.provider === "groq"
+                                    ? "Groq"
+                                    : "Google Gemini"}
+                              </span>
+                              <span className="text-[10px] font-semibold text-[#147054] bg-[#f0faf5] border border-[#bce4d6] px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <Icon name="check" size={10} />
+                                Đánh giá thành công
+                              </span>
+                            </>
+                          ) : isRetrying ? (
+                            <span className="text-[10px] font-bold text-[#175cdd] bg-[#edf3ff] border border-[#c7d9fc] px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                              <Icon name="refresh" size={10} className="animate-spin" />
+                              Đang thử lại...
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-[#b45309] bg-[#fef3c7] border border-[#fde68a] px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Icon name="alert" size={10} />
+                              Chưa có điểm AI
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
 
@@ -462,6 +479,8 @@ export function ResultDashboard({
                   </h3>
                   <span className="text-xs text-[#64748b]">
                     Overall Skill Band: <strong>{selectedSkillData.band !== null ? selectedSkillData.band.toFixed(1) : "—"}</strong>
+                    {selectedSkillData.provider && ` • Đánh giá bởi ${selectedSkillData.provider === "openai" ? "OpenAI" : selectedSkillData.provider === "groq" ? "Groq" : "Google Gemini"}`}
+                    {selectedSkillData.modelUsed && ` (${selectedSkillData.modelUsed})`}
                   </span>
                 </div>
               </div>

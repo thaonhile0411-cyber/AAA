@@ -322,12 +322,12 @@ export const READING_PARTS: ReadingPart[] = [
         prompt: "Choose the correct heading for Section A:",
         paragraphRef: "Section A",
         options: [
-          { label: "i", text: "i. Bureaucratic bookkeeping as the primary catalyst" },
-          { label: "ii", text: "ii. The invention of the printing press in Western Europe" },
-          { label: "iii", text: "iii. Bridging the semantic barrier with phonetic rebus" },
-          { label: "iv", text: "iv. The exclusive monopoly of professional scribes" },
-          { label: "v", text: "v. The emergence of the simplified phonetic alphabet" },
-          { label: "vi", text: "vi. Astronomical calculations in Mesoamerican codices" },
+          { label: "i", text: "Bureaucratic bookkeeping as the primary catalyst" },
+          { label: "ii", text: "The invention of the printing press in Western Europe" },
+          { label: "iii", text: "Bridging the semantic barrier with phonetic rebus" },
+          { label: "iv", text: "The exclusive monopoly of professional scribes" },
+          { label: "v", text: "The emergence of the simplified phonetic alphabet" },
+          { label: "vi", text: "Astronomical calculations in Mesoamerican codices" },
         ],
         correctAnswer: "i",
         explanation:
@@ -341,12 +341,12 @@ export const READING_PARTS: ReadingPart[] = [
         prompt: "Choose the correct heading for Section B:",
         paragraphRef: "Section B",
         options: [
-          { label: "i", text: "i. Bureaucratic bookkeeping as the primary catalyst" },
-          { label: "ii", text: "ii. The invention of the printing press in Western Europe" },
-          { label: "iii", text: "iii. Bridging the semantic barrier with phonetic rebus" },
-          { label: "iv", text: "iv. The exclusive monopoly of professional scribes" },
-          { label: "v", text: "v. The emergence of the simplified phonetic alphabet" },
-          { label: "vi", text: "vi. Astronomical calculations in Mesoamerican codices" },
+          { label: "i", text: "Bureaucratic bookkeeping as the primary catalyst" },
+          { label: "ii", text: "The invention of the printing press in Western Europe" },
+          { label: "iii", text: "Bridging the semantic barrier with phonetic rebus" },
+          { label: "iv", text: "The exclusive monopoly of professional scribes" },
+          { label: "v", text: "The emergence of the simplified phonetic alphabet" },
+          { label: "vi", text: "Astronomical calculations in Mesoamerican codices" },
         ],
         correctAnswer: "iii",
         explanation:
@@ -360,12 +360,12 @@ export const READING_PARTS: ReadingPart[] = [
         prompt: "Choose the correct heading for Section C:",
         paragraphRef: "Section C",
         options: [
-          { label: "i", text: "i. Bureaucratic bookkeeping as the primary catalyst" },
-          { label: "ii", text: "ii. The invention of the printing press in Western Europe" },
-          { label: "iii", text: "iii. Bridging the semantic barrier with phonetic rebus" },
-          { label: "iv", text: "iv. The exclusive monopoly of professional scribes" },
-          { label: "v", text: "v. The emergence of the simplified phonetic alphabet" },
-          { label: "vi", text: "vi. Astronomical calculations in Mesoamerican codices" },
+          { label: "i", text: "Bureaucratic bookkeeping as the primary catalyst" },
+          { label: "ii", text: "The invention of the printing press in Western Europe" },
+          { label: "iii", text: "Bridging the semantic barrier with phonetic rebus" },
+          { label: "iv", text: "The exclusive monopoly of professional scribes" },
+          { label: "v", text: "The emergence of the simplified phonetic alphabet" },
+          { label: "vi", text: "Astronomical calculations in Mesoamerican codices" },
         ],
         correctAnswer: "iv",
         explanation:
@@ -379,12 +379,12 @@ export const READING_PARTS: ReadingPart[] = [
         prompt: "Choose the correct heading for Section D:",
         paragraphRef: "Section D",
         options: [
-          { label: "i", text: "i. Bureaucratic bookkeeping as the primary catalyst" },
-          { label: "ii", text: "ii. The invention of the printing press in Western Europe" },
-          { label: "iii", text: "iii. Bridging the semantic barrier with phonetic rebus" },
-          { label: "iv", text: "iv. The exclusive monopoly of professional scribes" },
-          { label: "v", text: "v. The emergence of the simplified phonetic alphabet" },
-          { label: "vi", text: "vi. Astronomical calculations in Mesoamerican codices" },
+          { label: "i", text: "Bureaucratic bookkeeping as the primary catalyst" },
+          { label: "ii", text: "The invention of the printing press in Western Europe" },
+          { label: "iii", text: "Bridging the semantic barrier with phonetic rebus" },
+          { label: "iv", text: "The exclusive monopoly of professional scribes" },
+          { label: "v", text: "The emergence of the simplified phonetic alphabet" },
+          { label: "vi", text: "Astronomical calculations in Mesoamerican codices" },
         ],
         correctAnswer: "v",
         explanation:
@@ -488,6 +488,7 @@ export const READING_PARTS: ReadingPart[] = [
 // ==========================================
 export const WRITING_TASKS: WritingTaskData[] = [
   {
+    id: "writing_task_1",
     taskNumber: 1,
     title: "Writing Task 1: Academic Data Description",
     type: "academic_chart",
@@ -530,6 +531,7 @@ export const WRITING_TASKS: WritingTaskData[] = [
     },
   },
   {
+    id: "writing_task_2",
     taskNumber: 2,
     title: "Writing Task 2: Academic Discursive Essay",
     type: "essay",
@@ -541,6 +543,18 @@ export const WRITING_TASKS: WritingTaskData[] = [
     recommendedMinutes: 40,
   },
 ];
+
+export function getWritingTask(
+  idOrTaskNumber: string | number,
+): WritingTaskData | undefined {
+  if (typeof idOrTaskNumber === "number") {
+    return WRITING_TASKS.find((t) => t.taskNumber === idOrTaskNumber);
+  }
+  return WRITING_TASKS.find(
+    (t) =>
+      t.id === idOrTaskNumber || t.taskNumber.toString() === idOrTaskNumber,
+  );
+}
 
 // ==========================================
 // 4. SPEAKING DATA (3 Parts)

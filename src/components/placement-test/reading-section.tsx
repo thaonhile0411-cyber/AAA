@@ -12,21 +12,32 @@ type ReadingSectionProps = {
   answers: Record<string, string>;
   onAnswerChange: (questionId: string, answer: string) => void;
   onNextSection: () => void;
+  disabled?: boolean;
 };
+
+/**
+ * Strips duplicate prefixes from option text if data accidentally repeats label.
+ * e.g., label="i", text="i. Bureaucratic..." -> "Bureaucratic..."
+ */
+export function stripOptionPrefix(label: string, text: string): string {
+  if (!text) return "";
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`^${escaped}[.)\\s-]+\\s*`, "i");
+  return text.replace(regex, "").trim();
+}
 
 export function ReadingSection({
   answers,
   onAnswerChange,
   onNextSection,
+  disabled = false,
 }: ReadingSectionProps) {
   const [activeQuestionId, setActiveQuestionId] = useState<string>("R1");
-  const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
 
   const totalQuestions = ALL_READING_QUESTIONS.length;
   const answeredCount = ALL_READING_QUESTIONS.filter((q) =>
     Boolean(answers[q.id]?.trim()),
   ).length;
-  const remainingCount = totalQuestions - answeredCount;
 
   function handleSelectQuestion(id: string) {
     setActiveQuestionId(id);
@@ -37,10 +48,6 @@ export function ReadingSection({
   }
 
   function handleCompleteSection() {
-    if (answeredCount < totalQuestions) {
-      setShowIncompleteWarning(true);
-      return;
-    }
     onNextSection();
   }
 
@@ -60,7 +67,7 @@ export function ReadingSection({
             Reading Section
           </h2>
           <p className="text-xs text-[#64748b] m-0 mt-0.5">
-            Đọc bài bên cột trái và trả lời 12 câu hỏi bên cột phải (cuộn độc lập)
+            Đọc bài bên cột trái và trả lời {totalQuestions} câu hỏi bên cột phải (cuộn độc lập)
           </p>
         </div>
 
@@ -127,21 +134,22 @@ export function ReadingSection({
           ))}
         </div>
 
-        {/* Right Column: All 12 Questions (6 cols) */}
+        {/* Right Column: All Questions (6 cols) */}
         <div className="lg:col-span-6 space-y-4">
           {/* Question Navigator */}
           <QuestionNavigator
-            title="Reading (12 câu)"
+            title={`Reading (${totalQuestions} câu)`}
             items={navItems}
             onSelect={handleSelectQuestion}
           />
 
-          {/* All 12 Questions Continuously */}
+          {/* All Questions Continuously */}
           <div className="overflow-y-auto max-h-[62vh] space-y-4 pr-1">
             {ALL_READING_QUESTIONS.map((q) => {
               const currentAnswer = answers[q.id] || "";
               const isAnswered = Boolean(currentAnswer.trim());
               const isActive = q.id === activeQuestionId;
+              const isTrueFalse = q.type === "true_false_not_given";
 
               return (
                 <div
@@ -197,10 +205,16 @@ export function ReadingSection({
                     <div className="space-y-2 mt-2">
                       {q.options.map((opt) => {
                         const isSelected = currentAnswer === opt.label;
+                        const cleanText = stripOptionPrefix(opt.label, opt.text);
+
                         return (
                           <label
                             key={opt.label}
-                            className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer text-xs transition-all ${
+                            className={`flex items-start gap-3 p-3 rounded-xl border text-xs transition-all ${
+                              disabled
+                                ? "cursor-not-allowed opacity-65"
+                                : "cursor-pointer"
+                            } ${
                               isSelected
                                 ? "bg-[#edf3ff] border-[#175cdd] text-[#11213f] font-semibold"
                                 : "bg-white border-[#e6eaf1] text-[#334155] hover:bg-[#f8fafc]"
@@ -210,14 +224,25 @@ export function ReadingSection({
                               type="radio"
                               name={`reading-${q.id}`}
                               value={opt.label}
+                              disabled={disabled}
                               checked={isSelected}
                               onChange={() => onAnswerChange(q.id, opt.label)}
                               className="mt-0.5 text-[#175cdd] focus:ring-[#175cdd]"
                             />
-                            <span className="font-bold text-[#175cdd]">
-                              {opt.label}.
-                            </span>
-                            <span className="leading-relaxed">{opt.text}</span>
+                            {isTrueFalse ? (
+                              <span className="font-bold text-[#11213f] tracking-wide">
+                                {opt.label}
+                              </span>
+                            ) : (
+                              <>
+                                <span className="font-bold text-[#175cdd]">
+                                  {opt.label}.
+                                </span>
+                                <span className="leading-relaxed">
+                                  {cleanText || opt.text}
+                                </span>
+                              </>
+                            )}
                           </label>
                         );
                       })}
@@ -241,32 +266,6 @@ export function ReadingSection({
           </div>
         </div>
       </div>
-
-      {/* Warning Modal if Incomplete (Strict validation) */}
-      {showIncompleteWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-2xl border border-[#e6eaf1] shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center gap-3 text-amber-600">
-              <Icon name="alert" size={24} />
-              <h3 className="text-base font-bold text-[#11213f] m-0">
-                Chưa hoàn thành kỹ năng Reading
-              </h3>
-            </div>
-            <p className="text-xs md:text-sm text-[#475569] leading-relaxed m-0">
-              Bạn còn <strong>{remainingCount} câu hỏi</strong> Reading chưa trả lời. Vui lòng hoàn thành tất cả câu hỏi trước khi chuyển sang kỹ năng tiếp theo.
-            </p>
-            <div className="flex items-center justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setShowIncompleteWarning(false)}
-                className="px-5 py-2.5 bg-[#175cdd] hover:bg-[#104dc1] text-white text-xs font-bold rounded-xl cursor-pointer"
-              >
-                Ở lại làm tiếp
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

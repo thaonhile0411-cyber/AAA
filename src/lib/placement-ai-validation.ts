@@ -1,5 +1,5 @@
-import { countWords, roundToIeltsBand } from "./placement-scoring";
-import type { AssessmentStatus } from "./placement-ai-types";
+import { countWords, roundToIeltsBand } from "./placement-scoring.ts";
+import type { AssessmentStatus } from "./placement-ai-types.ts";
 
 // Vietnamese accented character regex
 const VIETNAMESE_ACCENT_REGEX =
@@ -38,19 +38,28 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
     };
   }
 
-  const wordCount = countWords(trimmed);
+  const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
 
-  // Check 1: Insufficient length (under 20 words cannot be assessed as an IELTS essay)
-  if (wordCount < 20) {
+  // Check 1: Repeated character gibberish (e.g. "aaaaaaa", "asdfasdfasdfasdf")
+  if (/(.)\1{5,}/.test(trimmed) || /([a-z0-9]{2,8})\1{4,}/i.test(trimmed)) {
     return {
       valid: false,
-      status: "insufficient_response",
-      message: `Bài viết chỉ có ${wordCount} từ, quá ngắn để đánh giá năng lực IELTS Task 2 (yêu cầu bài viết hoàn chỉnh tối thiểu 250 từ).`,
+      status: "invalid_response",
+      message: "Bài viết chứa các chuỗi ký tự lặp lại vô nghĩa (gibberish/spam).",
     };
   }
 
-  // Check 2: Vietnamese language detection
-  const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+  // Check 2: Words with excessive length (> 35 characters)
+  const hasExcessiveWord = words.some((w) => w.length > 35);
+  if (hasExcessiveWord) {
+    return {
+      valid: false,
+      status: "invalid_response",
+      message: "Bài viết chứa từ có độ dài bất thường không có trong từ điển tiếng Anh.",
+    };
+  }
+
+  // Check 3: Vietnamese language detection
   let vietnameseCharCount = 0;
   for (const char of trimmed) {
     if (VIETNAMESE_ACCENT_REGEX.test(char)) {
@@ -71,22 +80,13 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
     };
   }
 
-  // Check 3: Repeated character gibberish (e.g. "aaaaaaa", "asdfasdfasdfasdf")
-  if (/(.)\1{5,}/.test(trimmed)) {
+  // Check 4: Insufficient length (under 20 words cannot be assessed as an IELTS essay)
+  const wordCount = countWords(trimmed);
+  if (wordCount < 20) {
     return {
       valid: false,
-      status: "invalid_response",
-      message: "Bài viết chứa các chuỗi ký tự lặp lại vô nghĩa (gibberish/spam).",
-    };
-  }
-
-  // Check 4: Words with excessive length (> 35 characters)
-  const hasExcessiveWord = words.some((w) => w.length > 35);
-  if (hasExcessiveWord) {
-    return {
-      valid: false,
-      status: "invalid_response",
-      message: "Bài viết chứa từ có độ dài bất thường không có trong từ điển tiếng Anh.",
+      status: "insufficient_response",
+      message: `Bài viết chỉ có ${wordCount} từ, quá ngắn để đánh giá năng lực IELTS Task 2 (yêu cầu bài viết hoàn chỉnh tối thiểu 250 từ).`,
     };
   }
 
@@ -120,6 +120,33 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
 }
 
 /**
+ * Strips data URI prefix (including codecs) and whitespace to return clean raw base64
+ */
+export function sanitizeAudioBase64(raw?: string | null): string {
+  if (!raw || typeof raw !== "string") return "";
+  const trimmed = raw.trim();
+  const commaIdx = trimmed.indexOf(",");
+  if (commaIdx !== -1 && trimmed.slice(0, commaIdx).includes("base64")) {
+    return trimmed.slice(commaIdx + 1).replace(/\s/g, "");
+  }
+  return trimmed.replace(/^data:[^;]+;base64,/, "").replace(/\s/g, "");
+}
+
+/**
+ * Normalizes audio MIME type to clean standard types supported by Gemini (without codecs parameters)
+ */
+export function sanitizeAudioMimeType(raw?: string | null): string {
+  if (!raw || typeof raw !== "string") return "audio/webm";
+  const base = raw.split(";")[0].trim().toLowerCase();
+  if (base.includes("webm")) return "audio/webm";
+  if (base.includes("mp4") || base.includes("m4a") || base.includes("aac")) return "audio/mp4";
+  if (base.includes("wav")) return "audio/wav";
+  if (base.includes("mp3") || base.includes("mpeg")) return "audio/mp3";
+  if (base.includes("ogg")) return "audio/ogg";
+  return "audio/webm";
+}
+
+/**
  * Validates speaking recordings before calling Gemini API
  */
 export function validateSpeakingInput(
@@ -140,9 +167,11 @@ export function validateSpeakingInput(
     };
   }
 
-  const recordedEntries = Object.entries(recordings).filter(
-    ([, v]) => Boolean(v?.hasRecorded && v?.audioBase64 && v.audioBase64.length > 50),
-  );
+  const recordedEntries = Object.entries(recordings).filter(([, v]) => {
+    if (!v?.hasRecorded || !v?.audioBase64) return false;
+    const clean = sanitizeAudioBase64(v.audioBase64);
+    return clean.length > 20 && !clean.startsWith("blob:");
+  });
 
   if (recordedEntries.length === 0) {
     return {

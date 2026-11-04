@@ -13,21 +13,21 @@ type ListeningSectionProps = {
   answers: Record<string, string>;
   onAnswerChange: (questionId: string, answer: string) => void;
   onNextSection: () => void;
+  disabled?: boolean;
 };
 
 export function ListeningSection({
   answers,
   onAnswerChange,
   onNextSection,
+  disabled = false,
 }: ListeningSectionProps) {
   const [activeQuestionId, setActiveQuestionId] = useState<string>("L1");
-  const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
 
   const totalQuestions = ALL_LISTENING_QUESTIONS.length;
   const answeredCount = ALL_LISTENING_QUESTIONS.filter((q) =>
     Boolean(answers[q.id]?.trim()),
   ).length;
-  const remainingCount = totalQuestions - answeredCount;
 
   function handleSelectQuestion(id: string) {
     setActiveQuestionId(id);
@@ -38,10 +38,6 @@ export function ListeningSection({
   }
 
   function handleCompleteSection() {
-    if (answeredCount < totalQuestions) {
-      setShowIncompleteWarning(true);
-      return;
-    }
     onNextSection();
   }
 
@@ -146,7 +142,11 @@ export function ListeningSection({
                       return (
                         <label
                           key={opt.label}
-                          className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer text-xs transition-all ${
+                          className={`flex items-start gap-3 p-3 rounded-xl border text-xs transition-all ${
+                            disabled
+                              ? "cursor-not-allowed opacity-65"
+                              : "cursor-pointer"
+                          } ${
                             isSelected
                               ? "bg-[#edf3ff] border-[#175cdd] text-[#11213f] font-semibold"
                               : "bg-white border-[#e6eaf1] text-[#334155] hover:bg-[#f8fafc]"
@@ -156,6 +156,7 @@ export function ListeningSection({
                             type="radio"
                             name={`listening-${q.id}`}
                             value={opt.label}
+                            disabled={disabled}
                             checked={isSelected}
                             onChange={() => onAnswerChange(q.id, opt.label)}
                             className="mt-0.5 text-[#175cdd] focus:ring-[#175cdd]"
@@ -175,9 +176,12 @@ export function ListeningSection({
                     <input
                       type="text"
                       value={currentAnswer}
+                      disabled={disabled}
                       onChange={(e) => onAnswerChange(q.id, e.target.value)}
                       placeholder="Nhập câu trả lời (tối đa 2 từ hoặc 1 số)..."
-                      className="w-full p-3 rounded-xl border border-[#dce3ee] text-xs focus:border-[#175cdd] focus:ring-2 focus:ring-[#175cdd]/15 outline-none font-medium bg-white"
+                      className={`w-full p-3 rounded-xl border border-[#dce3ee] text-xs focus:border-[#175cdd] focus:ring-2 focus:ring-[#175cdd]/15 outline-none font-medium bg-white ${
+                        disabled ? "bg-gray-100 cursor-not-allowed" : ""
+                      }`}
                     />
                   </div>
                 )}
@@ -201,38 +205,12 @@ export function ListeningSection({
         {/* Right Column: Question Navigator (4 cols) */}
         <div className="lg:col-span-4 sticky top-4 space-y-4">
           <QuestionNavigator
-            title="Listening (10 câu)"
+            title={`Listening (${totalQuestions} câu)`}
             items={navItems}
             onSelect={handleSelectQuestion}
           />
         </div>
       </div>
-
-      {/* Warning Modal if Incomplete (Strict validation) */}
-      {showIncompleteWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-2xl border border-[#e6eaf1] shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center gap-3 text-amber-600">
-              <Icon name="alert" size={24} />
-              <h3 className="text-base font-bold text-[#11213f] m-0">
-                Chưa hoàn thành kỹ năng Listening
-              </h3>
-            </div>
-            <p className="text-xs md:text-sm text-[#475569] leading-relaxed m-0">
-              Bạn còn <strong>{remainingCount} câu hỏi</strong> Listening chưa trả lời. Vui lòng hoàn thành tất cả câu hỏi trước khi chuyển sang kỹ năng tiếp theo.
-            </p>
-            <div className="flex items-center justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setShowIncompleteWarning(false)}
-                className="px-5 py-2.5 bg-[#175cdd] hover:bg-[#104dc1] text-white text-xs font-bold rounded-xl cursor-pointer"
-              >
-                Ở lại làm tiếp
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
