@@ -25,7 +25,7 @@ export function filterTopics(
     (topic) =>
       (!filters.topic || topic.id === filters.topic) &&
       topic.editions.some((edition) => {
-        const [year, quarter] = edition.split("-");
+        const [year, quarter] = edition.label.split("-");
         return (
           (!filters.year || filters.year === year) &&
           (!filters.quarter || filters.quarter === quarter)

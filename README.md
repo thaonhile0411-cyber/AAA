@@ -1,6 +1,7 @@
 # AAA — Speaking Question & Model Answer
 
-Module gộp US-305 và US-306, trên nhánh local `feat/us305-us306-speaking`.
+Module gộp US-305 và US-306 trên nhánh `feat/us305-us306-speaking`, đã push lên
+repository GitHub của nhóm. `main` GitHub chưa bị thay đổi.
 
 ```powershell
 cd D:\XAMPP\htdocs\BTTH3_PHP\AAA-speaking-model-answer
@@ -27,4 +28,4 @@ npm.cmd run build
 npm.cmd run smoke:speaking
 ```
 
-Các đường dẫn `/shadowing` cũ chuyển về `/speaking`, không tạo thêm module độc lập. Chưa push bản gộp lên GitHub.
+Các đường dẫn `/shadowing` cũ chuyển về `/speaking`, không tạo thêm module độc lập.

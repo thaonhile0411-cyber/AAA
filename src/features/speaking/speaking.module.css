@@ -631,6 +631,31 @@
   line-height: 1.9;
   margin-top: 5px;
 }
+.sources section {
+  border-bottom: 1px solid #edf1f6;
+  padding: 14px 0;
+}
+.sources section:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.sources h3 {
+  color: #315782;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.sources a {
+  color: var(--blue);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.sources p {
+  color: #8090a7;
+  font-size: 11px;
+  line-height: 1.8;
+  margin-top: 5px;
+}
 .tip {
   display: flex;
   gap: 13px;

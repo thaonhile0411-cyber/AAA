@@ -1,6 +1,8 @@
 import type {
   GrammarSuggestion,
   ShortQuestion,
+  SpeakingEdition,
+  SpeakingSource,
   SpeakingTopic,
   SpeakingVocabulary,
 } from "./types";
@@ -26,14 +28,53 @@ const grammar = (items: [string, string, string][]): GrammarSuggestion[] =>
     example,
   }));
 
-// Original practice content. Editions are study collections, not verified exam forecasts.
+const officialFormatSource: SpeakingSource = {
+  title: "IELTS Academic: Speaking test format",
+  publisher: "IELTS",
+  url: "https://ielts.org/take-a-test/test-types/ielts-academic-test/ielts-academic-format-speaking",
+  accessedAt: "2026-11-04",
+  kind: "official-format",
+};
+const forecastThemeSource: SpeakingSource = {
+  title: "IELTS Speaking Forecast: Topics to Prepare (Sep–Dec 2026)",
+  publisher: "The IELTS Bro",
+  url: "https://www.theieltsbro.com/ielts-speaking-forecast",
+  accessedAt: "2026-11-04",
+  kind: "unofficial-forecast",
+};
+const edition = (
+  label: string,
+  status: SpeakingEdition["status"],
+  sources: SpeakingSource[],
+): SpeakingEdition => ({
+  label,
+  status,
+  sources,
+  updatedAt: "2026-11-04",
+});
+const suggestedBand: SpeakingTopic["suggestedBand"] = {
+  "part-1": "7.0+",
+  "part-2": "7.0+",
+  "part-3": "8.0+",
+};
+
+// Questions are original practice content. Forecast sources support topic selection only;
+// they are never presented as official IELTS questions or verified exam content.
 export const speakingTopics: SpeakingTopic[] = [
   {
     id: "hometown",
     title: "Hometown",
     descriptionVi: "Quê hương, cộng đồng và những thay đổi ở nơi bạn sống.",
-    editions: ["2026-Q4", "2026-Q3", "2025-Q4"],
+    editions: [
+      edition("2026-Q4", "unverified-prediction", [
+        forecastThemeSource,
+        officialFormatSource,
+      ]),
+      edition("2026-Q3", "original-practice", [officialFormatSource]),
+      edition("2025-Q4", "original-practice", [officialFormatSource]),
+    ],
     updatedAt: "2026-11-04",
+    suggestedBand,
     part1: [
       question("hometown-p1-01", "Where is your hometown?"),
       question("hometown-p1-02", "What do you like most about your hometown?"),
@@ -166,8 +207,15 @@ export const speakingTopics: SpeakingTopic[] = [
     id: "work-and-study",
     title: "Work & Study",
     descriptionVi: "Việc học, kỹ năng mới và định hướng nghề nghiệp.",
-    editions: ["2026-Q4", "2026-Q3"],
+    editions: [
+      edition("2026-Q4", "unverified-prediction", [
+        forecastThemeSource,
+        officialFormatSource,
+      ]),
+      edition("2026-Q3", "original-practice", [officialFormatSource]),
+    ],
     updatedAt: "2026-11-04",
+    suggestedBand,
     part1: [
       question("study-p1-01", "Do you work or are you a student?"),
       question(
@@ -304,8 +352,14 @@ export const speakingTopics: SpeakingTopic[] = [
     title: "Technology",
     descriptionVi:
       "Thiết bị quen thuộc, thói quen sử dụng và tác động của công nghệ.",
-    editions: ["2026-Q4"],
+    editions: [
+      edition("2026-Q4", "unverified-prediction", [
+        forecastThemeSource,
+        officialFormatSource,
+      ]),
+    ],
     updatedAt: "2026-11-04",
+    suggestedBand,
     part1: [
       question("technology-p1-01", "What technology do you use every day?"),
       question(

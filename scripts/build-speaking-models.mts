@@ -15,7 +15,7 @@ const sources = speakingTopics.flatMap((topic) =>
         title: `${topic.title} · Part ${partIndex + 1} · Question ${questionIndex + 1}`,
         part: partIndex + 1,
         topic: topic.title,
-        targetBand: part === "part-3" ? "8.0+" : "7.0+",
+        targetBand: topic.suggestedBand[part],
         prompt: question.text,
         cuePoints: part === "part-2" ? topic.part2.cuePoints : [],
         sentences,

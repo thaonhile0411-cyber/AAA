@@ -16,7 +16,9 @@ export default function SpeakingBank({ part }: { part: SpeakingPart }) {
   const info = partInfo[part];
   const years = [
     ...new Set(
-      speakingTopics.flatMap((t) => t.editions.map((e) => e.split("-")[0])),
+      speakingTopics.flatMap((t) =>
+        t.editions.map((edition) => edition.label.split("-")[0]),
+      ),
     ),
   ]
     .sort()
@@ -159,14 +161,21 @@ export default function SpeakingBank({ part }: { part: SpeakingPart }) {
               “{questionsForPart(topic, part)[0].text}”
             </blockquote>
             <div className={styles.tags}>
+              <span>Band {topic.suggestedBand[part]} · mục tiêu luyện tập</span>
               {topic.editions
                 .filter(
                   (edition) =>
-                    (!filters.year || edition.startsWith(filters.year)) &&
-                    (!filters.quarter || edition.endsWith(filters.quarter)),
+                    (!filters.year || edition.label.startsWith(filters.year)) &&
+                    (!filters.quarter ||
+                      edition.label.endsWith(filters.quarter)),
                 )
                 .map((edition) => (
-                  <span key={edition}>{edition.replace("-", " · ")}</span>
+                  <span key={edition.label}>
+                    {edition.label.replace("-", " · ")} ·{" "}
+                    {edition.status === "unverified-prediction"
+                      ? "dự đoán chưa xác minh"
+                      : "bộ tự biên soạn"}
+                  </span>
                 ))}
             </div>
             <div className={styles.cardFooter}>
@@ -194,8 +203,9 @@ export default function SpeakingBank({ part }: { part: SpeakingPart }) {
         <Icon name="info" size={18} />
         <p>
           <strong>Bộ đề luyện tập theo quý/năm.</strong> Nội dung được biên soạn
-          cho việc luyện nói, chưa được xác minh là dự báo hoặc đề thi thật. Cập
-          nhật nội dung: 04/11/2026.
+          cho việc luyện nói. Nhãn dự đoán là nguồn tham khảo bên thứ ba, không
+          phải xác nhận của IELTS/IDP/British Council và không bảo đảm xuất hiện
+          trong đề thi. Cập nhật nội dung: 04/11/2026.
         </p>
       </div>
     </div>

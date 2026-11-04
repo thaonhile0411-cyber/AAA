@@ -154,8 +154,9 @@ export default function SpeakingPractice({
             </nav>
             <p className={styles.contentNote}>
               Đề luyện tập tự biên soạn · cập nhật{" "}
-              {topic.updatedAt.split("-").reverse().join("/")} · Từ vựng là gợi
-              ý mở rộng, không bảo đảm một mức band cụ thể.
+              {topic.updatedAt.split("-").reverse().join("/")} · Mục tiêu luyện
+              tập Band {topic.suggestedBand[part]}, không phải kết quả giám khảo
+              chấm. Từ vựng là gợi ý mở rộng.
             </p>
           </div>
           <TopicMaterials topic={topic} part={part} />

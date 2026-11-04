@@ -25,6 +25,7 @@ test("US-305 + US-306: every question has exactly one matching answer and separa
         const [model] = matches;
         assert.equal(model.part, index + 1);
         assert.equal(model.topic, topic.title);
+        assert.equal(model.targetBand, topic.suggestedBand[part]);
         assert.equal(model.prompt, question.text);
         assert.deepEqual(
           model.sentences.map((sentence) => sentence.text),

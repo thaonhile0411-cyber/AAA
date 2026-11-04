@@ -3,7 +3,8 @@
 ## Chạy bản gộp
 
 Thư mục riêng: `D:\XAMPP\htdocs\BTTH3_PHP\AAA-speaking-model-answer`.
-Nhánh local: `feat/us305-us306-speaking`. Chưa push hoặc merge bản gộp vào main.
+Nhánh làm việc: `feat/us305-us306-speaking`, đã push lên GitHub nhóm. Bản gộp
+đã fast-forward vào `main` local để kiểm thử; `main` trên GitHub chưa bị thay đổi.
 
 ```powershell
 cd D:\XAMPP\htdocs\BTTH3_PHP\AAA-speaking-model-answer
@@ -35,12 +36,19 @@ Các engine nội bộ vẫn nằm trong `features/speaking`, `features/shadowin
 - Đủ **27 câu hỏi và 27 bài mẫu**, ghép một-một bằng question ID; đề chính, Part, chủ đề và cue points phải khớp tuyệt đối.
 - 27 WAV đọc câu hỏi và 27 WAV đọc bài mẫu, ở hai thư mục `/audio/speaking` và `/audio/shadowing`. Đây là hai loại bản đọc khác nhau, không phải hai module.
 - Mỗi chủ đề có năm từ/cụm từ, IPA, nghĩa Việt và ví dụ; ngữ pháp thay đổi theo Part.
-- Q4/2026 có ba chủ đề; Q3/2026 có Hometown và Work & Study; Q4/2025 có Hometown. Đây là bộ luyện tập tự biên soạn, không phải dự báo hoặc đề thật đã xác minh.
+- Q4/2026 có ba chủ đề và được gắn nhãn **dự đoán chưa xác minh** kèm nguồn
+  forecast bên thứ ba/ngày truy cập. Q3/2026 và Q4/2025 là bộ luyện tập tự biên
+  soạn. Mọi câu hỏi vẫn do AAA biên soạn, không được trình bày như đề thi thật.
 - Band 7.0+/8.0+ là mục tiêu học tập, chưa được giám khảo xác nhận.
 
 Nguồn dữ liệu câu hỏi: `src/features/speaking/topics.ts`.
 Nội dung trả lời: `src/features/speaking/model-responses.ts`.
 Script `scripts/build-speaking-models.mts` ghép chúng thành source model; generator tạo WAV và timestamp từ cùng lần tổng hợp. Không dùng lại ba bài demo cũ cho những đề không khớp.
+
+Metadata mỗi collection bắt buộc có trạng thái, ngày cập nhật và nguồn. Test sẽ
+thất bại nếu một collection mang nhãn forecast nhưng không có nguồn forecast.
+Quy trình biên tập và phát hành nằm tại
+[`speaking-content-update.md`](speaking-content-update.md).
 
 ## Player và ghi âm
 
@@ -87,6 +95,6 @@ npm.cmd run build
 npm.cmd run smoke:speaking
 ```
 
-64 unit/data/storage tests hiện có kiểm tra cả US-305, US-306 và ghép bài mẫu. Smoke test bao phủ ba ngân hàng Part, chín trang chủ đề, 27 trang câu hỏi/bài mẫu, 54 audio Range requests, redirect cũ và session không cache.
+65 unit/data/storage tests hiện có kiểm tra cả US-305, US-306, nguồn forecast và ghép bài mẫu. Smoke test bao phủ ba ngân hàng Part, chín trang chủ đề, 27 trang câu hỏi/bài mẫu, 54 audio Range requests, redirect cũ và session không cache.
 
 Browser access host chưa khả dụng trong phiên triển khai trước. Cần kiểm tra trực tiếp mobile/desktop, xin/từ chối quyền mic, nghe và lặp câu ở cả ba tốc độ, thao tác Space trên summary/input, chuyển giữa audio đề/model, so sánh bản thu và đổi tài khoản trước khi nghiệm thu toàn bộ. Cũng cần review đồng đội và tích hợp vào môi trường chung.

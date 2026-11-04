@@ -41,12 +41,26 @@ export type GrammarSuggestion = {
   usageVi: string;
   example: string;
 };
+export type SpeakingSource = {
+  title: string;
+  publisher: string;
+  url: string;
+  accessedAt: string;
+  kind: "official-format" | "unofficial-forecast";
+};
+export type SpeakingEdition = {
+  label: string;
+  status: "original-practice" | "unverified-prediction";
+  updatedAt: string;
+  sources: SpeakingSource[];
+};
 export type SpeakingTopic = {
   id: string;
   title: string;
   descriptionVi: string;
-  editions: string[];
+  editions: SpeakingEdition[];
   updatedAt: string;
+  suggestedBand: Record<SpeakingPart, "7.0+" | "8.0+">;
   vocabulary: SpeakingVocabulary[];
   grammar: Record<SpeakingPart, GrammarSuggestion[]>;
   part1: ShortQuestion[];

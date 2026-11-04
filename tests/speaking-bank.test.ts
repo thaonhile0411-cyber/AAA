@@ -96,6 +96,34 @@ test("AC-305.3: all topics have IPA, Vietnamese meanings and examples, plus gram
   }
 });
 
+test("forecast labels require sources, dates and explicit non-official wording", () => {
+  for (const topic of speakingTopics) {
+    assert.match(topic.updatedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.deepEqual(topic.suggestedBand, {
+      "part-1": "7.0+",
+      "part-2": "7.0+",
+      "part-3": "8.0+",
+    });
+    for (const edition of topic.editions) {
+      assert.match(edition.label, /^\d{4}-Q[1-4]$/);
+      assert.match(edition.updatedAt, /^\d{4}-\d{2}-\d{2}$/);
+      assert.ok(edition.sources.length > 0, edition.label);
+      for (const source of edition.sources) {
+        assert.match(source.url, /^https:\/\//);
+        assert.ok(source.title && source.publisher);
+        assert.match(source.accessedAt, /^\d{4}-\d{2}-\d{2}$/);
+      }
+      if (edition.status === "unverified-prediction")
+        assert.ok(
+          edition.sources.some(
+            (source) => source.kind === "unofficial-forecast",
+          ),
+          `${topic.id}:${edition.label}`,
+        );
+    }
+  }
+});
+
 test("quarter and year must match the same edition, with topic and search combined", () => {
   assert.equal(filterTopics(speakingTopics, filters).length, 3);
   assert.deepEqual(

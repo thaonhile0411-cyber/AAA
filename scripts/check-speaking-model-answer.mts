@@ -24,6 +24,10 @@ for (const part of speakingParts) {
     const topicResponse = await fetch(`${origin}/speaking/${part}/${topic.id}`);
     assert.equal(topicResponse.status, 200);
     const topicHtml = await topicResponse.text();
+    assert.ok(topicHtml.includes("Nguồn &amp; trạng thái"));
+    assert.ok(topicHtml.includes("Mục tiêu luyện"));
+    assert.ok(topicHtml.includes(topic.suggestedBand[part]));
+    assert.ok(topicHtml.includes("không phải đề thi chính thức"));
     for (const question of questionsForPart(topic, part)) {
       const path = `/speaking/${part}/${topic.id}/${question.id}`;
       assert.ok(topicHtml.includes(`href="${path}"`));
