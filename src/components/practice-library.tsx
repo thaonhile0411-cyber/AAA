@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   originalPracticeTests,
   practiceSkills,
@@ -9,6 +9,7 @@ import {
 } from "@/data/original-practice-tests";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
+import type { ExerciseSummary } from "@/lib/practice";
 
 function iconFor(skill: TestSkill): "book" | "headphones" | "pen" {
   return skill === "listening" || skill === "speaking"
@@ -20,12 +21,35 @@ function iconFor(skill: TestSkill): "book" | "headphones" | "pen" {
 
 export function PracticeLibrary() {
   const [skill, setSkill] = useState<TestSkill | "all">("all");
+  const [databaseExercises, setDatabaseExercises] = useState<ExerciseSummary[]>([]);
+  const [catalogError, setCatalogError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/practice?band=all", { signal: controller.signal, cache: "no-store" })
+      .then(async (response) => {
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error ?? "Chưa tải được kho bài.");
+        setDatabaseExercises(body.exercises ?? []);
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted)
+          setCatalogError(error instanceof Error ? error.message : "Chưa tải được kho bài.");
+      });
+    return () => controller.abort();
+  }, []);
   const tests = useMemo(
     () =>
       skill === "all"
         ? originalPracticeTests
         : originalPracticeTests.filter((test) => test.skill === skill),
     [skill],
+  );
+  const scoredExercises = useMemo(
+    () =>
+      databaseExercises.filter(
+        (exercise) => skill === "all" || exercise.skill === skill,
+      ),
+    [databaseExercises, skill],
   );
 
   return (
@@ -103,9 +127,52 @@ export function PracticeLibrary() {
           </div>
         </div>
         <div className="catalog-count" role="status">
-          <strong>{tests.length} bài luyện</strong>
+          <strong>{tests.length + scoredExercises.length} bài luyện</strong>
           <span>Nội dung tự soạn · làm trực tiếp trong AAA</span>
         </div>
+        {(scoredExercises.length > 0 || catalogError) && (
+          <section className="scored-catalog" aria-label="Bài Reading và Listening có chấm điểm">
+            <div className="catalog-heading">
+              <div>
+                <h2>Reading & Listening có chấm điểm chi tiết</h2>
+                <p>Nộp bài để xem tổng điểm, đáp án, giải thích và vị trí bằng chứng.</p>
+              </div>
+            </div>
+            {catalogError ? (
+              <p className="load-error" role="alert">{catalogError}</p>
+            ) : (
+              <div className="exercise-grid">
+                {scoredExercises.map((exercise, index) => (
+                  <article className="exercise-card" key={exercise.id}>
+                    <div className={`exercise-cover ${exercise.skill}`}>
+                      <span className="exercise-skill">
+                        <Icon
+                          name={exercise.skill === "listening" ? "headphones" : "book"}
+                          size={15}
+                        />
+                        {exercise.skill.toUpperCase()}
+                      </span>
+                      <span className="exercise-cover-number" aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="exercise-band">{exercise.band_group}</span>
+                    </div>
+                    <div className="exercise-card-body">
+                      <h3>{exercise.title}</h3>
+                      <p>{exercise.summary}</p>
+                      <div className="exercise-card-footer">
+                        <span>{exercise.question_count} câu · có lời giải</span>
+                        <Link href={`/practice/${exercise.slug}`}>
+                          Bắt đầu <Icon name="arrow" size={17} />
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
         <div className="exercise-grid">
           {tests.map((test, index) => (
             <article className="exercise-card" key={test.slug}>
