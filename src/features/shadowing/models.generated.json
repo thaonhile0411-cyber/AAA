@@ -1,0 +1,2424 @@
+[
+    {
+        "id":  "hometown-quiet-place",
+        "title":  "A quiet place in my hometown",
+        "part":  2,
+        "topic":  "Hometown",
+        "targetBand":  "7.0+",
+        "prompt":  "Describe a quiet place in your hometown that you enjoy visiting.",
+        "cuePoints":  [
+                          "where it is",
+                          "what you do there",
+                          "when you usually visit",
+                          "and explain why you enjoy spending time there"
+                      ],
+        "audioSrc":  "/audio/shadowing/hometown-quiet-place.wav",
+        "audioKind":  "synthetic-demo",
+        "voice":  "Microsoft Zira Desktop (en-US)",
+        "duration":  67.955,
+        "sentences":  [
+                          {
+                              "id":  "s1",
+                              "text":  "One place I particularly enjoy visiting is a small public garden near the river in my hometown.",
+                              "start":  0,
+                              "end":  6.5,
+                              "words":  [
+                                            {
+                                                "text":  "One ",
+                                                "start":  0.11,
+                                                "end":  0.35,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "place ",
+                                                "start":  0.35,
+                                                "end":  0.755,
+                                                "offset":  4
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  0.755,
+                                                "end":  0.875,
+                                                "offset":  10
+                                            },
+                                            {
+                                                "text":  "particularly ",
+                                                "start":  0.875,
+                                                "end":  1.6749999999999998,
+                                                "offset":  12
+                                            },
+                                            {
+                                                "text":  "enjoy ",
+                                                "start":  1.6749999999999998,
+                                                "end":  2.045,
+                                                "offset":  25
+                                            },
+                                            {
+                                                "text":  "visiting ",
+                                                "start":  2.045,
+                                                "end":  2.5149999999999997,
+                                                "offset":  31
+                                            },
+                                            {
+                                                "text":  "is ",
+                                                "start":  2.5149999999999997,
+                                                "end":  2.675,
+                                                "offset":  40
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  2.675,
+                                                "end":  2.735,
+                                                "offset":  43
+                                            },
+                                            {
+                                                "text":  "small ",
+                                                "start":  2.735,
+                                                "end":  3.145,
+                                                "offset":  45
+                                            },
+                                            {
+                                                "text":  "public ",
+                                                "start":  3.145,
+                                                "end":  3.5749999999999997,
+                                                "offset":  51
+                                            },
+                                            {
+                                                "text":  "garden ",
+                                                "start":  3.5749999999999997,
+                                                "end":  3.9349999999999996,
+                                                "offset":  58
+                                            },
+                                            {
+                                                "text":  "near ",
+                                                "start":  3.9349999999999996,
+                                                "end":  4.145,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  4.145,
+                                                "end":  4.2749999999999995,
+                                                "offset":  70
+                                            },
+                                            {
+                                                "text":  "river ",
+                                                "start":  4.2749999999999995,
+                                                "end":  4.6,
+                                                "offset":  74
+                                            },
+                                            {
+                                                "text":  "in ",
+                                                "start":  4.6,
+                                                "end":  4.725,
+                                                "offset":  80
+                                            },
+                                            {
+                                                "text":  "my ",
+                                                "start":  4.725,
+                                                "end":  4.91,
+                                                "offset":  83
+                                            },
+                                            {
+                                                "text":  "hometown.",
+                                                "start":  4.91,
+                                                "end":  6.5,
+                                                "offset":  86
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s2",
+                              "text":  "It is only a short walk from my house, but it feels surprisingly removed from the traffic and noise of the main streets.",
+                              "start":  6.5,
+                              "end":  14.515,
+                              "words":  [
+                                            {
+                                                "text":  "It ",
+                                                "start":  6.61,
+                                                "end":  6.715,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "is ",
+                                                "start":  6.715,
+                                                "end":  6.885,
+                                                "offset":  3
+                                            },
+                                            {
+                                                "text":  "only ",
+                                                "start":  6.885,
+                                                "end":  7.185,
+                                                "offset":  6
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  7.185,
+                                                "end":  7.255,
+                                                "offset":  11
+                                            },
+                                            {
+                                                "text":  "short ",
+                                                "start":  7.255,
+                                                "end":  7.625,
+                                                "offset":  13
+                                            },
+                                            {
+                                                "text":  "walk ",
+                                                "start":  7.625,
+                                                "end":  7.91,
+                                                "offset":  19
+                                            },
+                                            {
+                                                "text":  "from ",
+                                                "start":  7.91,
+                                                "end":  8.125,
+                                                "offset":  24
+                                            },
+                                            {
+                                                "text":  "my ",
+                                                "start":  8.125,
+                                                "end":  8.315,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "house, ",
+                                                "start":  8.315,
+                                                "end":  9.26,
+                                                "offset":  32
+                                            },
+                                            {
+                                                "text":  "but ",
+                                                "start":  9.26,
+                                                "end":  9.4,
+                                                "offset":  39
+                                            },
+                                            {
+                                                "text":  "it ",
+                                                "start":  9.4,
+                                                "end":  9.53,
+                                                "offset":  43
+                                            },
+                                            {
+                                                "text":  "feels ",
+                                                "start":  9.53,
+                                                "end":  9.9,
+                                                "offset":  46
+                                            },
+                                            {
+                                                "text":  "surprisingly ",
+                                                "start":  9.9,
+                                                "end":  10.735,
+                                                "offset":  52
+                                            },
+                                            {
+                                                "text":  "removed ",
+                                                "start":  10.735,
+                                                "end":  11.195,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "from ",
+                                                "start":  11.195,
+                                                "end":  11.41,
+                                                "offset":  73
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  11.41,
+                                                "end":  11.5,
+                                                "offset":  78
+                                            },
+                                            {
+                                                "text":  "traffic ",
+                                                "start":  11.5,
+                                                "end":  12.02,
+                                                "offset":  82
+                                            },
+                                            {
+                                                "text":  "and ",
+                                                "start":  12.02,
+                                                "end":  12.145,
+                                                "offset":  90
+                                            },
+                                            {
+                                                "text":  "noise ",
+                                                "start":  12.145,
+                                                "end":  12.524999999999999,
+                                                "offset":  94
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  12.524999999999999,
+                                                "end":  12.635,
+                                                "offset":  100
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  12.635,
+                                                "end":  12.735,
+                                                "offset":  103
+                                            },
+                                            {
+                                                "text":  "main ",
+                                                "start":  12.735,
+                                                "end":  13.024999999999999,
+                                                "offset":  107
+                                            },
+                                            {
+                                                "text":  "streets.",
+                                                "start":  13.024999999999999,
+                                                "end":  14.515,
+                                                "offset":  112
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s3",
+                              "text":  "I first discovered it when a friend suggested taking a different route home after school.",
+                              "start":  14.515,
+                              "end":  20,
+                              "words":  [
+                                            {
+                                                "text":  "I ",
+                                                "start":  14.625,
+                                                "end":  14.725000000000001,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "first ",
+                                                "start":  14.725000000000001,
+                                                "end":  15.145000000000001,
+                                                "offset":  2
+                                            },
+                                            {
+                                                "text":  "discovered ",
+                                                "start":  15.145000000000001,
+                                                "end":  15.67,
+                                                "offset":  8
+                                            },
+                                            {
+                                                "text":  "it ",
+                                                "start":  15.67,
+                                                "end":  15.815000000000001,
+                                                "offset":  19
+                                            },
+                                            {
+                                                "text":  "when ",
+                                                "start":  15.815000000000001,
+                                                "end":  15.965,
+                                                "offset":  22
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  15.965,
+                                                "end":  16.025000000000002,
+                                                "offset":  27
+                                            },
+                                            {
+                                                "text":  "friend ",
+                                                "start":  16.025000000000002,
+                                                "end":  16.41,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "suggested ",
+                                                "start":  16.41,
+                                                "end":  17.005,
+                                                "offset":  36
+                                            },
+                                            {
+                                                "text":  "taking ",
+                                                "start":  17.005,
+                                                "end":  17.4,
+                                                "offset":  46
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  17.4,
+                                                "end":  17.46,
+                                                "offset":  53
+                                            },
+                                            {
+                                                "text":  "different ",
+                                                "start":  17.46,
+                                                "end":  17.875,
+                                                "offset":  55
+                                            },
+                                            {
+                                                "text":  "route ",
+                                                "start":  17.875,
+                                                "end":  18.065,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "home ",
+                                                "start":  18.065,
+                                                "end":  18.365000000000002,
+                                                "offset":  71
+                                            },
+                                            {
+                                                "text":  "after ",
+                                                "start":  18.365000000000002,
+                                                "end":  18.685000000000002,
+                                                "offset":  76
+                                            },
+                                            {
+                                                "text":  "school.",
+                                                "start":  18.685000000000002,
+                                                "end":  20,
+                                                "offset":  82
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s4",
+                              "text":  "Since then, I have made a habit of going there whenever I need to clear my head.",
+                              "start":  20,
+                              "end":  25.655,
+                              "words":  [
+                                            {
+                                                "text":  "Since ",
+                                                "start":  20.11,
+                                                "end":  20.51,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "then, ",
+                                                "start":  20.51,
+                                                "end":  21.32,
+                                                "offset":  6
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  21.32,
+                                                "end":  21.44,
+                                                "offset":  12
+                                            },
+                                            {
+                                                "text":  "have ",
+                                                "start":  21.44,
+                                                "end":  21.605,
+                                                "offset":  14
+                                            },
+                                            {
+                                                "text":  "made ",
+                                                "start":  21.605,
+                                                "end":  21.85,
+                                                "offset":  19
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  21.85,
+                                                "end":  21.93,
+                                                "offset":  24
+                                            },
+                                            {
+                                                "text":  "habit ",
+                                                "start":  21.93,
+                                                "end":  22.33,
+                                                "offset":  26
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  22.33,
+                                                "end":  22.46,
+                                                "offset":  32
+                                            },
+                                            {
+                                                "text":  "going ",
+                                                "start":  22.46,
+                                                "end":  22.805,
+                                                "offset":  35
+                                            },
+                                            {
+                                                "text":  "there ",
+                                                "start":  22.805,
+                                                "end":  23.02,
+                                                "offset":  41
+                                            },
+                                            {
+                                                "text":  "whenever ",
+                                                "start":  23.02,
+                                                "end":  23.455,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  23.455,
+                                                "end":  23.57,
+                                                "offset":  56
+                                            },
+                                            {
+                                                "text":  "need ",
+                                                "start":  23.57,
+                                                "end":  23.8,
+                                                "offset":  58
+                                            },
+                                            {
+                                                "text":  "to ",
+                                                "start":  23.8,
+                                                "end":  23.91,
+                                                "offset":  63
+                                            },
+                                            {
+                                                "text":  "clear ",
+                                                "start":  23.91,
+                                                "end":  24.240000000000002,
+                                                "offset":  66
+                                            },
+                                            {
+                                                "text":  "my ",
+                                                "start":  24.240000000000002,
+                                                "end":  24.425,
+                                                "offset":  72
+                                            },
+                                            {
+                                                "text":  "head.",
+                                                "start":  24.425,
+                                                "end":  25.655,
+                                                "offset":  75
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s5",
+                              "text":  "I usually visit in the early evening, when the air is cooler and the light reflects beautifully on the water.",
+                              "start":  25.655,
+                              "end":  32.615,
+                              "words":  [
+                                            {
+                                                "text":  "I ",
+                                                "start":  25.765,
+                                                "end":  25.885,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "usually ",
+                                                "start":  25.885,
+                                                "end":  26.405,
+                                                "offset":  2
+                                            },
+                                            {
+                                                "text":  "visit ",
+                                                "start":  26.405,
+                                                "end":  26.76,
+                                                "offset":  10
+                                            },
+                                            {
+                                                "text":  "in ",
+                                                "start":  26.76,
+                                                "end":  26.880000000000003,
+                                                "offset":  16
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  26.880000000000003,
+                                                "end":  27.03,
+                                                "offset":  19
+                                            },
+                                            {
+                                                "text":  "early ",
+                                                "start":  27.03,
+                                                "end":  27.375,
+                                                "offset":  23
+                                            },
+                                            {
+                                                "text":  "evening, ",
+                                                "start":  27.375,
+                                                "end":  28.29,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "when ",
+                                                "start":  28.29,
+                                                "end":  28.470000000000002,
+                                                "offset":  38
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  28.470000000000002,
+                                                "end":  28.64,
+                                                "offset":  43
+                                            },
+                                            {
+                                                "text":  "air ",
+                                                "start":  28.64,
+                                                "end":  28.855,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "is ",
+                                                "start":  28.855,
+                                                "end":  29.015,
+                                                "offset":  51
+                                            },
+                                            {
+                                                "text":  "cooler ",
+                                                "start":  29.015,
+                                                "end":  29.43,
+                                                "offset":  54
+                                            },
+                                            {
+                                                "text":  "and ",
+                                                "start":  29.43,
+                                                "end":  29.560000000000002,
+                                                "offset":  61
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  29.560000000000002,
+                                                "end":  29.655,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "light ",
+                                                "start":  29.655,
+                                                "end":  29.945,
+                                                "offset":  69
+                                            },
+                                            {
+                                                "text":  "reflects ",
+                                                "start":  29.945,
+                                                "end":  30.455000000000002,
+                                                "offset":  75
+                                            },
+                                            {
+                                                "text":  "beautifully ",
+                                                "start":  30.455000000000002,
+                                                "end":  31.080000000000002,
+                                                "offset":  84
+                                            },
+                                            {
+                                                "text":  "on ",
+                                                "start":  31.080000000000002,
+                                                "end":  31.23,
+                                                "offset":  96
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  31.23,
+                                                "end":  31.325000000000003,
+                                                "offset":  99
+                                            },
+                                            {
+                                                "text":  "water.",
+                                                "start":  31.325000000000003,
+                                                "end":  32.615,
+                                                "offset":  103
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s6",
+                              "text":  "Sometimes I bring a book, although I often end up simply watching people walk their dogs or chatting with a neighbour.",
+                              "start":  32.615,
+                              "end":  40.18,
+                              "words":  [
+                                            {
+                                                "text":  "Sometimes ",
+                                                "start":  32.725,
+                                                "end":  33.39,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  33.39,
+                                                "end":  33.505,
+                                                "offset":  10
+                                            },
+                                            {
+                                                "text":  "bring ",
+                                                "start":  33.505,
+                                                "end":  33.795,
+                                                "offset":  12
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  33.795,
+                                                "end":  33.86,
+                                                "offset":  18
+                                            },
+                                            {
+                                                "text":  "book, ",
+                                                "start":  33.86,
+                                                "end":  34.67,
+                                                "offset":  20
+                                            },
+                                            {
+                                                "text":  "although ",
+                                                "start":  34.67,
+                                                "end":  35.010000000000005,
+                                                "offset":  26
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  35.010000000000005,
+                                                "end":  35.17,
+                                                "offset":  35
+                                            },
+                                            {
+                                                "text":  "often ",
+                                                "start":  35.17,
+                                                "end":  35.505,
+                                                "offset":  37
+                                            },
+                                            {
+                                                "text":  "end ",
+                                                "start":  35.505,
+                                                "end":  35.715,
+                                                "offset":  43
+                                            },
+                                            {
+                                                "text":  "up ",
+                                                "start":  35.715,
+                                                "end":  35.895,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "simply ",
+                                                "start":  35.895,
+                                                "end":  36.33,
+                                                "offset":  50
+                                            },
+                                            {
+                                                "text":  "watching ",
+                                                "start":  36.33,
+                                                "end":  36.785000000000004,
+                                                "offset":  57
+                                            },
+                                            {
+                                                "text":  "people ",
+                                                "start":  36.785000000000004,
+                                                "end":  37.175000000000004,
+                                                "offset":  66
+                                            },
+                                            {
+                                                "text":  "walk ",
+                                                "start":  37.175000000000004,
+                                                "end":  37.475,
+                                                "offset":  73
+                                            },
+                                            {
+                                                "text":  "their ",
+                                                "start":  37.475,
+                                                "end":  37.660000000000004,
+                                                "offset":  78
+                                            },
+                                            {
+                                                "text":  "dogs ",
+                                                "start":  37.660000000000004,
+                                                "end":  38.105000000000004,
+                                                "offset":  84
+                                            },
+                                            {
+                                                "text":  "or ",
+                                                "start":  38.105000000000004,
+                                                "end":  38.27,
+                                                "offset":  89
+                                            },
+                                            {
+                                                "text":  "chatting ",
+                                                "start":  38.27,
+                                                "end":  38.695,
+                                                "offset":  92
+                                            },
+                                            {
+                                                "text":  "with ",
+                                                "start":  38.695,
+                                                "end":  38.835,
+                                                "offset":  101
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  38.835,
+                                                "end":  38.895,
+                                                "offset":  106
+                                            },
+                                            {
+                                                "text":  "neighbour.",
+                                                "start":  38.895,
+                                                "end":  40.18,
+                                                "offset":  108
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s7",
+                              "text":  "What makes the garden special is that it gives people a place to slow down without spending any money.",
+                              "start":  40.18,
+                              "end":  46.535,
+                              "words":  [
+                                            {
+                                                "text":  "What ",
+                                                "start":  40.29,
+                                                "end":  40.485,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "makes ",
+                                                "start":  40.485,
+                                                "end":  40.815,
+                                                "offset":  5
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  40.815,
+                                                "end":  40.925,
+                                                "offset":  11
+                                            },
+                                            {
+                                                "text":  "garden ",
+                                                "start":  40.925,
+                                                "end":  41.315,
+                                                "offset":  15
+                                            },
+                                            {
+                                                "text":  "special ",
+                                                "start":  41.315,
+                                                "end":  41.83,
+                                                "offset":  22
+                                            },
+                                            {
+                                                "text":  "is ",
+                                                "start":  41.83,
+                                                "end":  42.005,
+                                                "offset":  30
+                                            },
+                                            {
+                                                "text":  "that ",
+                                                "start":  42.005,
+                                                "end":  42.165,
+                                                "offset":  33
+                                            },
+                                            {
+                                                "text":  "it ",
+                                                "start":  42.165,
+                                                "end":  42.29,
+                                                "offset":  38
+                                            },
+                                            {
+                                                "text":  "gives ",
+                                                "start":  42.29,
+                                                "end":  42.565,
+                                                "offset":  41
+                                            },
+                                            {
+                                                "text":  "people ",
+                                                "start":  42.565,
+                                                "end":  42.97,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  42.97,
+                                                "end":  43.03,
+                                                "offset":  54
+                                            },
+                                            {
+                                                "text":  "place ",
+                                                "start":  43.03,
+                                                "end":  43.45,
+                                                "offset":  56
+                                            },
+                                            {
+                                                "text":  "to ",
+                                                "start":  43.45,
+                                                "end":  43.57,
+                                                "offset":  62
+                                            },
+                                            {
+                                                "text":  "slow ",
+                                                "start":  43.57,
+                                                "end":  43.91,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "down ",
+                                                "start":  43.91,
+                                                "end":  44.22,
+                                                "offset":  70
+                                            },
+                                            {
+                                                "text":  "without ",
+                                                "start":  44.22,
+                                                "end":  44.595,
+                                                "offset":  75
+                                            },
+                                            {
+                                                "text":  "spending ",
+                                                "start":  44.595,
+                                                "end":  45.08,
+                                                "offset":  83
+                                            },
+                                            {
+                                                "text":  "any ",
+                                                "start":  45.08,
+                                                "end":  45.295,
+                                                "offset":  92
+                                            },
+                                            {
+                                                "text":  "money.",
+                                                "start":  45.295,
+                                                "end":  46.535,
+                                                "offset":  96
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s8",
+                              "text":  "There are no impressive buildings or expensive attractions, just trees, comfortable benches and a sense of belonging.",
+                              "start":  46.535,
+                              "end":  54.36,
+                              "words":  [
+                                            {
+                                                "text":  "There ",
+                                                "start":  46.644999999999996,
+                                                "end":  46.815,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "are ",
+                                                "start":  46.815,
+                                                "end":  46.925,
+                                                "offset":  6
+                                            },
+                                            {
+                                                "text":  "no ",
+                                                "start":  46.925,
+                                                "end":  47.175,
+                                                "offset":  10
+                                            },
+                                            {
+                                                "text":  "impressive ",
+                                                "start":  47.175,
+                                                "end":  47.775,
+                                                "offset":  13
+                                            },
+                                            {
+                                                "text":  "buildings ",
+                                                "start":  47.775,
+                                                "end":  48.315,
+                                                "offset":  24
+                                            },
+                                            {
+                                                "text":  "or ",
+                                                "start":  48.315,
+                                                "end":  48.474999999999994,
+                                                "offset":  34
+                                            },
+                                            {
+                                                "text":  "expensive ",
+                                                "start":  48.474999999999994,
+                                                "end":  49.059999999999995,
+                                                "offset":  37
+                                            },
+                                            {
+                                                "text":  "attractions, ",
+                                                "start":  49.059999999999995,
+                                                "end":  49.989999999999995,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "just ",
+                                                "start":  49.989999999999995,
+                                                "end":  50.309999999999995,
+                                                "offset":  60
+                                            },
+                                            {
+                                                "text":  "trees, ",
+                                                "start":  50.309999999999995,
+                                                "end":  50.929999999999993,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "comfortable ",
+                                                "start":  50.929999999999993,
+                                                "end":  51.519999999999996,
+                                                "offset":  72
+                                            },
+                                            {
+                                                "text":  "benches ",
+                                                "start":  51.519999999999996,
+                                                "end":  52.254999999999995,
+                                                "offset":  84
+                                            },
+                                            {
+                                                "text":  "and ",
+                                                "start":  52.254999999999995,
+                                                "end":  52.364999999999995,
+                                                "offset":  92
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  52.364999999999995,
+                                                "end":  52.425,
+                                                "offset":  96
+                                            },
+                                            {
+                                                "text":  "sense ",
+                                                "start":  52.425,
+                                                "end":  52.794999999999995,
+                                                "offset":  98
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  52.794999999999995,
+                                                "end":  52.91,
+                                                "offset":  104
+                                            },
+                                            {
+                                                "text":  "belonging.",
+                                                "start":  52.91,
+                                                "end":  54.36,
+                                                "offset":  107
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s9",
+                              "text":  "For me, it is a reminder that a good quality of life often depends on ordinary spaces that bring a community together.",
+                              "start":  54.36,
+                              "end":  62.325,
+                              "words":  [
+                                            {
+                                                "text":  "For ",
+                                                "start":  54.47,
+                                                "end":  54.71,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "me, ",
+                                                "start":  54.71,
+                                                "end":  55.455,
+                                                "offset":  4
+                                            },
+                                            {
+                                                "text":  "it ",
+                                                "start":  55.455,
+                                                "end":  55.55,
+                                                "offset":  8
+                                            },
+                                            {
+                                                "text":  "is ",
+                                                "start":  55.55,
+                                                "end":  55.685,
+                                                "offset":  11
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  55.685,
+                                                "end":  55.79,
+                                                "offset":  14
+                                            },
+                                            {
+                                                "text":  "reminder ",
+                                                "start":  55.79,
+                                                "end":  56.365,
+                                                "offset":  16
+                                            },
+                                            {
+                                                "text":  "that ",
+                                                "start":  56.365,
+                                                "end":  56.525,
+                                                "offset":  25
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  56.525,
+                                                "end":  56.589999999999996,
+                                                "offset":  30
+                                            },
+                                            {
+                                                "text":  "good ",
+                                                "start":  56.589999999999996,
+                                                "end":  56.82,
+                                                "offset":  32
+                                            },
+                                            {
+                                                "text":  "quality ",
+                                                "start":  56.82,
+                                                "end":  57.375,
+                                                "offset":  37
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  57.375,
+                                                "end":  57.515,
+                                                "offset":  45
+                                            },
+                                            {
+                                                "text":  "life ",
+                                                "start":  57.515,
+                                                "end":  57.825,
+                                                "offset":  48
+                                            },
+                                            {
+                                                "text":  "often ",
+                                                "start":  57.825,
+                                                "end":  58.16,
+                                                "offset":  53
+                                            },
+                                            {
+                                                "text":  "depends ",
+                                                "start":  58.16,
+                                                "end":  58.589999999999996,
+                                                "offset":  59
+                                            },
+                                            {
+                                                "text":  "on ",
+                                                "start":  58.589999999999996,
+                                                "end":  58.785,
+                                                "offset":  67
+                                            },
+                                            {
+                                                "text":  "ordinary ",
+                                                "start":  58.785,
+                                                "end":  59.28,
+                                                "offset":  70
+                                            },
+                                            {
+                                                "text":  "spaces ",
+                                                "start":  59.28,
+                                                "end":  59.835,
+                                                "offset":  79
+                                            },
+                                            {
+                                                "text":  "that ",
+                                                "start":  59.835,
+                                                "end":  60.025,
+                                                "offset":  86
+                                            },
+                                            {
+                                                "text":  "bring ",
+                                                "start":  60.025,
+                                                "end":  60.29,
+                                                "offset":  91
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  60.29,
+                                                "end":  60.375,
+                                                "offset":  97
+                                            },
+                                            {
+                                                "text":  "community ",
+                                                "start":  60.375,
+                                                "end":  60.925,
+                                                "offset":  99
+                                            },
+                                            {
+                                                "text":  "together.",
+                                                "start":  60.925,
+                                                "end":  62.325,
+                                                "offset":  109
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s10",
+                              "text":  "If I moved away, this would definitely be one of the places I would miss most.",
+                              "start":  62.325,
+                              "end":  67.955,
+                              "words":  [
+                                            {
+                                                "text":  "If ",
+                                                "start":  62.435,
+                                                "end":  62.59,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  62.59,
+                                                "end":  62.705000000000005,
+                                                "offset":  3
+                                            },
+                                            {
+                                                "text":  "moved ",
+                                                "start":  62.705000000000005,
+                                                "end":  63.055,
+                                                "offset":  5
+                                            },
+                                            {
+                                                "text":  "away, ",
+                                                "start":  63.055,
+                                                "end":  63.900000000000006,
+                                                "offset":  11
+                                            },
+                                            {
+                                                "text":  "this ",
+                                                "start":  63.900000000000006,
+                                                "end":  64.12,
+                                                "offset":  17
+                                            },
+                                            {
+                                                "text":  "would ",
+                                                "start":  64.12,
+                                                "end":  64.315,
+                                                "offset":  22
+                                            },
+                                            {
+                                                "text":  "definitely ",
+                                                "start":  64.315,
+                                                "end":  64.875,
+                                                "offset":  28
+                                            },
+                                            {
+                                                "text":  "be ",
+                                                "start":  64.875,
+                                                "end":  65.04,
+                                                "offset":  39
+                                            },
+                                            {
+                                                "text":  "one ",
+                                                "start":  65.04,
+                                                "end":  65.3,
+                                                "offset":  42
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  65.3,
+                                                "end":  65.41,
+                                                "offset":  46
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  65.41,
+                                                "end":  65.495,
+                                                "offset":  49
+                                            },
+                                            {
+                                                "text":  "places ",
+                                                "start":  65.495,
+                                                "end":  66.06,
+                                                "offset":  53
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  66.06,
+                                                "end":  66.185,
+                                                "offset":  60
+                                            },
+                                            {
+                                                "text":  "would ",
+                                                "start":  66.185,
+                                                "end":  66.36,
+                                                "offset":  62
+                                            },
+                                            {
+                                                "text":  "miss ",
+                                                "start":  66.36,
+                                                "end":  66.615000000000009,
+                                                "offset":  68
+                                            },
+                                            {
+                                                "text":  "most.",
+                                                "start":  66.615000000000009,
+                                                "end":  67.955,
+                                                "offset":  73
+                                            }
+                                        ]
+                          }
+                      ]
+    },
+    {
+        "id":  "study-daily-routine",
+        "title":  "My study routine",
+        "part":  1,
+        "topic":  "Work \u0026 Study",
+        "targetBand":  "7.0+",
+        "prompt":  "Do you prefer studying in the morning or in the evening?",
+        "cuePoints":  [
+
+                      ],
+        "audioSrc":  "/audio/shadowing/study-daily-routine.wav",
+        "audioKind":  "synthetic-demo",
+        "voice":  "Microsoft Zira Desktop (en-US)",
+        "duration":  28.11,
+        "sentences":  [
+                          {
+                              "id":  "s1",
+                              "text":  "I tend to study in the morning because I find it easier to concentrate before the day becomes busy.",
+                              "start":  0,
+                              "end":  6.51,
+                              "words":  [
+                                            {
+                                                "text":  "I ",
+                                                "start":  0.11,
+                                                "end":  0.21,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "tend ",
+                                                "start":  0.21,
+                                                "end":  0.505,
+                                                "offset":  2
+                                            },
+                                            {
+                                                "text":  "to ",
+                                                "start":  0.505,
+                                                "end":  0.595,
+                                                "offset":  7
+                                            },
+                                            {
+                                                "text":  "study ",
+                                                "start":  0.595,
+                                                "end":  1.015,
+                                                "offset":  10
+                                            },
+                                            {
+                                                "text":  "in ",
+                                                "start":  1.015,
+                                                "end":  1.135,
+                                                "offset":  16
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  1.135,
+                                                "end":  1.21,
+                                                "offset":  19
+                                            },
+                                            {
+                                                "text":  "morning ",
+                                                "start":  1.21,
+                                                "end":  1.615,
+                                                "offset":  23
+                                            },
+                                            {
+                                                "text":  "because ",
+                                                "start":  1.615,
+                                                "end":  2.085,
+                                                "offset":  31
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  2.085,
+                                                "end":  2.205,
+                                                "offset":  39
+                                            },
+                                            {
+                                                "text":  "find ",
+                                                "start":  2.205,
+                                                "end":  2.605,
+                                                "offset":  41
+                                            },
+                                            {
+                                                "text":  "it ",
+                                                "start":  2.605,
+                                                "end":  2.7399999999999998,
+                                                "offset":  46
+                                            },
+                                            {
+                                                "text":  "easier ",
+                                                "start":  2.7399999999999998,
+                                                "end":  3.195,
+                                                "offset":  49
+                                            },
+                                            {
+                                                "text":  "to ",
+                                                "start":  3.195,
+                                                "end":  3.3249999999999997,
+                                                "offset":  56
+                                            },
+                                            {
+                                                "text":  "concentrate ",
+                                                "start":  3.3249999999999997,
+                                                "end":  4.08,
+                                                "offset":  59
+                                            },
+                                            {
+                                                "text":  "before ",
+                                                "start":  4.08,
+                                                "end":  4.45,
+                                                "offset":  71
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  4.45,
+                                                "end":  4.545,
+                                                "offset":  78
+                                            },
+                                            {
+                                                "text":  "day ",
+                                                "start":  4.545,
+                                                "end":  4.765,
+                                                "offset":  82
+                                            },
+                                            {
+                                                "text":  "becomes ",
+                                                "start":  4.765,
+                                                "end":  5.2299999999999995,
+                                                "offset":  86
+                                            },
+                                            {
+                                                "text":  "busy.",
+                                                "start":  5.2299999999999995,
+                                                "end":  6.51,
+                                                "offset":  94
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s2",
+                              "text":  "For example, I usually spend half an hour reviewing my notes before checking my messages.",
+                              "start":  6.51,
+                              "end":  13.295,
+                              "words":  [
+                                            {
+                                                "text":  "For ",
+                                                "start":  6.62,
+                                                "end":  6.875,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "example, ",
+                                                "start":  6.875,
+                                                "end":  7.965,
+                                                "offset":  4
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  7.965,
+                                                "end":  8.09,
+                                                "offset":  13
+                                            },
+                                            {
+                                                "text":  "usually ",
+                                                "start":  8.09,
+                                                "end":  8.5849999999999991,
+                                                "offset":  15
+                                            },
+                                            {
+                                                "text":  "spend ",
+                                                "start":  8.5849999999999991,
+                                                "end":  8.965,
+                                                "offset":  23
+                                            },
+                                            {
+                                                "text":  "half ",
+                                                "start":  8.965,
+                                                "end":  9.27,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "an ",
+                                                "start":  9.27,
+                                                "end":  9.3999999999999986,
+                                                "offset":  34
+                                            },
+                                            {
+                                                "text":  "hour ",
+                                                "start":  9.3999999999999986,
+                                                "end":  9.695,
+                                                "offset":  37
+                                            },
+                                            {
+                                                "text":  "reviewing ",
+                                                "start":  9.695,
+                                                "end":  10.2,
+                                                "offset":  42
+                                            },
+                                            {
+                                                "text":  "my ",
+                                                "start":  10.2,
+                                                "end":  10.385,
+                                                "offset":  52
+                                            },
+                                            {
+                                                "text":  "notes ",
+                                                "start":  10.385,
+                                                "end":  10.745,
+                                                "offset":  55
+                                            },
+                                            {
+                                                "text":  "before ",
+                                                "start":  10.745,
+                                                "end":  11.149999999999999,
+                                                "offset":  61
+                                            },
+                                            {
+                                                "text":  "checking ",
+                                                "start":  11.149999999999999,
+                                                "end":  11.555,
+                                                "offset":  68
+                                            },
+                                            {
+                                                "text":  "my ",
+                                                "start":  11.555,
+                                                "end":  11.739999999999998,
+                                                "offset":  77
+                                            },
+                                            {
+                                                "text":  "messages.",
+                                                "start":  11.739999999999998,
+                                                "end":  13.295,
+                                                "offset":  80
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s3",
+                              "text":  "That small routine helps me feel more organised and gives me a clear idea of what I need to do next.",
+                              "start":  13.295,
+                              "end":  20.1,
+                              "words":  [
+                                            {
+                                                "text":  "That ",
+                                                "start":  13.405,
+                                                "end":  13.61,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "small ",
+                                                "start":  13.61,
+                                                "end":  13.995,
+                                                "offset":  5
+                                            },
+                                            {
+                                                "text":  "routine ",
+                                                "start":  13.995,
+                                                "end":  14.42,
+                                                "offset":  11
+                                            },
+                                            {
+                                                "text":  "helps ",
+                                                "start":  14.42,
+                                                "end":  14.805,
+                                                "offset":  19
+                                            },
+                                            {
+                                                "text":  "me ",
+                                                "start":  14.805,
+                                                "end":  14.965,
+                                                "offset":  25
+                                            },
+                                            {
+                                                "text":  "feel ",
+                                                "start":  14.965,
+                                                "end":  15.265,
+                                                "offset":  28
+                                            },
+                                            {
+                                                "text":  "more ",
+                                                "start":  15.265,
+                                                "end":  15.559999999999999,
+                                                "offset":  33
+                                            },
+                                            {
+                                                "text":  "organised ",
+                                                "start":  15.559999999999999,
+                                                "end":  16.2,
+                                                "offset":  38
+                                            },
+                                            {
+                                                "text":  "and ",
+                                                "start":  16.2,
+                                                "end":  16.375,
+                                                "offset":  48
+                                            },
+                                            {
+                                                "text":  "gives ",
+                                                "start":  16.375,
+                                                "end":  16.665,
+                                                "offset":  52
+                                            },
+                                            {
+                                                "text":  "me ",
+                                                "start":  16.665,
+                                                "end":  16.84,
+                                                "offset":  58
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  16.84,
+                                                "end":  16.91,
+                                                "offset":  61
+                                            },
+                                            {
+                                                "text":  "clear ",
+                                                "start":  16.91,
+                                                "end":  17.295,
+                                                "offset":  63
+                                            },
+                                            {
+                                                "text":  "idea ",
+                                                "start":  17.295,
+                                                "end":  17.759999999999998,
+                                                "offset":  69
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  17.759999999999998,
+                                                "end":  17.875,
+                                                "offset":  74
+                                            },
+                                            {
+                                                "text":  "what ",
+                                                "start":  17.875,
+                                                "end":  18.05,
+                                                "offset":  77
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  18.05,
+                                                "end":  18.165,
+                                                "offset":  82
+                                            },
+                                            {
+                                                "text":  "need ",
+                                                "start":  18.165,
+                                                "end":  18.375,
+                                                "offset":  84
+                                            },
+                                            {
+                                                "text":  "to ",
+                                                "start":  18.375,
+                                                "end":  18.485,
+                                                "offset":  89
+                                            },
+                                            {
+                                                "text":  "do ",
+                                                "start":  18.485,
+                                                "end":  18.68,
+                                                "offset":  92
+                                            },
+                                            {
+                                                "text":  "next.",
+                                                "start":  18.68,
+                                                "end":  20.1,
+                                                "offset":  95
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s4",
+                              "text":  "Having said that, I am quite flexible when I have a deadline, so I sometimes work in the evening as well.",
+                              "start":  20.1,
+                              "end":  28.11,
+                              "words":  [
+                                            {
+                                                "text":  "Having ",
+                                                "start":  20.21,
+                                                "end":  20.545,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "said ",
+                                                "start":  20.545,
+                                                "end":  20.860000000000003,
+                                                "offset":  7
+                                            },
+                                            {
+                                                "text":  "that, ",
+                                                "start":  20.860000000000003,
+                                                "end":  21.665000000000003,
+                                                "offset":  12
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  21.665000000000003,
+                                                "end":  21.835,
+                                                "offset":  18
+                                            },
+                                            {
+                                                "text":  "am ",
+                                                "start":  21.835,
+                                                "end":  21.995,
+                                                "offset":  20
+                                            },
+                                            {
+                                                "text":  "quite ",
+                                                "start":  21.995,
+                                                "end":  22.35,
+                                                "offset":  23
+                                            },
+                                            {
+                                                "text":  "flexible ",
+                                                "start":  22.35,
+                                                "end":  22.955000000000002,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "when ",
+                                                "start":  22.955000000000002,
+                                                "end":  23.125,
+                                                "offset":  38
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  23.125,
+                                                "end":  23.245,
+                                                "offset":  43
+                                            },
+                                            {
+                                                "text":  "have ",
+                                                "start":  23.245,
+                                                "end":  23.455000000000002,
+                                                "offset":  45
+                                            },
+                                            {
+                                                "text":  "a ",
+                                                "start":  23.455000000000002,
+                                                "end":  23.520000000000003,
+                                                "offset":  50
+                                            },
+                                            {
+                                                "text":  "deadline, ",
+                                                "start":  23.520000000000003,
+                                                "end":  24.645000000000003,
+                                                "offset":  52
+                                            },
+                                            {
+                                                "text":  "so ",
+                                                "start":  24.645000000000003,
+                                                "end":  24.91,
+                                                "offset":  62
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  24.91,
+                                                "end":  25.055,
+                                                "offset":  65
+                                            },
+                                            {
+                                                "text":  "sometimes ",
+                                                "start":  25.055,
+                                                "end":  25.720000000000002,
+                                                "offset":  67
+                                            },
+                                            {
+                                                "text":  "work ",
+                                                "start":  25.720000000000002,
+                                                "end":  26.020000000000003,
+                                                "offset":  77
+                                            },
+                                            {
+                                                "text":  "in ",
+                                                "start":  26.020000000000003,
+                                                "end":  26.125,
+                                                "offset":  82
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  26.125,
+                                                "end":  26.29,
+                                                "offset":  85
+                                            },
+                                            {
+                                                "text":  "evening ",
+                                                "start":  26.29,
+                                                "end":  26.68,
+                                                "offset":  89
+                                            },
+                                            {
+                                                "text":  "as ",
+                                                "start":  26.68,
+                                                "end":  26.845000000000002,
+                                                "offset":  97
+                                            },
+                                            {
+                                                "text":  "well.",
+                                                "start":  26.845000000000002,
+                                                "end":  28.11,
+                                                "offset":  100
+                                            }
+                                        ]
+                          }
+                      ]
+    },
+    {
+        "id":  "technology-communication",
+        "title":  "Technology and communication",
+        "part":  3,
+        "topic":  "Technology",
+        "targetBand":  "8.0+",
+        "prompt":  "Has technology improved the way people communicate?",
+        "cuePoints":  [
+
+                      ],
+        "audioSrc":  "/audio/shadowing/technology-communication.wav",
+        "audioKind":  "synthetic-demo",
+        "voice":  "Microsoft Zira Desktop (en-US)",
+        "duration":  47.755,
+        "sentences":  [
+                          {
+                              "id":  "s1",
+                              "text":  "On balance, I think technology has made communication more accessible, especially for people who live far from their families.",
+                              "start":  0,
+                              "end":  9.03,
+                              "words":  [
+                                            {
+                                                "text":  "On ",
+                                                "start":  0.11,
+                                                "end":  0.285,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "balance, ",
+                                                "start":  0.285,
+                                                "end":  1.29,
+                                                "offset":  3
+                                            },
+                                            {
+                                                "text":  "I ",
+                                                "start":  1.29,
+                                                "end":  1.395,
+                                                "offset":  12
+                                            },
+                                            {
+                                                "text":  "think ",
+                                                "start":  1.395,
+                                                "end":  1.69,
+                                                "offset":  14
+                                            },
+                                            {
+                                                "text":  "technology ",
+                                                "start":  1.69,
+                                                "end":  2.435,
+                                                "offset":  20
+                                            },
+                                            {
+                                                "text":  "has ",
+                                                "start":  2.435,
+                                                "end":  2.625,
+                                                "offset":  31
+                                            },
+                                            {
+                                                "text":  "made ",
+                                                "start":  2.625,
+                                                "end":  2.885,
+                                                "offset":  35
+                                            },
+                                            {
+                                                "text":  "communication ",
+                                                "start":  2.885,
+                                                "end":  3.7399999999999998,
+                                                "offset":  40
+                                            },
+                                            {
+                                                "text":  "more ",
+                                                "start":  3.7399999999999998,
+                                                "end":  4.01,
+                                                "offset":  54
+                                            },
+                                            {
+                                                "text":  "accessible, ",
+                                                "start":  4.01,
+                                                "end":  5.2299999999999995,
+                                                "offset":  59
+                                            },
+                                            {
+                                                "text":  "especially ",
+                                                "start":  5.2299999999999995,
+                                                "end":  5.8549999999999995,
+                                                "offset":  71
+                                            },
+                                            {
+                                                "text":  "for ",
+                                                "start":  5.8549999999999995,
+                                                "end":  6.04,
+                                                "offset":  82
+                                            },
+                                            {
+                                                "text":  "people ",
+                                                "start":  6.04,
+                                                "end":  6.4449999999999994,
+                                                "offset":  86
+                                            },
+                                            {
+                                                "text":  "who ",
+                                                "start":  6.4449999999999994,
+                                                "end":  6.6,
+                                                "offset":  93
+                                            },
+                                            {
+                                                "text":  "live ",
+                                                "start":  6.6,
+                                                "end":  6.8249999999999993,
+                                                "offset":  97
+                                            },
+                                            {
+                                                "text":  "far ",
+                                                "start":  6.8249999999999993,
+                                                "end":  7.1049999999999995,
+                                                "offset":  102
+                                            },
+                                            {
+                                                "text":  "from ",
+                                                "start":  7.1049999999999995,
+                                                "end":  7.3249999999999993,
+                                                "offset":  106
+                                            },
+                                            {
+                                                "text":  "their ",
+                                                "start":  7.3249999999999993,
+                                                "end":  7.4849999999999994,
+                                                "offset":  111
+                                            },
+                                            {
+                                                "text":  "families.",
+                                                "start":  7.4849999999999994,
+                                                "end":  9.03,
+                                                "offset":  117
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s2",
+                              "text":  "A video call can help someone feel involved in an important occasion even when travelling is impossible.",
+                              "start":  9.03,
+                              "end":  15.885,
+                              "words":  [
+                                            {
+                                                "text":  "A ",
+                                                "start":  9.1399999999999988,
+                                                "end":  9.26,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "video ",
+                                                "start":  9.26,
+                                                "end":  9.6849999999999987,
+                                                "offset":  2
+                                            },
+                                            {
+                                                "text":  "call ",
+                                                "start":  9.6849999999999987,
+                                                "end":  10.02,
+                                                "offset":  8
+                                            },
+                                            {
+                                                "text":  "can ",
+                                                "start":  10.02,
+                                                "end":  10.254999999999999,
+                                                "offset":  13
+                                            },
+                                            {
+                                                "text":  "help ",
+                                                "start":  10.254999999999999,
+                                                "end":  10.549999999999999,
+                                                "offset":  17
+                                            },
+                                            {
+                                                "text":  "someone ",
+                                                "start":  10.549999999999999,
+                                                "end":  11.045,
+                                                "offset":  22
+                                            },
+                                            {
+                                                "text":  "feel ",
+                                                "start":  11.045,
+                                                "end":  11.32,
+                                                "offset":  30
+                                            },
+                                            {
+                                                "text":  "involved ",
+                                                "start":  11.32,
+                                                "end":  11.82,
+                                                "offset":  35
+                                            },
+                                            {
+                                                "text":  "in ",
+                                                "start":  11.82,
+                                                "end":  11.924999999999999,
+                                                "offset":  44
+                                            },
+                                            {
+                                                "text":  "an ",
+                                                "start":  11.924999999999999,
+                                                "end":  12.04,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "important ",
+                                                "start":  12.04,
+                                                "end":  12.59,
+                                                "offset":  50
+                                            },
+                                            {
+                                                "text":  "occasion ",
+                                                "start":  12.59,
+                                                "end":  13.09,
+                                                "offset":  60
+                                            },
+                                            {
+                                                "text":  "even ",
+                                                "start":  13.09,
+                                                "end":  13.375,
+                                                "offset":  69
+                                            },
+                                            {
+                                                "text":  "when ",
+                                                "start":  13.375,
+                                                "end":  13.59,
+                                                "offset":  74
+                                            },
+                                            {
+                                                "text":  "travelling ",
+                                                "start":  13.59,
+                                                "end":  14.11,
+                                                "offset":  79
+                                            },
+                                            {
+                                                "text":  "is ",
+                                                "start":  14.11,
+                                                "end":  14.28,
+                                                "offset":  90
+                                            },
+                                            {
+                                                "text":  "impossible.",
+                                                "start":  14.28,
+                                                "end":  15.885,
+                                                "offset":  93
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s3",
+                              "text":  "However, convenience does not necessarily mean that every conversation becomes more meaningful.",
+                              "start":  15.885,
+                              "end":  22.695,
+                              "words":  [
+                                            {
+                                                "text":  "However, ",
+                                                "start":  15.995,
+                                                "end":  17.02,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "convenience ",
+                                                "start":  17.02,
+                                                "end":  17.65,
+                                                "offset":  9
+                                            },
+                                            {
+                                                "text":  "does ",
+                                                "start":  17.65,
+                                                "end":  17.915,
+                                                "offset":  21
+                                            },
+                                            {
+                                                "text":  "not ",
+                                                "start":  17.915,
+                                                "end":  18.189999999999998,
+                                                "offset":  26
+                                            },
+                                            {
+                                                "text":  "necessarily ",
+                                                "start":  18.189999999999998,
+                                                "end":  18.95,
+                                                "offset":  30
+                                            },
+                                            {
+                                                "text":  "mean ",
+                                                "start":  18.95,
+                                                "end":  19.245,
+                                                "offset":  42
+                                            },
+                                            {
+                                                "text":  "that ",
+                                                "start":  19.245,
+                                                "end":  19.419999999999998,
+                                                "offset":  47
+                                            },
+                                            {
+                                                "text":  "every ",
+                                                "start":  19.419999999999998,
+                                                "end":  19.71,
+                                                "offset":  52
+                                            },
+                                            {
+                                                "text":  "conversation ",
+                                                "start":  19.71,
+                                                "end":  20.57,
+                                                "offset":  58
+                                            },
+                                            {
+                                                "text":  "becomes ",
+                                                "start":  20.57,
+                                                "end":  21.025,
+                                                "offset":  71
+                                            },
+                                            {
+                                                "text":  "more ",
+                                                "start":  21.025,
+                                                "end":  21.259999999999998,
+                                                "offset":  79
+                                            },
+                                            {
+                                                "text":  "meaningful.",
+                                                "start":  21.259999999999998,
+                                                "end":  22.695,
+                                                "offset":  84
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s4",
+                              "text":  "When people constantly check notifications, they may pay less attention to the person sitting beside them.",
+                              "start":  22.695,
+                              "end":  29.905,
+                              "words":  [
+                                            {
+                                                "text":  "When ",
+                                                "start":  22.805,
+                                                "end":  23,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "people ",
+                                                "start":  23,
+                                                "end":  23.37,
+                                                "offset":  5
+                                            },
+                                            {
+                                                "text":  "constantly ",
+                                                "start":  23.37,
+                                                "end":  24.07,
+                                                "offset":  12
+                                            },
+                                            {
+                                                "text":  "check ",
+                                                "start":  24.07,
+                                                "end":  24.41,
+                                                "offset":  23
+                                            },
+                                            {
+                                                "text":  "notifications, ",
+                                                "start":  24.41,
+                                                "end":  25.885,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "they ",
+                                                "start":  25.885,
+                                                "end":  26.01,
+                                                "offset":  44
+                                            },
+                                            {
+                                                "text":  "may ",
+                                                "start":  26.01,
+                                                "end":  26.225,
+                                                "offset":  49
+                                            },
+                                            {
+                                                "text":  "pay ",
+                                                "start":  26.225,
+                                                "end":  26.490000000000002,
+                                                "offset":  53
+                                            },
+                                            {
+                                                "text":  "less ",
+                                                "start":  26.490000000000002,
+                                                "end":  26.78,
+                                                "offset":  57
+                                            },
+                                            {
+                                                "text":  "attention ",
+                                                "start":  26.78,
+                                                "end":  27.285,
+                                                "offset":  62
+                                            },
+                                            {
+                                                "text":  "to ",
+                                                "start":  27.285,
+                                                "end":  27.4,
+                                                "offset":  72
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  27.4,
+                                                "end":  27.485,
+                                                "offset":  75
+                                            },
+                                            {
+                                                "text":  "person ",
+                                                "start":  27.485,
+                                                "end":  27.96,
+                                                "offset":  79
+                                            },
+                                            {
+                                                "text":  "sitting ",
+                                                "start":  27.96,
+                                                "end":  28.31,
+                                                "offset":  86
+                                            },
+                                            {
+                                                "text":  "beside ",
+                                                "start":  28.31,
+                                                "end":  28.740000000000002,
+                                                "offset":  94
+                                            },
+                                            {
+                                                "text":  "them.",
+                                                "start":  28.740000000000002,
+                                                "end":  29.905,
+                                                "offset":  101
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s5",
+                              "text":  "I would therefore argue that the benefits depend largely on how deliberately we use these tools.",
+                              "start":  29.905,
+                              "end":  36.145,
+                              "words":  [
+                                            {
+                                                "text":  "I ",
+                                                "start":  30.015,
+                                                "end":  30.135,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "would ",
+                                                "start":  30.135,
+                                                "end":  30.315,
+                                                "offset":  2
+                                            },
+                                            {
+                                                "text":  "therefore ",
+                                                "start":  30.315,
+                                                "end":  30.82,
+                                                "offset":  8
+                                            },
+                                            {
+                                                "text":  "argue ",
+                                                "start":  30.82,
+                                                "end":  31.185000000000002,
+                                                "offset":  18
+                                            },
+                                            {
+                                                "text":  "that ",
+                                                "start":  31.185000000000002,
+                                                "end":  31.365000000000002,
+                                                "offset":  24
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  31.365000000000002,
+                                                "end":  31.470000000000002,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "benefits ",
+                                                "start":  31.470000000000002,
+                                                "end":  32.02,
+                                                "offset":  33
+                                            },
+                                            {
+                                                "text":  "depend ",
+                                                "start":  32.02,
+                                                "end":  32.43,
+                                                "offset":  42
+                                            },
+                                            {
+                                                "text":  "largely ",
+                                                "start":  32.43,
+                                                "end":  32.99,
+                                                "offset":  49
+                                            },
+                                            {
+                                                "text":  "on ",
+                                                "start":  32.99,
+                                                "end":  33.145,
+                                                "offset":  57
+                                            },
+                                            {
+                                                "text":  "how ",
+                                                "start":  33.145,
+                                                "end":  33.370000000000005,
+                                                "offset":  60
+                                            },
+                                            {
+                                                "text":  "deliberately ",
+                                                "start":  33.370000000000005,
+                                                "end":  34.015,
+                                                "offset":  64
+                                            },
+                                            {
+                                                "text":  "we ",
+                                                "start":  34.015,
+                                                "end":  34.18,
+                                                "offset":  77
+                                            },
+                                            {
+                                                "text":  "use ",
+                                                "start":  34.18,
+                                                "end":  34.455,
+                                                "offset":  80
+                                            },
+                                            {
+                                                "text":  "these ",
+                                                "start":  34.455,
+                                                "end":  34.715,
+                                                "offset":  84
+                                            },
+                                            {
+                                                "text":  "tools.",
+                                                "start":  34.715,
+                                                "end":  36.145,
+                                                "offset":  90
+                                            }
+                                        ]
+                          },
+                          {
+                              "id":  "s6",
+                              "text":  "If we set aside distractions and choose the right form of communication for each situation, technology can support relationships rather than replace genuine human contact.",
+                              "start":  36.145,
+                              "end":  47.755,
+                              "words":  [
+                                            {
+                                                "text":  "If ",
+                                                "start":  36.255,
+                                                "end":  36.42,
+                                                "offset":  0
+                                            },
+                                            {
+                                                "text":  "we ",
+                                                "start":  36.42,
+                                                "end":  36.56,
+                                                "offset":  3
+                                            },
+                                            {
+                                                "text":  "set ",
+                                                "start":  36.56,
+                                                "end":  36.81,
+                                                "offset":  6
+                                            },
+                                            {
+                                                "text":  "aside ",
+                                                "start":  36.81,
+                                                "end":  37.235,
+                                                "offset":  10
+                                            },
+                                            {
+                                                "text":  "distractions ",
+                                                "start":  37.235,
+                                                "end":  38.040000000000006,
+                                                "offset":  16
+                                            },
+                                            {
+                                                "text":  "and ",
+                                                "start":  38.040000000000006,
+                                                "end":  38.195,
+                                                "offset":  29
+                                            },
+                                            {
+                                                "text":  "choose ",
+                                                "start":  38.195,
+                                                "end":  38.550000000000004,
+                                                "offset":  33
+                                            },
+                                            {
+                                                "text":  "the ",
+                                                "start":  38.550000000000004,
+                                                "end":  38.695,
+                                                "offset":  40
+                                            },
+                                            {
+                                                "text":  "right ",
+                                                "start":  38.695,
+                                                "end":  38.970000000000006,
+                                                "offset":  44
+                                            },
+                                            {
+                                                "text":  "form ",
+                                                "start":  38.970000000000006,
+                                                "end":  39.32,
+                                                "offset":  50
+                                            },
+                                            {
+                                                "text":  "of ",
+                                                "start":  39.32,
+                                                "end":  39.45,
+                                                "offset":  55
+                                            },
+                                            {
+                                                "text":  "communication ",
+                                                "start":  39.45,
+                                                "end":  40.32,
+                                                "offset":  58
+                                            },
+                                            {
+                                                "text":  "for ",
+                                                "start":  40.32,
+                                                "end":  40.515,
+                                                "offset":  72
+                                            },
+                                            {
+                                                "text":  "each ",
+                                                "start":  40.515,
+                                                "end":  40.755,
+                                                "offset":  76
+                                            },
+                                            {
+                                                "text":  "situation, ",
+                                                "start":  40.755,
+                                                "end":  42.015,
+                                                "offset":  81
+                                            },
+                                            {
+                                                "text":  "technology ",
+                                                "start":  42.015,
+                                                "end":  42.760000000000005,
+                                                "offset":  92
+                                            },
+                                            {
+                                                "text":  "can ",
+                                                "start":  42.760000000000005,
+                                                "end":  42.985,
+                                                "offset":  103
+                                            },
+                                            {
+                                                "text":  "support ",
+                                                "start":  42.985,
+                                                "end":  43.445,
+                                                "offset":  107
+                                            },
+                                            {
+                                                "text":  "relationships ",
+                                                "start":  43.445,
+                                                "end":  44.315000000000005,
+                                                "offset":  115
+                                            },
+                                            {
+                                                "text":  "rather ",
+                                                "start":  44.315000000000005,
+                                                "end":  44.6,
+                                                "offset":  129
+                                            },
+                                            {
+                                                "text":  "than ",
+                                                "start":  44.6,
+                                                "end":  44.78,
+                                                "offset":  136
+                                            },
+                                            {
+                                                "text":  "replace ",
+                                                "start":  44.78,
+                                                "end":  45.32,
+                                                "offset":  141
+                                            },
+                                            {
+                                                "text":  "genuine ",
+                                                "start":  45.32,
+                                                "end":  45.785000000000004,
+                                                "offset":  149
+                                            },
+                                            {
+                                                "text":  "human ",
+                                                "start":  45.785000000000004,
+                                                "end":  46.190000000000005,
+                                                "offset":  157
+                                            },
+                                            {
+                                                "text":  "contact.",
+                                                "start":  46.190000000000005,
+                                                "end":  47.755,
+                                                "offset":  163
+                                            }
+                                        ]
+                          }
+                      ]
+    }
+]

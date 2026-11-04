@@ -1,0 +1,60 @@
+[
+  {
+    "id": "hometown-quiet-place",
+    "title": "A quiet place in my hometown",
+    "part": 2,
+    "topic": "Hometown",
+    "targetBand": "7.0+",
+    "prompt": "Describe a quiet place in your hometown that you enjoy visiting.",
+    "cuePoints": [
+      "where it is",
+      "what you do there",
+      "when you usually visit",
+      "and explain why you enjoy spending time there"
+    ],
+    "sentences": [
+      "One place I particularly enjoy visiting is a small public garden near the river in my hometown.",
+      "It is only a short walk from my house, but it feels surprisingly removed from the traffic and noise of the main streets.",
+      "I first discovered it when a friend suggested taking a different route home after school.",
+      "Since then, I have made a habit of going there whenever I need to clear my head.",
+      "I usually visit in the early evening, when the air is cooler and the light reflects beautifully on the water.",
+      "Sometimes I bring a book, although I often end up simply watching people walk their dogs or chatting with a neighbour.",
+      "What makes the garden special is that it gives people a place to slow down without spending any money.",
+      "There are no impressive buildings or expensive attractions, just trees, comfortable benches and a sense of belonging.",
+      "For me, it is a reminder that a good quality of life often depends on ordinary spaces that bring a community together.",
+      "If I moved away, this would definitely be one of the places I would miss most."
+    ]
+  },
+  {
+    "id": "study-daily-routine",
+    "title": "My study routine",
+    "part": 1,
+    "topic": "Work & Study",
+    "targetBand": "7.0+",
+    "prompt": "Do you prefer studying in the morning or in the evening?",
+    "cuePoints": [],
+    "sentences": [
+      "I tend to study in the morning because I find it easier to concentrate before the day becomes busy.",
+      "For example, I usually spend half an hour reviewing my notes before checking my messages.",
+      "That small routine helps me feel more organised and gives me a clear idea of what I need to do next.",
+      "Having said that, I am quite flexible when I have a deadline, so I sometimes work in the evening as well."
+    ]
+  },
+  {
+    "id": "technology-communication",
+    "title": "Technology and communication",
+    "part": 3,
+    "topic": "Technology",
+    "targetBand": "8.0+",
+    "prompt": "Has technology improved the way people communicate?",
+    "cuePoints": [],
+    "sentences": [
+      "On balance, I think technology has made communication more accessible, especially for people who live far from their families.",
+      "A video call can help someone feel involved in an important occasion even when travelling is impossible.",
+      "However, convenience does not necessarily mean that every conversation becomes more meaningful.",
+      "When people constantly check notifications, they may pay less attention to the person sitting beside them.",
+      "I would therefore argue that the benefits depend largely on how deliberately we use these tools.",
+      "If we set aside distractions and choose the right form of communication for each situation, technology can support relationships rather than replace genuine human contact."
+    ]
+  }
+]

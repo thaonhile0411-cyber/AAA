@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Shadowing studio — US-306
+
+Project riêng `AAA-shadowing`, từ `origin/main` mới nhất tại commit `0c68c18`. Chạy `npm.cmd run dev:shadowing`, mở **http://localhost:3002/shadowing**. Cấu hình Supabase đã được sao chép riêng vào `.env.local` (không commit).
+
+Có highlight theo audio, Sentence-by-Sentence, Loop Sentence, tốc độ 0.75/1/1.25, recorder với waveform/timer, nghe so sánh, lưu tự nguyện theo tài khoản/câu hỏi trên thiết bị và xác nhận hoàn thành một lần. Audio local là demo tổng hợp có nhãn rõ; video YouTube gốc được đính kèm để tham khảo. Chưa coi demo là bản thu người bản ngữ thật.
+
+Xem [hướng dẫn và checklist](docs/us-306-shadowing.md). `npm test` kiểm tra dữ liệu, timeline và persistence; `npm run smoke:shadowing` kiểm tra HTTP khi server đang chạy. Bản thu tạm không upload lên cloud.
+
 ## Getting Started
 
 First, run the development server:
