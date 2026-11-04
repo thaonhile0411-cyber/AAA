@@ -12,6 +12,7 @@ export const PLACEMENT_TIMER_START_KEY = "aaa:us103:placement:timer_start:v1";
 export const PLACEMENT_TIMER_DEADLINE_KEY = "aaa:us103:placement:timer_deadline:v1";
 export const PLACEMENT_SUBMITTED_KEY = "aaa:us103:placement:submitted:v1";
 export const PLACEMENT_UNLOCKED_KEY = "aaa:us103:placement:unlocked:v1";
+export const PLACEMENT_CLOUD_TEST_ID_KEY = "aaa:us103:placement:test_id";
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
@@ -263,5 +264,8 @@ export function clearPlacementTestStorage(
     storage.removeItem(PLACEMENT_TIMER_DEADLINE_KEY);
     storage.removeItem(PLACEMENT_SUBMITTED_KEY);
     storage.removeItem(PLACEMENT_UNLOCKED_KEY);
+    // Only removes the browser pointer to the current attempt. The completed
+    // placement_tests row in Supabase remains available for later comparison.
+    storage.removeItem(PLACEMENT_CLOUD_TEST_ID_KEY);
   } catch {}
 }
