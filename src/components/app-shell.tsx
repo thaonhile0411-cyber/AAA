@@ -28,10 +28,11 @@ export function AppShell({
             href="/practice"
             className={active === "practice" ? "active" : ""}
             aria-current={active === "practice" ? "page" : undefined}
-            aria-label="Kho bài luyện Reading và Listening"
+            aria-label="Kho tài liệu IELTS"
           >
             <Icon name="book" />
-            Kho bài luyện{active === "practice" && <span className="nav-dot" />}
+            Kho tài liệu
+            {active === "practice" && <span className="nav-dot" />}
           </Link>
           <Link
             href="/onboarding/goals"
