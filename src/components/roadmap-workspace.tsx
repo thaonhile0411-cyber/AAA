@@ -1,4 +1,5 @@
 "use client";
+import { notifyStudyUpdate } from '@/features/dashboard/notify';
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -33,6 +34,7 @@ export function RoadmapWorkspace({ initialRoadmap }: { initialRoadmap: ActiveRoa
       });
       const payload = (await response.json()) as { completedAt?: string | null; error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Không thể cập nhật tiến độ.");
+      notifyStudyUpdate();
       setRoadmap((current) => current ? {
         ...current,
         milestones: current.milestones.map((milestone) => ({

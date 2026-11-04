@@ -9,7 +9,8 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:dashboard-db": "node scripts/test-dashboard-db.mjs",
     "test": "tsx --test tests/*.test.ts tests/*.test.tsx",
     "test:integration": "node scripts/test-integration.mjs",
     "format": "prettier --write src tests next.config.ts tsconfig.json package.json eslint.config.mjs",
@@ -25,6 +26,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.14",
     "@tailwindcss/postcss": "^4.3.4",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^24",

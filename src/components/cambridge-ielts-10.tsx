@@ -5,6 +5,7 @@ import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 import { PracticeAudio } from "./practice-audio";
 import Image from "next/image";
+import { StudyTracker } from '@/features/dashboard/StudyTracker';
 import {
   cambridgeIelts10Tests,
   cambridgeSkillLabels,
@@ -137,10 +138,14 @@ function normaliseAnswer(value: string) {
   return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
 
-export function CambridgeIelts10() {
+export function CambridgeIelts10({ taskId = null, initialSkill }: { taskId?: string | null; initialSkill?: string } = {}) {
   const [selectedTestId, setSelectedTestId] = useState(cambridgeIelts10Tests[0].id);
-  const [selectedSkill, setSelectedSkill] = useState<CambridgeSkill | null>(null);
-  const [active, setActive] = useState<ActivePart | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<CambridgeSkill | null>(() => cambridgeIelts10Tests[0].skills.find(section => section.skill === initialSkill)?.skill ?? null);
+  const [active, setActive] = useState<ActivePart | null>(() => {
+    const test = cambridgeIelts10Tests[0];
+    const section = test.skills.find(section => section.skill === initialSkill);
+    return taskId && section ? { test, section, part: section.parts[0] } : null;
+  });
   const test = cambridgeIelts10Tests.find((item) => item.id === selectedTestId)!;
 
   return (
@@ -210,7 +215,7 @@ export function CambridgeIelts10() {
           />
         )}
       </main>
-      {active && <ExamPlayer key={active.part.id} active={active} onClose={() => setActive(null)} />}
+      {active && <><StudyTracker key={`${active.part.id}:${taskId}`} resourceSlug="cambridge-10" taskId={taskId} /><ExamPlayer key={active.part.id} active={active} onClose={() => setActive(null)} /></>}
     </AppShell>
   );
 }
@@ -416,7 +421,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
         <footer className="exam-modal-footer">
           <span>{active.part.label}</span>
           {!isWritingOrSpeaking && <nav aria-label="Question navigation">{numbers.map((number) => <button key={number} type="button" className={`${selectedQuestion === number ? "current" : ""} ${answers[String(number)]?.trim() ? "answered" : ""}`} onClick={() => { setSelectedQuestion(number); setMobilePane("answers"); requestAnimationFrame(() => answersRef.current[String(number)]?.focus()); }}>{number}</button>)}</nav>}
-          <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => setSubmitted(true)}>{submitted ? "Submitted" : "Submit"}</button></div>
+          <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => { setSubmitted(true); if (completed) window.dispatchEvent(new CustomEvent('practice-completed', { detail: { resourceSlug: 'cambridge-10' } })); }}>{submitted ? "Submitted" : "Submit"}</button></div>
           <small>{submitted && acceptedAnswers ? `${correct.length}/${scoredNumbers.length} correct` : typeof completed === "number" ? `${completed}/${numbers.length} answered` : completed ? "Response saved" : "No response yet"}</small>
         </footer>
       </section>
