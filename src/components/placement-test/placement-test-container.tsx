@@ -595,15 +595,20 @@ export function PlacementTestContainer() {
       setResult(evaluated);
       saveResultToStorage(evaluated);
 
-      savePlacementTestCloud({
+      const saveResult = await savePlacementTestCloud({
         current_skill: "speaking",
         completed_skills: allCompleted,
         listening_answers: answers.listening,
         reading_answers: answers.reading,
         writing_response: answers.writing,
         speaking_recordings: answers.speakingRecordings,
+        assessment_results: evaluated,
+        overall_band: evaluated.overallBand,
         status: "completed",
       });
+      if (!saveResult.success) {
+        console.warn("Could not save the completed placement result:", saveResult.error);
+      }
 
       setStage("result");
       setIsReviewOpen(false);
