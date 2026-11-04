@@ -28,6 +28,34 @@ export function PasswordInput({ name, label, autoComplete, required }: {
   );
 }
 
+export function VerificationForm({ email: initialEmail, verify, resend }: {
+  email: string;
+  verify: AuthAction;
+  resend: AuthAction;
+}) {
+  const [email, setEmail] = useState(initialEmail);
+
+  return (
+    <>
+      <AccountForm action={verify} submit="Xác minh email">
+        <label className={styles.field}>
+          Email
+          <input name="email" type="email" required autoComplete="email"
+            value={email} onChange={(event) => setEmail(event.target.value)} />
+        </label>
+        <label className={styles.field}>
+          Mã xác minh
+          <input name="otp" required autoComplete="one-time-code"
+            inputMode="numeric" pattern="[0-9]{6}" maxLength={6} />
+        </label>
+      </AccountForm>
+      <AccountForm action={resend} submit="Gửi lại mã" secondary>
+        <input type="hidden" name="email" value={email} />
+      </AccountForm>
+    </>
+  );
+}
+
 export function AccountForm({ action, submit, children, secondary = false }: {
   action: AuthAction;
   submit: string;

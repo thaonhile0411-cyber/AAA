@@ -2,10 +2,10 @@
 
 ## Chạy cục bộ
 
-1. Chạy `npm ci` tại `D:\AAA`. Khởi động Supabase CLI với `supabase start` và lấy URL cùng publishable key từ `supabase status`.
-2. Tạo `.env.local` theo `.env.example`, dùng URL và publishable key của stack cục bộ. Dùng `http://localhost:3000` nhất quán để giữ cookie trong luồng OAuth.
-3. Chạy `npm run dev`, mở `http://localhost:3000`. Xem email thử nghiệm tại `http://127.0.0.1:54324`.
-4. Khi kiểm thử Google, cấu hình Google OAuth cho stack thử nghiệm. Đăng ký callback của Supabase trong Google Cloud và allowlist `/auth/callback` của ứng dụng trong Supabase. Không đưa OAuth secret vào repo.
+1. Chạy `npm ci` tại `D:\AAA`.
+2. Tạo `.env.local` theo `.env.example`, dùng URL và publishable key của Supabase nhóm. Dùng `http://localhost:3000` nhất quán để giữ cookie trong luồng OAuth.
+3. Chạy `npm run dev`, mở `http://localhost:3000`. Mã OTP được gửi qua dịch vụ SMTP đã cấu hình trong Supabase nhóm.
+4. Khi kiểm thử Google, đăng ký callback của Supabase trong Google Cloud và allowlist `/auth/callback` của ứng dụng trong Supabase. Không đưa OAuth secret vào repo.
 
 ## Cấu hình Supabase
 
