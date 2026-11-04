@@ -891,6 +891,9 @@
 }
 
 /* Cambridge IELTS 10 exam flow */
+.cambridge-library { max-width: 1240px; margin: 0 auto; padding: 32px 38px 60px; }
+.cambridge-library-heading { margin: 20px 0 28px; }.cambridge-library-heading h1 { margin: 9px 0; color: #1d3557; font-size: 32px; }.cambridge-library-heading p { margin: 0; color: #667792; }
+.cambridge-library-entry { margin-bottom: 0; }
 .cambridge-page {
   max-width: 1240px;
   margin: 0 auto;
@@ -957,6 +960,7 @@
   .exam-answer-pane { padding: 24px; }
 }
 @media (max-width: 700px) {
+  .cambridge-library { padding: 23px 16px 42px; }.cambridge-library-heading h1 { font-size: 26px; }
   .cambridge-page { padding: 23px 16px 42px; }.cambridge-heading h1 { font-size: 26px; }.cambridge-entry { align-items: stretch; flex-direction: column; }.cambridge-entry .primary-button { width: 100%; }
   .exam-modal-backdrop { padding: 0; }.exam-modal-header { grid-template-columns: 70px 1fr auto; padding: 9px 12px; }.exam-brand { font-size: 15px; }.exam-modal-header strong { font-size: 12px; }.exam-instruction { margin: 9px 11px; padding: 10px 12px; }.exam-mobile-tabs { display: flex; border-bottom: 1px solid #d3d8df; }.exam-mobile-tabs button { flex: 1; padding: 10px; background: white; color: #4c5b6f; font: inherit; cursor: pointer; }.exam-mobile-tabs button[aria-selected="true"] { color: #155ec4; border-bottom: 3px solid #2166d7; }.exam-modal-body { display: block; }.exam-divider { display: none; }.exam-source-pane,.exam-answer-pane { display: none; height: 100%; }.exam-modal-body.show-source .exam-source-pane,.exam-modal-body.show-answers .exam-answer-pane { display: block; }.exam-source-pane { padding: 12px; }.exam-answer-pane { padding: 20px 16px 90px; }.exam-modal-footer { grid-template-columns: 1fr auto; gap: 8px; padding: 8px 11px; }.exam-modal-footer > span { font-size: 12px; }.exam-modal-footer nav { grid-column: 1 / -1; grid-row: 2; }.exam-modal-footer > div { grid-column: 2; grid-row: 1; }.exam-modal-footer > div .exam-step { display: none; }.exam-modal-footer > small { grid-column: 1; grid-row: 3; }.exam-modal-footer .primary-button { padding: 7px 10px; }
 }
