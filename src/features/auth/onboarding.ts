@@ -15,6 +15,9 @@ export async function loadGoals(): Promise<GoalResponse> {
     today,
     minExamDate: addDays(today, 7),
     demoMode: false,
+    warning: null,
+    nextStep: scores ? "roadmap" : "placement",
+    nextPath: scores ? "/roadmap" : "/onboarding/placement-test",
     profile: data ? {
       targetBand: Number(data.target_band),
       examDate: data.expected_exam_date,

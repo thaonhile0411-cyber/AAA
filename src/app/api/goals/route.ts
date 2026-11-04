@@ -108,6 +108,7 @@ async function handle(request?: Request) {
       profile,
       today,
       minExamDate: addDays(today, 7),
+      demoMode: false,
       warning: profile
         ? goalWarning(profile.targetBand, profile.currentBand)
         : null,

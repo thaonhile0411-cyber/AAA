@@ -42,6 +42,9 @@ export async function supabaseServer() {
   return client;
 }
 
+// Compatibility name used by the goals and practice Route Handlers.
+export const createClient = supabaseServer;
+
 export async function authenticatedClient() {
   await connection();
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
