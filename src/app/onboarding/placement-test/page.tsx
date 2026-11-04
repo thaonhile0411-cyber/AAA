@@ -1,4 +1,5 @@
 import { DiagnosticTest } from "@/components/diagnostic-test";
+import { connection } from "next/server";
 
 export const metadata = {
   title: "IELTS Diagnostic Placement Test | AAA",
@@ -11,6 +12,7 @@ export default async function PlacementTestPage({
 }: {
   searchParams: Promise<{ mode?: string }>;
 }) {
+  await connection();
   const { mode } = await searchParams;
   return <DiagnosticTest reassessment={mode === "reassessment"} />;
 }

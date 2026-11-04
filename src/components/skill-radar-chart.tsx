@@ -11,21 +11,23 @@ const LABELS: Record<Skill, string> = {
 };
 
 const AXIS_ENDS: Record<Skill, readonly [number, number]> = {
-  listening: [120, 25],
-  reading: [215, 120],
-  speaking: [120, 215],
-  writing: [25, 120],
+  listening: [160, 45],
+  reading: [275, 160],
+  speaking: [160, 275],
+  writing: [45, 160],
 };
 
 const LABEL_POSITIONS: Record<Skill, readonly [number, number]> = {
-  listening: [120, 14],
-  reading: [235, 124],
-  speaking: [120, 238],
-  writing: [5, 124],
+  listening: [160, 18],
+  reading: [305, 164],
+  speaking: [160, 304],
+  writing: [15, 164],
 };
 
-const CENTER = 120;
-const OUTER_RADIUS = 95;
+const CENTER = 160;
+const OUTER_RADIUS = 115;
+
+const SERIES_COLORS = ["#2563eb", "#e65d7a", "#16a34a"] as const;
 
 function pointForBand(skill: Skill, band: number): string {
   const [axisX, axisY] = AXIS_ENDS[skill];
@@ -35,12 +37,17 @@ function pointForBand(skill: Skill, band: number): string {
   return `${x.toFixed(1)},${y.toFixed(1)}`;
 }
 
-function diamond(size: number): string {
-  return `${CENTER},${CENTER - size} ${CENTER + size},${CENTER} ${CENTER},${CENTER + size} ${CENTER - size},${CENTER}`;
-}
+export type RadarSeries = {
+  profile: LearnerSkillProfile;
+  label: string;
+  color?: string;
+};
 
 type SkillRadarChartProps = {
-  profile: LearnerSkillProfile;
+  /** Use this for the single, current Placement Test result. */
+  profile?: LearnerSkillProfile;
+  /** Use this to overlay the newest one to three completed assessments. */
+  series?: RadarSeries[];
   title?: string;
   subtitle?: string;
 };
@@ -48,12 +55,21 @@ type SkillRadarChartProps = {
 /** Four-axis IELTS profile chart. Grammar and vocabulary are intentionally not axes. */
 export function SkillRadarChart({
   profile,
+  series,
   title = "Hồ sơ năng lực 4 kỹ năng",
   subtitle = "Listening, Reading, Writing và Speaking trên thang IELTS 9.0.",
 }: SkillRadarChartProps) {
-  const polygonPoints = profile.isComplete
-    ? RADAR_SKILLS.map((skill) => pointForBand(skill, profile.skills[skill]!)).join(" ")
-    : null;
+  const chartSeries = (series?.length
+    ? series
+    : profile
+      ? [{ profile, label: "Kết quả hiện tại" }]
+      : []).slice(-3).map((entry, index) => ({
+    ...entry,
+    color: entry.color ?? SERIES_COLORS[index],
+  }));
+  const currentProfile = chartSeries.at(-1)?.profile ?? profile;
+  if (!currentProfile) return null;
+  const hasCompleteProfile = chartSeries.some((entry) => entry.profile.isComplete);
 
   return (
     <section
@@ -74,28 +90,44 @@ export function SkillRadarChart({
         </div>
         <span
           className={`rounded-full px-3 py-1 text-[11px] font-semibold ${
-            profile.isComplete
+            hasCompleteProfile
               ? "bg-[#edf8f2] text-[#147054]"
               : "bg-[#fff8eb] text-[#a16207]"
           }`}
         >
-          {profile.isComplete ? "Đã đánh giá đủ 4 kỹ năng" : "Đang chờ đánh giá đủ 4 kỹ năng"}
+          {hasCompleteProfile
+            ? chartSeries.length === 1
+              ? "Đã đánh giá đủ 4 kỹ năng"
+              : `So sánh ${chartSeries.length} lần test gần nhất`
+            : "Đang chờ đánh giá đủ 4 kỹ năng"}
         </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] items-center gap-5">
         <div className="mx-auto w-full max-w-[340px]">
+          {chartSeries.length > 1 && (
+            <div className="mb-3 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] text-slate-600">
+              {chartSeries.map((entry) => (
+                <span key={entry.label} className="inline-flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-sm" style={{ backgroundColor: entry.color }} />
+                  {entry.label}
+                </span>
+              ))}
+            </div>
+          )}
           <svg
-            viewBox="0 0 240 250"
+            viewBox="-40 0 400 320"
             className="w-full h-auto"
             role="img"
             aria-label="Biểu đồ radar gồm bốn kỹ năng IELTS"
           >
             <title>Biểu đồ radar 4 kỹ năng IELTS</title>
-            {[1 / 3, 2 / 3, 1].map((level) => (
-              <polygon
+            {Array.from({ length: 10 }, (_, index) => (index + 1) / 10).map((level) => (
+              <circle
                 key={level}
-                points={diamond(OUTER_RADIUS * level)}
+                cx={CENTER}
+                cy={CENTER}
+                r={OUTER_RADIUS * level}
                 fill="none"
                 stroke="#dbe5f2"
                 strokeWidth="1"
@@ -115,25 +147,19 @@ export function SkillRadarChart({
                 />
               );
             })}
-            {polygonPoints && (
-              <polygon
-                points={polygonPoints}
-                fill="#2563eb"
-                fillOpacity="0.18"
-                stroke="#175cdd"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-              />
-            )}
-            {RADAR_SKILLS.map((skill) => {
-              const band = profile.skills[skill];
+            {chartSeries.map((entry) => {
+              if (!entry.profile.isComplete) return null;
+              const points = RADAR_SKILLS.map((skill) => pointForBand(skill, entry.profile.skills[skill]!)).join(" ");
+              return <polygon key={entry.label} points={points} fill={entry.color} fillOpacity="0.14" stroke={entry.color} strokeWidth="2.5" strokeLinejoin="round" />;
+            })}
+            {chartSeries.flatMap((entry) => RADAR_SKILLS.map((skill) => {
+              const band = entry.profile.skills[skill];
               if (band === null) return null;
               const [x, y] = pointForBand(skill, band).split(",").map(Number);
-              return <circle key={skill} cx={x} cy={y} r="4.5" fill="#175cdd" stroke="white" strokeWidth="2" />;
-            })}
+              return <circle key={`${entry.label}-${skill}`} cx={x} cy={y} r="3" fill={entry.color} stroke="white" strokeWidth="1.25" />;
+            }))}
             {RADAR_SKILLS.map((skill) => {
               const [x, y] = LABEL_POSITIONS[skill];
-              const band = profile.skills[skill];
               return (
                 <text
                   key={skill}
@@ -143,7 +169,7 @@ export function SkillRadarChart({
                   dominantBaseline="middle"
                   className="fill-[#334155] text-[10px] font-semibold"
                 >
-                  {`${LABELS[skill]} ${band === null ? "—" : band.toFixed(1)}`}
+                  {LABELS[skill]}
                 </text>
               );
             })}
@@ -152,8 +178,8 @@ export function SkillRadarChart({
 
         <div className="grid grid-cols-2 gap-2.5">
           {(["listening", "reading", "writing", "speaking"] as Skill[]).map((skill) => {
-            const band = profile.skills[skill];
-            const highlighted = skill === profile.weakestSkill || skill === profile.strongestSkill;
+            const band = currentProfile.skills[skill];
+            const highlighted = skill === currentProfile.weakestSkill || skill === currentProfile.strongestSkill;
             return (
               <div
                 key={skill}
@@ -166,9 +192,9 @@ export function SkillRadarChart({
                   {band === null ? "—" : band.toFixed(1)}
                 </p>
                 <p className="text-[10px] text-[#8c9bb3]">
-                  {skill === profile.weakestSkill
+                  {skill === currentProfile.weakestSkill
                     ? "Ưu tiên cải thiện"
-                    : skill === profile.strongestSkill
+                    : skill === currentProfile.strongestSkill
                       ? "Kỹ năng nổi bật"
                       : band === null
                         ? "Chưa đánh giá"
@@ -180,7 +206,7 @@ export function SkillRadarChart({
         </div>
       </div>
 
-      {!profile.isComplete && (
+      {!hasCompleteProfile && (
         <p className="mt-4 rounded-xl bg-[#fff8eb] px-3 py-2 text-xs text-[#925507]">
           Biểu đồ đầy đủ sẽ xuất hiện khi cả 4 kỹ năng có điểm hợp lệ. Hệ thống không tự tạo điểm cho kỹ năng còn thiếu.
         </p>

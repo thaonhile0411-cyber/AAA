@@ -96,6 +96,7 @@ export function SpeakingSection({
 
   // Start recording
   async function startRecording(questionKey: string, maxDuration = 120) {
+    let elapsedSeconds = 0;
     setMicPermissionError("");
     if (playingKey) {
       stopPlayingAudio();
@@ -128,7 +129,7 @@ export function SpeakingSection({
           type: "audio/webm",
         });
         const blobUrl = URL.createObjectURL(audioBlob);
-        const finalDuration = recordingElapsed;
+        const finalDuration = elapsedSeconds;
 
         // Convert to base64 for real AI evaluation
         const reader = new FileReader();
@@ -157,7 +158,6 @@ export function SpeakingSection({
       setRecordingElapsed(0);
 
       if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
-      let elapsedSeconds = 0;
       recordIntervalRef.current = setInterval(() => {
         elapsedSeconds += 1;
         setRecordingElapsed(elapsedSeconds);

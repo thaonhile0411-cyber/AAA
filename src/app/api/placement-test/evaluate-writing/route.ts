@@ -6,6 +6,7 @@ import {
 } from "@/lib/placement-ai-types";
 import { validateWritingInput } from "@/lib/placement-ai-validation";
 import { countWords, roundToIeltsBand } from "@/lib/placement-scoring";
+import { geminiFailureMessage, withGeminiRetry } from "@/lib/gemini-retry";
 
 export const maxDuration = 60; // 60 seconds timeout for AI evaluation
 
@@ -107,9 +108,9 @@ ${essay.trim()}
 """`;
 
     const ai = new GoogleGenAI({ apiKey });
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const modelName = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 
-    const response = await ai.models.generateContent({
+    const response = await withGeminiRetry(() => ai.models.generateContent({
       model: modelName,
       contents: [
         {
@@ -121,7 +122,7 @@ ${essay.trim()}
         responseMimeType: "application/json",
         temperature: 0.1,
       },
-    });
+    }));
 
     const responseText = response.text?.trim() || "";
     if (!responseText) {
@@ -206,7 +207,7 @@ ${essay.trim()}
       criteria: null,
       criteriaFeedback: null,
       feedback: null,
-      message: "Không thể hoàn thành đánh giá bài viết qua Gemini API do lỗi kết nối.",
+      message: geminiFailureMessage(error, "Không thể hoàn thành đánh giá bài viết qua Gemini API. Vui lòng kiểm tra cấu hình và thử lại."),
       error: message,
     };
     return NextResponse.json(errorPayload, { status: 200 });

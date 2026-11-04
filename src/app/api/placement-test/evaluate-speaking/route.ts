@@ -6,6 +6,7 @@ import {
 } from "@/lib/placement-ai-types";
 import { validateSpeakingInput } from "@/lib/placement-ai-validation";
 import { roundToIeltsBand } from "@/lib/placement-scoring";
+import { geminiFailureMessage, withGeminiRetry } from "@/lib/gemini-retry";
 
 export const maxDuration = 60; // 60 seconds timeout for audio AI analysis
 
@@ -140,9 +141,9 @@ Format strictly as JSON conforming to:
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const modelName = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 
-    const response = await ai.models.generateContent({
+    const response = await withGeminiRetry(() => ai.models.generateContent({
       model: modelName,
       contents: [
         {
@@ -154,7 +155,7 @@ Format strictly as JSON conforming to:
         responseMimeType: "application/json",
         temperature: 0.1,
       },
-    });
+    }));
 
     const responseText = response.text?.trim() || "";
     if (!responseText) {
@@ -238,7 +239,7 @@ Format strictly as JSON conforming to:
       criteria: null,
       criteriaFeedback: null,
       feedback: null,
-      message: "Không thể hoàn thành đánh giá bài nói qua Gemini API do lỗi phân tích âm thanh.",
+      message: geminiFailureMessage(error, "Không thể hoàn thành đánh giá bài nói qua Gemini API. Vui lòng kiểm tra cấu hình và thử lại."),
       error: message,
     };
     return NextResponse.json(errorPayload, { status: 200 });
