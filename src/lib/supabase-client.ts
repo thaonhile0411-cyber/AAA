@@ -2,7 +2,8 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { TestSkill } from "@/types/placement-test";
+import { PLACEMENT_CLOUD_TEST_ID_KEY } from "@/lib/placement-storage";
+import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -42,6 +43,9 @@ export type PlacementTestCloudPayload = {
   >;
   target_band?: number | null;
   expected_exam_date?: string | null;
+  assessment_results?: PlacementTestResult;
+  overall_band?: number | null;
+  assessment_kind?: "placement" | "reassessment";
   status?: "in_progress" | "evaluating" | "completed";
 };
 
@@ -63,11 +67,14 @@ export async function savePlacementTestCloud(
   try {
     const { data: authData } = await supabase.auth.getUser();
     const userId = authData?.user?.id || null;
+    if (!userId) {
+      return { success: false, error: "Sign in is required to save a placement test." };
+    }
 
     // Use test ID or generate a stable local session ID
     let testId = payload.id;
     if (!testId) {
-      testId = window.localStorage.getItem("aaa:us103:placement:test_id") || undefined;
+      testId = window.localStorage.getItem(PLACEMENT_CLOUD_TEST_ID_KEY) || undefined;
     }
 
     const upsertData: Record<string, unknown> = {
@@ -80,6 +87,13 @@ export async function savePlacementTestCloud(
       speaking_recordings: payload.speaking_recordings,
       target_band: payload.target_band,
       expected_exam_date: payload.expected_exam_date,
+      ...(payload.assessment_results
+        ? { assessment_results: payload.assessment_results }
+        : {}),
+      ...(payload.overall_band !== undefined
+        ? { overall_band: payload.overall_band }
+        : {}),
+      assessment_kind: payload.assessment_kind ?? "placement",
       status: payload.status || "in_progress",
       updated_at: new Date().toISOString(),
     };
@@ -100,7 +114,7 @@ export async function savePlacementTestCloud(
     }
 
     if (data?.id) {
-      window.localStorage.setItem("aaa:us103:placement:test_id", data.id);
+      window.localStorage.setItem(PLACEMENT_CLOUD_TEST_ID_KEY, data.id);
       return { success: true, id: data.id };
     }
 
@@ -130,7 +144,7 @@ export async function uploadSpeakingAudio(
   try {
     const { data: authData } = await supabase.auth.getUser();
     const userId = authData?.user?.id || "guest";
-    const tid = testId || window.localStorage.getItem("aaa:us103:placement:test_id") || "demo_session";
+    const tid = testId || window.localStorage.getItem(PLACEMENT_CLOUD_TEST_ID_KEY) || "demo_session";
     const ext = audioBlob.type.includes("mp4") ? "mp4" : "webm";
     const filePath = `${userId}/${tid}/${questionKey}_${Date.now()}.${ext}`;
 

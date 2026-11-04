@@ -42,6 +42,11 @@ export async function supabaseServer() {
   return client;
 }
 
+/** Compatibility helper used by Route Handlers that need the authenticated server client. */
+export async function createClient() {
+  return supabaseServer();
+}
+
 export async function authenticatedClient() {
   await connection();
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
@@ -52,3 +57,4 @@ export async function authenticatedClient() {
   if (!data?.claims.sub) redirect("/login");
   return { supabase, userId: data.claims.sub };
 }
+

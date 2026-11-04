@@ -123,6 +123,29 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
   };
 }
 
+/** Removes a data-URI wrapper and whitespace before sending recorded audio to Gemini. */
+export function sanitizeAudioBase64(raw?: string | null): string {
+  if (!raw || typeof raw !== "string") return "";
+  const trimmed = raw.trim();
+  const commaIndex = trimmed.indexOf(",");
+  if (commaIndex !== -1 && trimmed.slice(0, commaIndex).includes("base64")) {
+    return trimmed.slice(commaIndex + 1).replace(/\s/g, "");
+  }
+  return trimmed.replace(/^data:[^;]+;base64,/, "").replace(/\s/g, "");
+}
+
+/** Normalizes browser-provided MIME types to formats accepted by Gemini. */
+export function sanitizeAudioMimeType(raw?: string | null): string {
+  if (!raw || typeof raw !== "string") return "audio/webm";
+  const base = raw.split(";")[0].trim().toLowerCase();
+  if (base.includes("webm")) return "audio/webm";
+  if (base.includes("mp4") || base.includes("m4a") || base.includes("aac")) return "audio/mp4";
+  if (base.includes("wav")) return "audio/wav";
+  if (base.includes("mp3") || base.includes("mpeg")) return "audio/mp3";
+  if (base.includes("ogg")) return "audio/ogg";
+  return "audio/webm";
+}
+
 /**
  * Validates speaking recordings before calling Gemini API
  */

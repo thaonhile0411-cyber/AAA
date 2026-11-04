@@ -36,6 +36,10 @@ export const register: AuthAction = async (_, form) => {
   const supabase = await client();
   if (!supabase) return unavailable;
   const { data, error } = await supabase.auth.signUp({ email, password });
+  // With email confirmation enabled, Supabase may return a fake user with no identities.
+  if (error?.code === "user_already_exists" || error?.code === "email_exists" || data.user?.identities?.length === 0) {
+    return { error: "Email này đã được dùng để tạo tài khoản. Hãy đăng nhập hoặc đặt lại mật khẩu." };
+  }
   if (error) return { error: "Chưa đăng ký được. Hãy kiểm tra thông tin và thử lại." };
   if (data.session) {
     await supabase.auth.signOut({ scope: "local" });
@@ -59,9 +63,13 @@ export const verify: AuthAction = async (_, form) => {
 };
 
 export const resendVerification: AuthAction = async (_, form) => {
+  const email = value(form, "email").trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: "Vui lòng nhập email hợp lệ trước khi gửi lại mã." };
+  }
   const supabase = await client();
   if (!supabase) return unavailable;
-  const { error } = await supabase.auth.resend({ type: "signup", email: value(form, "email").trim() });
+  const { error } = await supabase.auth.resend({ type: "signup", email });
   if (error) return { error: "Chưa gửi lại được mã. Hãy đợi một lúc rồi thử lại." };
   return { success: "Nếu tài khoản đang chờ xác minh, bạn sẽ nhận được mã mới." };
 };

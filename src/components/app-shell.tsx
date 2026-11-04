@@ -7,7 +7,7 @@ export function AppShell({
   demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "test" | "speaking";
+  active?: "goals" | "settings" | "test" | "practice" | "speaking" | "roadmap" | "dashboard";
   demoMode?: boolean;
 }) {
   return (
@@ -23,18 +23,28 @@ export function AppShell({
         </Link>
         <div className="workspace-label">KHÔNG GIAN HỌC TẬP</div>
         <nav className="side-nav" aria-label="Điều hướng chính">
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/dashboard" className={active === "dashboard" ? "active" : ""} aria-current={active === "dashboard" ? "page" : undefined}>Dashboard</Link>
           <Link
-            href="/speaking"
-            className={active === "speaking" ? "active" : ""}
-            aria-current={active === "speaking" ? "page" : undefined}
+            href="/practice"
+            className={active === "practice" ? "active" : ""}
+            aria-current={active === "practice" ? "page" : undefined}
+            aria-label="Kho tài liệu IELTS"
           >
-            <Icon name="mic" />
-            Speaking Question & Model Answer
-            <span className="nav-dot" />
+            <Icon name="book" />
+            Kho tài liệu
+            {active === "practice" && <span className="nav-dot" />}
+          </Link>
+          <Link
+            href="/roadmap"
+            className={active === "roadmap" ? "active" : ""}
+            aria-current={active === "roadmap" ? "page" : undefined}
+          >
+            <Icon name="target" />
+            Lộ trình của tôi{active === "roadmap" && <span className="nav-dot" />}
           </Link>
           <Link
             href="/onboarding/goals"
+            aria-label="Mục tiêu học tập"
             className={active === "goals" ? "active" : ""}
             aria-current={active === "goals" ? "page" : undefined}
           >
@@ -44,6 +54,7 @@ export function AppShell({
           </Link>
           <Link
             href="/profile"
+            aria-label="Cài đặt tài khoản"
             className={active === "settings" ? "active" : ""}
             aria-current={active === "settings" ? "page" : undefined}
           >

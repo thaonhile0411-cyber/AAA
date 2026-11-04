@@ -1,22 +1,36 @@
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
-import {
-  GeminiWritingOutputSchema,
-  type WritingAssessmentResponse,
-} from "@/lib/placement-ai-types";
+import type { WritingAssessmentResponse } from "@/lib/placement-ai-types";
 import { validateWritingInput } from "@/lib/placement-ai-validation";
-import { countWords, roundToIeltsBand } from "@/lib/placement-scoring";
+import { countWords } from "@/lib/placement-scoring";
+import { evaluateWritingWithFailover } from "@/lib/ai-provider-manager";
+import {
+  createEvaluationJob,
+  updateEvaluationJob,
+} from "@/lib/ai-evaluation-queue";
+import { getWritingTask } from "@/data/placement-test-data";
 
 export const maxDuration = 60; // 60 seconds timeout for AI evaluation
 
+type EvaluateWritingRequestBody = {
+  essay?: string;
+  prompt?: string;
+  questionId?: string;
+  attemptId?: string;
+  submissionId?: string;
+  idempotencyKey?: string;
+};
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json().catch(() => ({}));
-    const { essay, prompt } = body;
+    const body =
+      (await request.json().catch(() => ({}))) as EvaluateWritingRequestBody;
+    const { essay, prompt, questionId, attemptId, submissionId, idempotencyKey } =
+      body;
 
     const wordCount = countWords(essay || "");
 
     // 1. Strict Pre-validation (Language, Gibberish, Length)
+    // Do not invoke AI or retry across providers if input itself is invalid
     const validation = validateWritingInput(essay);
     if (!validation.valid) {
       const responsePayload: WritingAssessmentResponse = {
@@ -32,119 +46,23 @@ export async function POST(request: Request) {
       return NextResponse.json(responsePayload, { status: 200 });
     }
 
-    // 2. Check GEMINI_API_KEY
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      const responsePayload: WritingAssessmentResponse = {
-        status: "missing_api_key",
-        skill: "writing",
-        overallBand: null,
-        criteria: null,
-        criteriaFeedback: null,
-        feedback: null,
-        wordCount,
-        message:
-          "GEMINI_API_KEY chưa được cấu hình trên server. Vui lòng thêm GEMINI_API_KEY vào .env.local để kích hoạt đánh giá AI thực tế.",
-      };
-      return NextResponse.json(responsePayload, { status: 200 });
+    // 2. Resolve Task Prompt from Payload or Official Data Source
+    // NEVER substitute or default to an unrelated prompt (e.g. AI employment)
+    let effectiveTaskPrompt = "";
+    const effectiveQuestionId = questionId || "writing_task_2";
+
+    if (prompt && prompt.trim().length >= 15) {
+      effectiveTaskPrompt = prompt.trim();
+    } else {
+      // Lookup official prompt from data dictionary using questionId
+      const officialTask = getWritingTask(effectiveQuestionId);
+      if (officialTask?.prompt) {
+        effectiveTaskPrompt = officialTask.prompt.trim();
+      }
     }
 
-    // 3. Prepare Prompt for Gemini
-    const taskPrompt =
-      prompt ||
-      "In the modern era, artificial intelligence (AI) is transforming various industries. Some people believe that AI will create more jobs and economic growth, while others argue that it will lead to widespread unemployment and social inequality. Discuss both views and give your own opinion. (Write at least 250 words)";
-
-    const systemInstruction = `You are a certified senior IELTS Academic Examiner.
-You will evaluate the candidate's IELTS Writing Task 2 essay.
-
-FIRST, VALIDATE THE SUBMISSION:
-1. Is it written in English? (If in Vietnamese or any other language, mark isValidEnglishEssay = false).
-2. Does it respond to the prompt topic (AI impact on jobs/economy)? (If completely off-topic or spam, mark isRelevantToTopic = false).
-3. Is it meaningful content with communicative value? (If gibberish, copy-pasting or random words, mark isMeaningfulContent = false).
-
-IF NOT VALID:
-Return:
-{
-  "isValidEnglishEssay": false,
-  "isRelevantToTopic": false,
-  "isMeaningfulContent": false,
-  "rejectionReason": "Clear explanation in Vietnamese why the essay cannot be assessed."
-}
-
-IF VALID:
-Evaluate strictly according to the 4 official IELTS Writing Task 2 Band Descriptors (scale 0.0 - 9.0 in 0.5 increments):
-- taskResponse: Addressing prompt, stance, depth of ideas. If under 250 words, reflect appropriately in TR, but evaluate content fairly.
-- coherenceAndCohesion: Paragraphing, flow, logical progression, cohesive devices.
-- lexicalResource: Academic vocabulary, collocations, precision, spelling.
-- grammaticalRangeAndAccuracy: Sentence variety, accuracy, punctuation.
-
-Format strictly as JSON conforming to:
-{
-  "isValidEnglishEssay": true,
-  "isRelevantToTopic": true,
-  "isMeaningfulContent": true,
-  "criteria": {
-    "taskResponse": { "score": 6.5, "feedback": "Detailed feedback..." },
-    "coherenceAndCohesion": { "score": 6.0, "feedback": "Detailed feedback..." },
-    "lexicalResource": { "score": 6.5, "feedback": "Detailed feedback..." },
-    "grammaticalRangeAndAccuracy": { "score": 6.0, "feedback": "Detailed feedback..." }
-  },
-  "overallBand": 6.5,
-  "strengths": ["Clear viewpoint...", "..."],
-  "weaknesses": ["Lacks development in body 2...", "..."],
-  "improvements": ["Use more precise academic collocations...", "..."],
-  "evaluationSummary": "Concise summary of candidate performance."
-}`;
-
-    const userContent = `Task Prompt:
-"""
-${taskPrompt}
-"""
-
-Candidate Response (${wordCount} words):
-"""
-${essay.trim()}
-"""`;
-
-    const ai = new GoogleGenAI({ apiKey });
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `${systemInstruction}\n\n${userContent}` }],
-        },
-      ],
-      config: {
-        responseMimeType: "application/json",
-        temperature: 0.1,
-      },
-    });
-
-    const responseText = response.text?.trim() || "";
-    if (!responseText) {
-      throw new Error("Gemini returned empty response text.");
-    }
-
-    const cleanedJson = responseText
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    const rawParsed = JSON.parse(cleanedJson);
-    const geminiOutput = GeminiWritingOutputSchema.parse(rawParsed);
-
-    // If Gemini determined invalid language, off-topic, or meaningless
-    if (
-      !geminiOutput.isValidEnglishEssay ||
-      !geminiOutput.isRelevantToTopic ||
-      !geminiOutput.isMeaningfulContent ||
-      !geminiOutput.criteria
-    ) {
-      const responsePayload: WritingAssessmentResponse = {
+    if (!effectiveTaskPrompt) {
+      const errorPayload: WritingAssessmentResponse = {
         status: "invalid_response",
         skill: "writing",
         overallBand: null,
@@ -153,51 +71,98 @@ ${essay.trim()}
         feedback: null,
         wordCount,
         message:
-          geminiOutput.rejectionReason ||
-          "Bài viết không hợp lệ (không phải tiếng Anh, lạc đề hoặc không có ý nghĩa học thuật).",
+          "Thiếu đề bài (Task Prompt) hoặc questionId không hợp lệ. Vui lòng cung cấp đúng thông tin đề bài để đánh giá.",
       };
-      return NextResponse.json(responsePayload, { status: 200 });
+      return NextResponse.json(errorPayload, { status: 400 });
     }
 
-    // Compute official IELTS mean of the 4 criteria
-    const c = geminiOutput.criteria;
-    const computedOverall = roundToIeltsBand(
-      (c.taskResponse.score +
-        c.coherenceAndCohesion.score +
-        c.lexicalResource.score +
-        c.grammaticalRangeAndAccuracy.score) /
-        4,
-    );
+    // 3. Persistent Job Creation & Attempt Identification
+    const effectiveAttemptId =
+      attemptId || submissionId || `attempt_${Date.now()}`;
+    const effectiveSubmissionId = submissionId || effectiveAttemptId;
+    const effectiveIdempotencyKey =
+      idempotencyKey || `writing_${effectiveAttemptId}_${effectiveQuestionId}`;
+    const evalRequestId = `eval_w_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
-    const successResponse: WritingAssessmentResponse = {
-      status: "success",
+    // Detailed Logging in non-production for prompt verification and audit
+    if (process.env.NODE_ENV !== "production") {
+      console.log("[Writing Evaluation Request]", {
+        evalRequestId,
+        attemptId: effectiveAttemptId,
+        questionId: effectiveQuestionId,
+        promptSnippet: effectiveTaskPrompt.slice(0, 100) + "...",
+        essayWordCount: wordCount,
+        submittedAt: new Date().toISOString(),
+      });
+    }
+
+    const { job, isDuplicate } = await createEvaluationJob({
+      submissionId: effectiveSubmissionId,
+      idempotencyKey: effectiveIdempotencyKey,
       skill: "writing",
-      overallBand: computedOverall,
-      criteria: {
-        taskResponse: c.taskResponse.score,
-        coherenceAndCohesion: c.coherenceAndCohesion.score,
-        lexicalResource: c.lexicalResource.score,
-        grammaticalRangeAndAccuracy: c.grammaticalRangeAndAccuracy.score,
+      payload: {
+        essay,
+        prompt: effectiveTaskPrompt,
+        questionId: effectiveQuestionId,
+        attemptId: effectiveAttemptId,
       },
-      criteriaFeedback: {
-        taskResponse: c.taskResponse.feedback,
-        coherenceAndCohesion: c.coherenceAndCohesion.feedback,
-        lexicalResource: c.lexicalResource.feedback,
-        grammaticalRangeAndAccuracy: c.grammaticalRangeAndAccuracy.feedback,
-      },
-      feedback: {
-        strengths: geminiOutput.strengths,
-        weaknesses: geminiOutput.weaknesses,
-        improvements: geminiOutput.improvements,
-        summary: geminiOutput.evaluationSummary || "Đã hoàn thành đánh giá bài viết theo tiêu chuẩn IELTS.",
-      },
-      wordCount,
-    };
+    });
 
-    return NextResponse.json(successResponse, { status: 200 });
+    // If job was previously completed AND the essay/prompt content matches, return cached result.
+    // If the essay or prompt changed in this attempt, do not return stale cache.
+    if (
+      isDuplicate &&
+      job.status === "completed" &&
+      job.result &&
+      job.payload?.essay === essay &&
+      job.payload?.prompt === effectiveTaskPrompt
+    ) {
+      return NextResponse.json(job.result as WritingAssessmentResponse, {
+        status: 200,
+      });
+    }
+
+    // Mark job as processing
+    await updateEvaluationJob(job.id, {
+      status: "processing",
+      attemptCount: job.attemptCount + 1,
+      payload: {
+        essay,
+        prompt: effectiveTaskPrompt,
+        questionId: effectiveQuestionId,
+        attemptId: effectiveAttemptId,
+      },
+    });
+
+    // 4. Multi-Provider Evaluation with Failover
+    // Gemini (primary) -> OpenAI (secondary) -> Groq (third)
+    const result = await evaluateWritingWithFailover({
+      essayText: essay!,
+      taskPrompt: effectiveTaskPrompt,
+    });
+
+    // 5. Update Persistent Job Status
+    if (result.status === "success") {
+      await updateEvaluationJob(job.id, {
+        status: "completed",
+        provider: result.provider,
+        modelUsed: result.modelUsed,
+        result: result as unknown as Record<string, unknown>,
+        tokensUsed: Math.round((essay!.length + effectiveTaskPrompt.length) / 4),
+      });
+    } else {
+      await updateEvaluationJob(job.id, {
+        status: "failed",
+        errorCode: result.status,
+        errorMessage: result.message,
+      });
+    }
+
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error("evaluate-writing API error:", error);
-    const message = error instanceof Error ? error.message : "Internal evaluation error";
+    console.error("evaluate-writing unexpected error:", error);
+    const message =
+      error instanceof Error ? error.message : "Internal evaluation error";
 
     const errorPayload: WritingAssessmentResponse = {
       status: "api_error",
@@ -206,7 +171,8 @@ ${essay.trim()}
       criteria: null,
       criteriaFeedback: null,
       feedback: null,
-      message: "Không thể hoàn thành đánh giá bài viết qua Gemini API do lỗi kết nối.",
+      message:
+        "Không thể hoàn thành đánh giá bài viết do lỗi nội bộ hệ thống.",
       error: message,
     };
     return NextResponse.json(errorPayload, { status: 200 });

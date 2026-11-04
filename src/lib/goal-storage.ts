@@ -1,5 +1,6 @@
 import {
   addDays,
+  goalWarning,
   overallBand,
   todayInVietnam,
   validateGoals,
@@ -37,11 +38,15 @@ export function loadBrowserGoals(
   storage: GoalStorage = window.localStorage,
 ): GoalResponse {
   const today = todayInVietnam();
+  const profile = readBrowserProfile(storage);
   return {
-    profile: readBrowserProfile(storage),
+    profile,
     today,
     minExamDate: addDays(today, 7),
     demoMode: true,
+    warning: profile ? goalWarning(profile.targetBand, profile.currentBand) : null,
+    nextStep: profile?.scores ? "roadmap" : "placement",
+    nextPath: null,
   };
 }
 

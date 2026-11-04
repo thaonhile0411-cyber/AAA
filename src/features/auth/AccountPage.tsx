@@ -3,7 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { notFound, redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
-import { AccountForm, PasswordInput } from "@/features/auth/Form";
+import { AccountForm, PasswordInput, VerificationForm } from "@/features/auth/Form";
 import {
   forgot, google, login, register, resendVerification, resetPassword, signOut, updatePassword, updateProfile, verify,
 } from "@/features/auth/actions";
@@ -87,7 +87,7 @@ async function PrivateScreen() {
         <NewPassword />
       </AccountForm>
       <Link href="/forgot-password" className="text-sm text-blue-800 underline">Quên mật khẩu hiện tại?</Link>
-      <Link href="/dashboard" className="block text-sm text-blue-800 underline">Về Dashboard</Link>
+      <Link href="/onboarding/goals" className="block text-sm text-blue-800 underline">Về mục tiêu học tập</Link>
       <form action={signOut}>
         <button className="text-blue-800 underline">Đăng xuất</button>
       </form>
@@ -134,15 +134,8 @@ export default async function AccountPage({ screen, searchParams }: {
           {screen === "verify-email" && (
             <>
               <p className="text-sm text-slate-600">Nhập mã xác minh đã gửi đến email của bạn.</p>
-              <AccountForm action={verify} submit="Xác minh email">
-                <Email defaultValue={typeof query.email === "string" ? query.email : undefined} />
-                <Field name="otp" label="Mã xác minh" autoComplete="one-time-code" maxLength={6} />
-              </AccountForm>
-              {typeof query.email === "string" && (
-                <AccountForm action={resendVerification} submit="Gửi lại mã" secondary>
-                  <input type="hidden" name="email" value={query.email} />
-                </AccountForm>
-              )}
+              <VerificationForm email={typeof query.email === "string" ? query.email : ""}
+                verify={verify} resend={resendVerification} />
             </>
           )}
           {screen === "forgot-password" && (

@@ -18,6 +18,15 @@ import {
   GeminiSpeakingOutputSchema,
 } from "../src/lib/placement-ai-types.ts";
 import type { PlacementTestAnswers } from "../src/types/placement-test.ts";
+import {
+  ALL_LISTENING_QUESTIONS,
+  ALL_READING_QUESTIONS,
+} from "../src/data/placement-test-data.ts";
+
+test("US-103 keeps the documented Listening 10 and Reading 12 totals", () => {
+  assert.equal(ALL_LISTENING_QUESTIONS.length, 10);
+  assert.equal(ALL_READING_QUESTIONS.length, 12);
+});
 
 test("normalizeAnswer trims, lowers, and strips punctuation", () => {
   assert.equal(normalizeAnswer("  Single Room. "), "single room");
