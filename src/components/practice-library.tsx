@@ -96,6 +96,16 @@ export function PracticeLibrary() {
           <span>10 bài cho mỗi kỹ năng</span>
         </div>
       </section>
+      <section className="cambridge-entry" aria-label="Cambridge IELTS 10">
+        <div>
+          <span className="eyebrow"><span />CAMBRIDGE IELTS 10</span>
+          <h2>Đề thi theo Test, Skill và Part</h2>
+          <p>Academic Test 1–4 và General Training Test A/B. Mở từng Part trong trình làm bài toàn màn hình.</p>
+        </div>
+        <Link className="primary-button" href="/practice/cambridge-10">
+          Mở Cambridge IELTS 10 <Icon name="arrow" size={17} />
+        </Link>
+      </section>
       <section className="practice-catalog" aria-label="Danh sách bài luyện">
         <div className="catalog-heading">
           <div>
