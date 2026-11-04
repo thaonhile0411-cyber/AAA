@@ -41,8 +41,8 @@ export function AppShell({
             <span className="nav-dot" />
           </Link>
           <Link
-            href="/settings/goals"
-            aria-label="Cài đặt mục tiêu"
+            href="/profile"
+            aria-label="Cài đặt tài khoản"
             className={active === "settings" ? "active" : ""}
             aria-current={active === "settings" ? "page" : undefined}
           >
@@ -74,7 +74,7 @@ export function AppShell({
             IELTS Academic
             <span className="course-pill">Hành trình của bạn</span>
           </div>
-          <Link className="account-link" href="/settings/goals">
+          <Link className="account-link" href="/profile">
             <span className="account-avatar">Y</span>
             <span>Tài khoản của bạn</span>
             <Icon name="chevron" size={14} />

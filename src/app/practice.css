@@ -732,6 +732,16 @@
 .answer-options b {
   font-weight: 600;
 }
+.original-question-list {
+  max-height: none;
+  overflow: visible;
+}
+.original-question-list .practice-question legend {
+  float: none;
+}
+.original-question-list .answer-options {
+  clear: both;
+}
 .practice-question > input {
   width: 100%;
   border: 1px solid #dce4f0;

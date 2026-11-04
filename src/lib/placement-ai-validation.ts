@@ -39,6 +39,23 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
   }
 
   const wordCount = countWords(trimmed);
+  const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+
+  // Reject obvious spam before reporting an otherwise accurate short response.
+  if (/(.)\1{5,}/.test(trimmed)) {
+    return {
+      valid: false,
+      status: "invalid_response",
+      message: "Bài viết chứa các chuỗi ký tự lặp lại vô nghĩa (gibberish/spam).",
+    };
+  }
+  if (words.some((word) => word.length > 35)) {
+    return {
+      valid: false,
+      status: "invalid_response",
+      message: "Bài viết chứa từ có độ dài bất thường không có trong từ điển tiếng Anh.",
+    };
+  }
 
   // Check 1: Insufficient length (under 20 words cannot be assessed as an IELTS essay)
   if (wordCount < 20) {
@@ -50,7 +67,6 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
   }
 
   // Check 2: Vietnamese language detection
-  const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
   let vietnameseCharCount = 0;
   for (const char of trimmed) {
     if (VIETNAMESE_ACCENT_REGEX.test(char)) {
@@ -71,26 +87,7 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
     };
   }
 
-  // Check 3: Repeated character gibberish (e.g. "aaaaaaa", "asdfasdfasdfasdf")
-  if (/(.)\1{5,}/.test(trimmed)) {
-    return {
-      valid: false,
-      status: "invalid_response",
-      message: "Bài viết chứa các chuỗi ký tự lặp lại vô nghĩa (gibberish/spam).",
-    };
-  }
-
-  // Check 4: Words with excessive length (> 35 characters)
-  const hasExcessiveWord = words.some((w) => w.length > 35);
-  if (hasExcessiveWord) {
-    return {
-      valid: false,
-      status: "invalid_response",
-      message: "Bài viết chứa từ có độ dài bất thường không có trong từ điển tiếng Anh.",
-    };
-  }
-
-  // Check 5: Spamming the exact same word repeatedly
+  // Check 3: Spamming the exact same word repeatedly
   if (words.length >= 25) {
     const uniqueWords = new Set(words);
     const diversityRatio = uniqueWords.size / words.length;
@@ -103,7 +100,7 @@ export function validateWritingInput(rawText: string | undefined | null): InputV
     }
   }
 
-  // Check 6: Check that words contain standard vowels (a, e, i, o, u, y)
+  // Check 4: Check that words contain standard vowels (a, e, i, o, u, y)
   const nonVowelWords = words.filter((w) => w.length >= 4 && !/[aeiouy]/i.test(w));
   if (nonVowelWords.length >= 3) {
     return {
