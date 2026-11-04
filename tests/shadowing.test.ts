@@ -34,7 +34,10 @@ const recording = () => ({
 });
 
 test("model audio, original transcript and sentence/word timestamps match", () => {
-  assert.deepEqual(models.map((model) => model.part).sort(), [1, 2, 3]);
+  assert.deepEqual(
+    [...new Set(models.map((model) => model.part))].sort(),
+    [1, 2, 3],
+  );
   for (const model of models) {
     const source = original.find(
       (item: { id: string }) => item.id === model.id,
@@ -91,7 +94,7 @@ test("AC-306.2: sentence practice schedules only sentence 1; next range requires
 });
 
 test("loop uses selected sentence boundaries and continuous mode ends at full duration", () => {
-  const model = models[0];
+  const model = models.find((item) => item.part === 2)!;
   const segment = playbackSegment(
     model.sentences,
     model.sentences[3].start + 0.4,

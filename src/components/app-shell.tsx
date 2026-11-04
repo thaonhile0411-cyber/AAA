@@ -7,7 +7,7 @@ export function AppShell({
   demoMode = false,
 }: {
   children: React.ReactNode;
-  active?: "goals" | "settings" | "test" | "shadowing";
+  active?: "goals" | "settings" | "test" | "speaking";
   demoMode?: boolean;
 }) {
   return (
@@ -25,12 +25,12 @@ export function AppShell({
         <nav className="side-nav" aria-label="Điều hướng chính">
           <Link href="/dashboard">Dashboard</Link>
           <Link
-            href="/shadowing"
-            className={active === "shadowing" ? "active" : ""}
-            aria-current={active === "shadowing" ? "page" : undefined}
+            href="/speaking"
+            className={active === "speaking" ? "active" : ""}
+            aria-current={active === "speaking" ? "page" : undefined}
           >
             <Icon name="mic" />
-            Shadowing studio
+            Speaking Question & Model Answer
             <span className="nav-dot" />
           </Link>
           <Link

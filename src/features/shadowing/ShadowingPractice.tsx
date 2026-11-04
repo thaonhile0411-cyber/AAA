@@ -3,6 +3,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { VoiceRecorder } from "@/components/audio/VoiceRecorder";
+import {
+  QuestionAudio,
+  useQuestionAudioController,
+} from "@/features/speaking/QuestionAudio";
+import type { ShortQuestion, SpeakingPart } from "@/features/speaking/types";
 import { createPracticeStore } from "./local-store";
 import { useShadowPlayer } from "./use-shadow-player";
 import { formatTime, sentenceAt, wordAt } from "./timeline";
@@ -13,10 +18,19 @@ import styles from "./shadowing.module.css";
 export default function ShadowingPractice({
   model,
   userId,
+  question,
+  part,
+  topicId,
+  materials,
 }: {
   model: ShadowModel;
   userId: string | null;
+  question: ShortQuestion;
+  part: SpeakingPart;
+  topicId: string;
+  materials: React.ReactNode;
 }) {
+  const questionAudio = useQuestionAudioController();
   const player = useShadowPlayer(model);
   const router = useRouter();
   const [recording, setRecording] = useState<Recording | null>(null);
@@ -35,6 +49,13 @@ export default function ShadowingPractice({
     ? Math.max(0, sentenceAt(model.sentences, player.time - 0.001))
     : sentenceAt(model.sentences, player.time);
   const activeWord = wordAt(model.sentences[activeSentence], player.time);
+
+  useEffect(() => {
+    const audio = ownAudio.current;
+    return () => {
+      audio?.pause();
+    };
+  }, [url]);
 
   useEffect(() => {
     if (!recording) return;
@@ -184,6 +205,8 @@ export default function ShadowingPractice({
     }
   }
   function compare(simultaneous: boolean) {
+    setVideo(null);
+    questionAudio.stop();
     if (!ownAudio.current || busy) return;
     ownAudio.current.pause();
     ownAudio.current.currentTime = 0;
@@ -210,17 +233,21 @@ export default function ShadowingPractice({
         if (
           event.code === "Space" &&
           !event.repeat &&
-          !target.closest("button,input,select,textarea,a,audio,iframe") &&
+          !target.closest(
+            "button,input,select,textarea,a,audio,iframe,summary,[contenteditable=true]",
+          ) &&
           !busy
         ) {
           event.preventDefault();
+          setVideo(null);
+          questionAudio.stop();
           if (player.playing) player.pause();
           else player.play();
         }
       }}
     >
-      <Link className={styles.back} href="/shadowing">
-        ← Tất cả bài Shadowing
+      <Link className={styles.back} href={`/speaking/${part}/${topicId}`}>
+        ← Câu hỏi {model.topic} · Part {model.part}
       </Link>
       <header className={styles.heading}>
         <p className={styles.eyebrow}>
@@ -237,7 +264,17 @@ export default function ShadowingPractice({
       <div className={styles.columns}>
         <div>
           <section className={styles.panel}>
-            <h2>Your prompt</h2>
+            <h2>Question & Model Answer</h2>
+            <QuestionAudio
+              disabled={busy}
+              question={question}
+              onBeforePlay={() => {
+                player.pause();
+                ownAudio.current?.pause();
+                setVideo(null);
+                questionAudio.stop();
+              }}
+            />
             <p className={styles.prompt} lang="en">
               {model.prompt}
             </p>
@@ -251,7 +288,7 @@ export default function ShadowingPractice({
           </section>
           <section className={styles.panel} aria-labelledby="player-heading">
             <div className={styles.panelHeader}>
-              <h2 id="player-heading">Shadowing player</h2>
+              <h2 id="player-heading">Model Answer · Shadowing player</h2>
               <span>
                 {formatTime(player.time)} / {formatTime(model.duration)}
               </span>
@@ -294,6 +331,7 @@ export default function ShadowingPractice({
                 disabled={busy}
                 onClick={() => {
                   setVideo(null);
+                  questionAudio.stop();
                   if (player.playing || player.loading) player.pause();
                   else player.play();
                 }}
@@ -385,7 +423,9 @@ export default function ShadowingPractice({
                 <div className={styles.controls}>
                   <button
                     className={styles.secondaryButton}
+                    disabled={busy}
                     onClick={() => {
+                      questionAudio.stop();
                       player.pause();
                       ownAudio.current?.pause();
                       setVideo(
@@ -424,6 +464,7 @@ export default function ShadowingPractice({
             <VoiceRecorder
               disabled={storageBusy}
               onBeforeRecord={() => {
+                questionAudio.stop();
                 recordingRevision.current++;
                 player.pause();
                 ownAudio.current?.pause();
@@ -565,6 +606,7 @@ export default function ShadowingPractice({
               này, chưa đồng bộ dashboard của nhóm.
             </p>
           </section>
+          {materials}
         </aside>
       </div>
     </div>

@@ -1,60 +1,428 @@
 [
   {
-    "id": "hometown-quiet-place",
-    "title": "A quiet place in my hometown",
+    "id": "hometown-p1-01",
+    "title": "Hometown · Part 1 · Question 1",
+    "part": 1,
+    "topic": "Hometown",
+    "targetBand": "7.0+",
+    "prompt": "Where is your hometown?",
+    "cuePoints": [],
+    "sentences": [
+      "My hometown is a small riverside town in southern Vietnam.",
+      "It is about an hour from the nearest large city, so it has a fairly relaxed atmosphere while still being well connected.",
+      "What I appreciate most is that I can get around easily and often meet people I know on the street."
+    ]
+  },
+  {
+    "id": "hometown-p1-02",
+    "title": "Hometown · Part 1 · Question 2",
+    "part": 1,
+    "topic": "Hometown",
+    "targetBand": "7.0+",
+    "prompt": "What do you like most about your hometown?",
+    "cuePoints": [],
+    "sentences": [
+      "The thing I like most is the strong sense of community.",
+      "My neighbours have known my family for years, and people are usually willing to help each other with everyday problems.",
+      "For example, when someone is away, a neighbour will often look after their plants, which makes the area feel welcoming."
+    ]
+  },
+  {
+    "id": "hometown-p1-03",
+    "title": "Hometown · Part 1 · Question 3",
+    "part": 1,
+    "topic": "Hometown",
+    "targetBand": "7.0+",
+    "prompt": "Has your hometown changed much in recent years?",
+    "cuePoints": [],
+    "sentences": [
+      "Yes, it has changed quite noticeably over the past few years.",
+      "There are more shops and better public facilities now, which has made daily life more convenient.",
+      "However, the roads have also become busier, so I sometimes miss how peaceful the town used to be when I was younger."
+    ]
+  },
+  {
+    "id": "hometown-p1-04",
+    "title": "Hometown · Part 1 · Question 4",
+    "part": 1,
+    "topic": "Hometown",
+    "targetBand": "7.0+",
+    "prompt": "Would you like to live in your hometown in the future?",
+    "cuePoints": [],
+    "sentences": [
+      "I would certainly consider living there again in the future.",
+      "At the moment, I would like to gain experience in a larger city, where there are more opportunities in my field.",
+      "If I could eventually work remotely, returning to my hometown would give me a good balance between my career and family life."
+    ]
+  },
+  {
+    "id": "hometown-p2-01",
+    "title": "Hometown · Part 2 · Question 1",
     "part": 2,
     "topic": "Hometown",
     "targetBand": "7.0+",
-    "prompt": "Describe a quiet place in your hometown that you enjoy visiting.",
+    "prompt": "Describe a place in your hometown that you enjoy visiting.",
     "cuePoints": [
       "where it is",
+      "what it is like",
       "what you do there",
-      "when you usually visit",
-      "and explain why you enjoy spending time there"
+      "and explain why you enjoy visiting it"
     ],
     "sentences": [
       "One place I particularly enjoy visiting is a small public garden near the river in my hometown.",
       "It is only a short walk from my house, but it feels surprisingly removed from the traffic and noise of the main streets.",
       "I first discovered it when a friend suggested taking a different route home after school.",
       "Since then, I have made a habit of going there whenever I need to clear my head.",
-      "I usually visit in the early evening, when the air is cooler and the light reflects beautifully on the water.",
+      "The garden has a narrow path beside the water, several old trees and a few benches where people can sit together.",
+      "I usually visit in the early evening, when the air is cooler and the light reflects beautifully on the river.",
       "Sometimes I bring a book, although I often end up simply watching people walk their dogs or chatting with a neighbour.",
       "What makes the garden special is that it gives people a place to slow down without spending any money.",
-      "There are no impressive buildings or expensive attractions, just trees, comfortable benches and a sense of belonging.",
       "For me, it is a reminder that a good quality of life often depends on ordinary spaces that bring a community together.",
       "If I moved away, this would definitely be one of the places I would miss most."
     ]
   },
   {
-    "id": "study-daily-routine",
-    "title": "My study routine",
-    "part": 1,
-    "topic": "Work & Study",
-    "targetBand": "7.0+",
-    "prompt": "Do you prefer studying in the morning or in the evening?",
+    "id": "hometown-p3-01",
+    "title": "Hometown · Part 3 · Question 1",
+    "part": 3,
+    "topic": "Hometown",
+    "targetBand": "8.0+",
+    "prompt": "Why do some people prefer living in small towns to large cities?",
     "cuePoints": [],
     "sentences": [
-      "I tend to study in the morning because I find it easier to concentrate before the day becomes busy.",
-      "For example, I usually spend half an hour reviewing my notes before checking my messages.",
-      "That small routine helps me feel more organised and gives me a clear idea of what I need to do next.",
-      "Having said that, I am quite flexible when I have a deadline, so I sometimes work in the evening as well."
+      "I think small towns appeal to people who value a slower pace of life and a stronger sense of community.",
+      "It may be easier to develop lasting relationships when neighbours meet regularly in the same shared spaces.",
+      "However, this does not mean that small towns suit everyone, because some people need access to specialist jobs or services.",
+      "The preference often depends on someone's stage of life and on how well a place meets their practical needs."
     ]
   },
   {
-    "id": "technology-communication",
-    "title": "Technology and communication",
+    "id": "hometown-p3-02",
+    "title": "Hometown · Part 3 · Question 2",
+    "part": 3,
+    "topic": "Hometown",
+    "targetBand": "8.0+",
+    "prompt": "How can urban development affect local communities?",
+    "cuePoints": [],
+    "sentences": [
+      "Urban development can improve local communities by bringing better transport, housing and public facilities.",
+      "For example, a new public park can give residents somewhere to exercise and meet without spending money.",
+      "On the other hand, development may push up rents or remove familiar meeting places, leaving existing residents feeling excluded.",
+      "I would therefore argue that planners should involve local people early, rather than judging success only by the number of new buildings."
+    ]
+  },
+  {
+    "id": "hometown-p3-03",
+    "title": "Hometown · Part 3 · Question 3",
+    "part": 3,
+    "topic": "Hometown",
+    "targetBand": "8.0+",
+    "prompt": "Should governments protect old buildings in growing cities?",
+    "cuePoints": [],
+    "sentences": [
+      "Governments should protect buildings that have genuine historical or cultural value, although preservation needs to be practical.",
+      "An old building can help residents understand the history of their community and give a neighbourhood a distinctive character.",
+      "Nevertheless, keeping every ageing structure would be expensive and could limit the space available for essential housing.",
+      "A sensible approach is to assess each site carefully and adapt suitable buildings for useful purposes, such as libraries or community centres."
+    ]
+  },
+  {
+    "id": "hometown-p3-04",
+    "title": "Hometown · Part 3 · Question 4",
+    "part": 3,
+    "topic": "Hometown",
+    "targetBand": "8.0+",
+    "prompt": "How might people's preferences about where to live change in the future?",
+    "cuePoints": [],
+    "sentences": [
+      "People's preferences may become more varied as work becomes less closely tied to a particular office.",
+      "Some people might choose smaller towns for their lower costs and access to outdoor space, provided that reliable internet is available.",
+      "Others will continue to favour large cities because of their cultural life, education and professional networks.",
+      "Rather than a single trend affecting everyone, I expect people to place greater importance on whether a location supports their individual routines."
+    ]
+  },
+  {
+    "id": "study-p1-01",
+    "title": "Work & Study · Part 1 · Question 1",
+    "part": 1,
+    "topic": "Work & Study",
+    "targetBand": "7.0+",
+    "prompt": "Do you work or are you a student?",
+    "cuePoints": [],
+    "sentences": [
+      "I am currently a university student, and I am studying information technology.",
+      "The course combines theoretical subjects with practical projects, so I spend quite a lot of time working with classmates.",
+      "I particularly enjoy building small applications because I can see how the ideas from lectures become useful in real situations."
+    ]
+  },
+  {
+    "id": "study-p1-02",
+    "title": "Work & Study · Part 1 · Question 2",
+    "part": 1,
+    "topic": "Work & Study",
+    "targetBand": "7.0+",
+    "prompt": "What do you enjoy most about your work or studies?",
+    "cuePoints": [],
+    "sentences": [
+      "What I enjoy most is the opportunity to solve problems with other people.",
+      "During a group project, everyone tends to notice something different, and discussing those ideas often leads to a better solution.",
+      "It can be challenging to coordinate our schedules, but seeing the finished result makes the effort feel worthwhile."
+    ]
+  },
+  {
+    "id": "study-p1-03",
+    "title": "Work & Study · Part 1 · Question 3",
+    "part": 1,
+    "topic": "Work & Study",
+    "targetBand": "7.0+",
+    "prompt": "Do you prefer working alone or with other people?",
+    "cuePoints": [],
+    "sentences": [
+      "It depends on the task, but I generally prefer working with a small group.",
+      "I find it useful to exchange ideas at the beginning, especially when a problem is unfamiliar.",
+      "Once we have agreed on a plan, though, I like having some quiet time to complete my own part without interruptions."
+    ]
+  },
+  {
+    "id": "study-p1-04",
+    "title": "Work & Study · Part 1 · Question 4",
+    "part": 1,
+    "topic": "Work & Study",
+    "targetBand": "7.0+",
+    "prompt": "What would you like to do after you finish your current work or studies?",
+    "cuePoints": [],
+    "sentences": [
+      "After I graduate, I hope to find a role where I can gain hands-on experience and keep developing my skills.",
+      "I am especially interested in joining a team that gives new employees regular feedback.",
+      "I have not decided on one exact job yet, so I am trying different projects before making a firm choice."
+    ]
+  },
+  {
+    "id": "study-p2-01",
+    "title": "Work & Study · Part 2 · Question 1",
+    "part": 2,
+    "topic": "Work & Study",
+    "targetBand": "7.0+",
+    "prompt": "Describe a useful skill that you learned from another person.",
+    "cuePoints": [
+      "what the skill was",
+      "who you learned it from",
+      "how you learned it",
+      "and explain why this skill has been useful to you"
+    ],
+    "sentences": [
+      "A useful skill I learned from another person was how to organise and deliver a clear presentation.",
+      "I learned it from a university tutor when my classmates and I were preparing to explain a project to a large audience.",
+      "At first, my slides were crowded with information, and I tended to read directly from them whenever I felt nervous.",
+      "Instead of simply correcting the slides, my tutor asked me to identify the one idea I wanted the audience to remember.",
+      "We then arranged the presentation around that idea and replaced long paragraphs with a few relevant examples.",
+      "She also encouraged me to practise aloud, record a short section and listen for places where I was speaking too quickly.",
+      "After several attempts, I became more comfortable pausing and making eye contact instead of rushing through every sentence.",
+      "The skill has been useful because I now need to explain my work regularly, both in class and during group meetings.",
+      "It has taught me that effective communication is less about sounding impressive and more about helping another person follow your thinking.",
+      "Although I still feel nervous sometimes, I now have a practical routine that makes the task much more manageable."
+    ]
+  },
+  {
+    "id": "study-p3-01",
+    "title": "Work & Study · Part 3 · Question 1",
+    "part": 3,
+    "topic": "Work & Study",
+    "targetBand": "8.0+",
+    "prompt": "What skills do young people need before starting their first job?",
+    "cuePoints": [],
+    "sentences": [
+      "Young people need a combination of practical knowledge and the ability to work responsibly with others.",
+      "Being able to ask clear questions, meet deadlines and respond constructively to feedback is useful in almost any occupation.",
+      "For instance, a new employee may not know every technical process, but good communication helps them learn without repeating avoidable mistakes.",
+      "Schools and employers should therefore give young people supervised opportunities to practise these transferable skills, rather than expecting them to arrive fully prepared."
+    ]
+  },
+  {
+    "id": "study-p3-02",
+    "title": "Work & Study · Part 3 · Question 2",
+    "part": 3,
+    "topic": "Work & Study",
+    "targetBand": "8.0+",
+    "prompt": "Is practical experience more valuable than academic qualifications?",
+    "cuePoints": [],
+    "sentences": [
+      "I do not think practical experience and academic qualifications can be ranked in exactly the same way for every career.",
+      "A qualification can provide the theoretical foundations needed to make safe decisions, particularly in professions such as engineering.",
+      "Practical experience then shows people how those principles operate when real situations are less predictable than textbook examples.",
+      "In my view, the strongest preparation usually combines both, with the balance depending on the responsibilities of the particular role."
+    ]
+  },
+  {
+    "id": "study-p3-03",
+    "title": "Work & Study · Part 3 · Question 3",
+    "part": 3,
+    "topic": "Work & Study",
+    "targetBand": "8.0+",
+    "prompt": "How can employers encourage their staff to keep learning?",
+    "cuePoints": [],
+    "sentences": [
+      "Employers can encourage learning by making it part of normal working life rather than an activity employees must fit into their evenings.",
+      "They could provide time for training, arrange mentoring and allow staff to apply new knowledge in manageable projects.",
+      "It is also important that people feel comfortable admitting what they do not understand, because fear of criticism can discourage useful questions.",
+      "When development is recognised and supported consistently, employees are more likely to see it as an opportunity rather than another obligation."
+    ]
+  },
+  {
+    "id": "study-p3-04",
+    "title": "Work & Study · Part 3 · Question 4",
+    "part": 3,
+    "topic": "Work & Study",
+    "targetBand": "8.0+",
+    "prompt": "How might the skills needed at work change in the future?",
+    "cuePoints": [],
+    "sentences": [
+      "As routine tasks become more automated, employees may need stronger skills in evaluating information and adapting to unfamiliar situations.",
+      "Technical knowledge will still matter, but people may have to update it more frequently throughout their careers.",
+      "At the same time, communication and judgement are likely to remain valuable because many workplace decisions involve understanding other people's needs.",
+      "I would therefore expect lifelong learning to become more important than mastering one fixed set of procedures at the beginning of a career."
+    ]
+  },
+  {
+    "id": "technology-p1-01",
+    "title": "Technology · Part 1 · Question 1",
+    "part": 1,
+    "topic": "Technology",
+    "targetBand": "7.0+",
+    "prompt": "What technology do you use every day?",
+    "cuePoints": [],
+    "sentences": [
+      "I use my phone and laptop every day, although I use them for different purposes.",
+      "My phone is mainly for messages and navigation, while my laptop is much more convenient for studying and writing.",
+      "I try to keep unnecessary notifications switched off so that the devices help me rather than constantly interrupting what I am doing."
+    ]
+  },
+  {
+    "id": "technology-p1-02",
+    "title": "Technology · Part 1 · Question 2",
+    "part": 1,
+    "topic": "Technology",
+    "targetBand": "7.0+",
+    "prompt": "When did you first start using a computer?",
+    "cuePoints": [],
+    "sentences": [
+      "I first started using a computer when I was at primary school.",
+      "At the time, I mostly used it for simple educational games and learning how to type.",
+      "I remember finding the keyboard quite confusing at first, but gradually becoming more confident once I could create a document by myself."
+    ]
+  },
+  {
+    "id": "technology-p1-03",
+    "title": "Technology · Part 1 · Question 3",
+    "part": 1,
+    "topic": "Technology",
+    "targetBand": "7.0+",
+    "prompt": "Do you find it easy to learn how to use new devices?",
+    "cuePoints": [],
+    "sentences": [
+      "I usually find it fairly easy, especially if the device has a user-friendly design.",
+      "I tend to explore the basic settings first and look for a short tutorial if something is unclear.",
+      "However, I am more cautious with expensive equipment, because I would rather understand the instructions than accidentally change an important setting."
+    ]
+  },
+  {
+    "id": "technology-p1-04",
+    "title": "Technology · Part 1 · Question 4",
+    "part": 1,
+    "topic": "Technology",
+    "targetBand": "7.0+",
+    "prompt": "Would you like to spend less time using your phone?",
+    "cuePoints": [],
+    "sentences": [
+      "Yes, particularly in the evening, when I sometimes check my phone without having a clear reason.",
+      "I would like to spend more of that time reading or talking with my family.",
+      "One change that has helped is leaving the phone away from my desk, so picking it up becomes a deliberate choice rather than a habit."
+    ]
+  },
+  {
+    "id": "technology-p2-01",
+    "title": "Technology · Part 2 · Question 1",
+    "part": 2,
+    "topic": "Technology",
+    "targetBand": "7.0+",
+    "prompt": "Describe a piece of technology that you find useful.",
+    "cuePoints": [
+      "what it is",
+      "when you started using it",
+      "how you use it",
+      "and explain why you find it useful"
+    ],
+    "sentences": [
+      "A piece of technology I find particularly useful is the laptop I bought when I started university.",
+      "It is a fairly ordinary model, but it is light enough to carry around and powerful enough for most of my coursework.",
+      "Before I had it, I often depended on shared computers, which made it difficult to continue a project whenever an idea occurred to me.",
+      "Now I use it almost every day to read course materials, write assignments and take part in online meetings.",
+      "It is especially helpful during group projects because my classmates and I can work on the same documents and discuss changes together.",
+      "Another useful feature is that I can record a short explanation of my work and review it before giving a presentation.",
+      "That saves time and helps me notice parts of an argument that are not as clear as I initially thought.",
+      "What I appreciate most is not one impressive function, but the way the device brings several everyday tasks into one place.",
+      "Of course, I have to manage distractions, so I usually close unrelated tabs when I need to concentrate.",
+      "Without it, studying would still be possible, but organising my work and collaborating with others would be considerably less convenient."
+    ]
+  },
+  {
+    "id": "technology-p3-01",
+    "title": "Technology · Part 3 · Question 1",
     "part": 3,
     "topic": "Technology",
     "targetBand": "8.0+",
-    "prompt": "Has technology improved the way people communicate?",
+    "prompt": "How has technology changed the way people communicate?",
     "cuePoints": [],
     "sentences": [
-      "On balance, I think technology has made communication more accessible, especially for people who live far from their families.",
+      "Technology has made communication more accessible, especially for people who live far from their families.",
       "A video call can help someone feel involved in an important occasion even when travelling is impossible.",
-      "However, convenience does not necessarily mean that every conversation becomes more meaningful.",
-      "When people constantly check notifications, they may pay less attention to the person sitting beside them.",
-      "I would therefore argue that the benefits depend largely on how deliberately we use these tools.",
-      "If we set aside distractions and choose the right form of communication for each situation, technology can support relationships rather than replace genuine human contact."
+      "However, convenience does not necessarily make every conversation more meaningful, particularly when people constantly check notifications.",
+      "I think the benefits depend on choosing the right tool for the situation and giving the other person our full attention."
+    ]
+  },
+  {
+    "id": "technology-p3-02",
+    "title": "Technology · Part 3 · Question 2",
+    "part": 3,
+    "topic": "Technology",
+    "targetBand": "8.0+",
+    "prompt": "Why do some people find it difficult to use new technology?",
+    "cuePoints": [],
+    "sentences": [
+      "People may struggle with new technology because they have had limited opportunities to practise, rather than because they are unwilling to learn.",
+      "Unfamiliar language, complicated menus and fear of making an expensive mistake can all make a device feel intimidating.",
+      "Clear instructions and patient support can therefore be more useful than simply telling someone that a product is easy to use.",
+      "Designers should also consider different levels of experience so that essential features remain accessible to a wider range of users."
+    ]
+  },
+  {
+    "id": "technology-p3-03",
+    "title": "Technology · Part 3 · Question 3",
+    "part": 3,
+    "topic": "Technology",
+    "targetBand": "8.0+",
+    "prompt": "Should schools teach children how to protect their privacy online?",
+    "cuePoints": [],
+    "sentences": [
+      "Yes, I think online privacy should be part of the practical digital literacy that schools teach.",
+      "Children need to understand that sharing a photo, a location or a password can have consequences beyond the immediate conversation.",
+      "Lessons should use age-appropriate examples and show students what they can do when a message or request makes them uncomfortable.",
+      "However, this responsibility should be shared with families and platform providers, rather than expecting children to manage every risk on their own."
+    ]
+  },
+  {
+    "id": "technology-p3-04",
+    "title": "Technology · Part 3 · Question 4",
+    "part": 3,
+    "topic": "Technology",
+    "targetBand": "8.0+",
+    "prompt": "Do you think people will become more dependent on technology in the future?",
+    "cuePoints": [],
+    "sentences": [
+      "People may become more dependent on technology as more everyday services move online, but dependence can take different forms.",
+      "Using a reliable tool to save time is not necessarily a problem if someone still understands its limitations.",
+      "The greater concern is relying on a system so completely that people cannot judge an incorrect result or manage when it fails.",
+      "I think future education should therefore help people use technology confidently while retaining the practical skills and judgement needed to question it."
     ]
   }
 ]

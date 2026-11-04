@@ -1,5 +1,7 @@
 # US-306 — Shadowing studio
 
+> Đây là tài liệu bản US-306 độc lập trước khi gộp. Với project hiện tại, dùng [Speaking Question & Model Answer — US-305 + US-306](speaking-question-model-answer.md), cổng 3003 và 27 bài mẫu ghép theo câu hỏi.
+
 ## Project and setup
 
 Separate directory: `D:\XAMPP\htdocs\BTTH3_PHP\AAA-shadowing`.

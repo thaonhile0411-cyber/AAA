@@ -34,7 +34,13 @@ async function Dashboard() {
               className="rounded-xl border border-slate-200 bg-white p-6"
             >
               <h2 className="text-xl font-semibold text-slate-900">
-                {skill}
+                {skill === "Speaking" ? (
+                  <Link href="/speaking">
+                    Speaking Question & Model Answer →
+                  </Link>
+                ) : (
+                  skill
+                )}
               </h2>
               <p className="mt-2 text-sm text-slate-500">
                 Chức năng luyện tập sẽ được nhóm phát triển.

@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "dev:shadowing": "next dev --port 3002",
+    "dev:speaking": "next dev --port 3003",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "smoke:shadowing": "node scripts/check-shadowing.mts"
+    "smoke:speaking": "node scripts/check-speaking-model-answer.mts"
   },
   "dependencies": {
     "@google/genai": "^2.32.0",
