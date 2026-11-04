@@ -30,6 +30,8 @@ export async function POST(
         return json({ error: "Bài luyện không tồn tại hoặc chưa xuất bản." }, 404);
       if (error.message.includes("ANSWER_KEYS_INCOMPLETE"))
         return json({ error: "Bài luyện chưa có đủ đáp án để chấm." }, 409);
+      if (error.message.includes("INVALID_BAND_SCALE"))
+        return json({ error: "Thang quy đổi band của bài luyện chưa hợp lệ." }, 409);
       throw error;
     }
 
