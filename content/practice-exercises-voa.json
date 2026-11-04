@@ -1,0 +1,90 @@
+[
+  {
+    "slug": "voa-sleepy-teens-reading", "title": "Early Classes = Sleepy Teens", "summary": "Đọc về giấc ngủ của thanh thiếu niên và giờ bắt đầu học.", "skill": "reading", "band_group": "below_5", "duration_minutes": 10,
+    "source": {"title": "Early Classes = Sleepy Teens (Duh!)", "url": "https://learningenglish.voanews.com/a/at-some-schools-later-classes--less-sleepy-teens-104438624/113705.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "passage": [
+      "A. Surveys of American teenagers find that about half of them do not get enough sleep on school nights. They get an average of sixty to ninety minutes less than experts say they need. One reason is biology. Experts say teens are programmed to go to sleep later and wake up later than other age groups. Yet many schools start classes as early as seven in the morning.",
+      "B. A clinical psychologist says teens need eight to ten hours of sleep a night. Sleepy teens can experience depression, and tired drivers can be dangerous. He says that starting classes later is one thing schools can do. Studies show that students can improve by a full letter grade in their first and second classes.",
+      "C. At St. George's School, the head teacher tried a thirty-minute delay. Visits to the health centre by tired students decreased by half. Late arrivals to first period fell by a third. Students said that they were less sleepy during the day, and teachers noticed a more positive mood."
+    ],
+    "questions": [
+      {"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"Why do many teenagers sleep less than experts recommend?","options":["Schools may begin very early.","They dislike their teachers.","They have no health centre."]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"Experts say teenagers need fewer than eight hours of sleep.","options":["TRUE","FALSE","NOT GIVEN"]},
+      {"type":"gap_fill","instruction":"Write ONE WORD from the passage.","prompt":"The school delayed its start time by thirty _____.","options":[]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"Late arrivals decreased at St. George's School.","options":["TRUE","FALSE","NOT GIVEN"]},
+      {"type":"gap_fill","instruction":"Write ONE WORD from the passage.","prompt":"Teachers noticed a more positive _____.","options":[]}
+    ]
+  },
+  {
+    "slug": "voa-test-anxiety-reading", "title": "Writing About Test Fears", "summary": "Đọc nghiên cứu về lo lắng trước kỳ thi và một can thiệp ngắn.", "skill": "reading", "band_group": "5_6", "duration_minutes": 14,
+    "source": {"title": "Anxious Students Gain on Tests by Writing About Fears", "url": "https://learningenglish.voanews.com/a/anxious-students-gain-on-tests-by-writing-about-fears-114235749/113753.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "passage": [
+      "A. Some students get so nervous before a test that they do poorly even when they know the material. Psychology professor Sian Beilock says that worrying about consequences uses attention and memory resources that could otherwise be used to focus on the exam.",
+      "B. Beilock and researcher Gerardo Ramirez developed a possible solution. Just before an exam, anxious students spent ten minutes writing about their worries. In a study, students who sat quietly performed an average of twelve percent worse on a second test. Students who wrote about their fears improved by an average of five percent.",
+      "C. The researchers also worked with younger students in a biology class. Before final exams, students either wrote about their feelings or thought about unrelated things. Highly anxious students who did the writing received an average grade of B+, compared with a B- for those who did not. The researchers say students can also try the technique at home or in a library."
+    ],
+    "questions": [
+      {"type":"matching_headings","instruction":"Choose the best heading for paragraph A.","prompt":"Paragraph A","options":["Why worry can affect test performance","A new biology course","How to mark an exam","The cost of university"]},
+      {"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"How long did students write about their worries?","options":["Ten minutes","Twelve minutes","One hour"]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"The quiet group improved by five percent.","options":["TRUE","FALSE","NOT GIVEN"]},
+      {"type":"gap_fill","instruction":"Write ONE LETTER AND ONE SYMBOL from the passage.","prompt":"Anxious writers in the biology class received an average grade of _____.","options":[]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"The technique can only be used immediately before an exam.","options":["TRUE","FALSE","NOT GIVEN"]}
+    ]
+  },
+  {
+    "slug": "voa-learning-from-failure-reading", "title": "Learning from Failure", "summary": "Đọc về cách tổ chức học hỏi từ thất bại và thay đổi quyết định.", "skill": "reading", "band_group": "6_7", "duration_minutes": 17,
+    "source": {"title": "How Failure Can Lead to Long-Lasting Knowledge", "url": "https://learningenglish.voanews.com/amp/sometimes-failure-leads-to-long-lasting-knowledge-102475329/113656.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "passage": [
+      "A. A study says organizations learn more from failures than from successes, and keep that knowledge longer. Researchers Vinit Desai and Peter Madsen did not find much long-term organizational learning from success. They found that knowledge gained from failure can last for years.",
+      "B. The study looked at organizations that launch satellites and other space vehicles. In 2002, insulating material damaged a rocket on Atlantis, but the flight was considered a success. In 2003, insulation struck Columbia during launch. The shuttle broke apart on re-entry, seven crew members died, and NASA suspended flights while an investigation suggested changes.",
+      "C. Desai says searching for solutions after a failure can make leaders more open-minded. He points to airlines as an industry that has learned from failures. He advises organizations to look for useful information in small failures and failures they avoided, and to encourage the open sharing of information."
+    ],
+    "questions": [
+      {"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What did the researchers find about knowledge from failure?","options":["It can last for years.","It is always ignored.","It is less useful than success.","It only applies to airlines."]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"The 2002 Atlantis flight was treated as a failure.","options":["TRUE","FALSE","NOT GIVEN"]},
+      {"type":"matching_headings","instruction":"Choose the best heading for paragraph B.","prompt":"Paragraph B","options":["Two shuttle events and their consequences","A new airline safety rule","Why satellites cannot launch","The costs of an investigation"]},
+      {"type":"gap_fill","instruction":"Write ONE WORD from the passage.","prompt":"NASA _____ flights after the Columbia disaster.","options":[]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"Desai recommends sharing information openly.","options":["TRUE","FALSE","NOT GIVEN"]}
+    ]
+  },
+  {
+    "slug": "voa-science-websites-reading", "title": "Science Websites for Children", "summary": "Đọc về các nền tảng trực tuyến giúp trẻ em khám phá khoa học.", "skill": "reading", "band_group": "8_plus", "duration_minutes": 21,
+    "source": {"title": "New Science Websites for Children", "url": "https://learningenglish.voanews.com/a/new-science-websites-for-children-112524799/113713.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "passage": [
+      "A. Millions of children use the Internet every day to explore the web, play games and research school projects. The Mad Science Group launched a science-based social network called Mad Science Kids Club. It was designed for children between six and fourteen and aimed to let them build an online community while exploring scientific discovery.",
+      "B. The club included groups such as a Counting Club for children who enjoy mathematics and Cosmic Adventures for those interested in space. One application allowed children to ask science questions that were published with answers from experts. The Science Zone offered experiments that children and parents could do at home.",
+      "C. The report also describes other sites. One explained science-related news in accessible language and added definitions of important words. Another offered guides for making toys from everyday materials and explained the scientific theories behind them. The report notes that such projects could provide many hours of exploration, although it had not tested every activity itself."
+    ],
+    "questions": [
+      {"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What was a purpose of Mad Science Kids Club?","options":["To support online scientific discovery","To sell school textbooks","To replace parents at home","To teach only computer programming"]},
+      {"type":"matching_headings","instruction":"Choose the best heading for paragraph B.","prompt":"Paragraph B","options":["Activities and groups within the club","The cost of online safety","A comparison of school subjects","Why children avoid science"]},
+      {"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"The Counting Club focused on mathematics.","options":["TRUE","FALSE","NOT GIVEN"]},
+      {"type":"gap_fill","instruction":"Write ONE WORD from the passage.","prompt":"The Science Zone offered experiments that families could do at _____.","options":[]},
+      {"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What limitation did the report acknowledge?","options":["It had not tested every activity.","The sites had no science content.","Children could not use the Internet.","Parents were forbidden to join."]}
+    ]
+  },
+  {
+    "slug": "voa-sleepy-teens-listening", "title": "Listen: Early Classes = Sleepy Teens", "summary": "Nghe VOA Learning English nói về giấc ngủ và giờ học.", "skill": "listening", "band_group": "below_5", "duration_minutes": 10,
+    "source": {"title": "Early Classes = Sleepy Teens (Duh!)", "url": "https://learningenglish.voanews.com/a/at-some-schools-later-classes--less-sleepy-teens-104438624/113705.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "transcript":"Surveys of American teenagers find that about half do not get enough sleep on school nights. They get sixty to ninety minutes less than experts recommend. At St. George's School, a thirty-minute delay in the start time reduced health-centre visits by tired students and reduced late arrivals. Students said they were less sleepy, while teachers noticed a more positive mood.",
+    "questions":[{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"Who is the report about?","options":["American teenagers","Airline pilots","Primary teachers"]},{"type":"gap_fill","instruction":"Write ONE NUMBER from the audio.","prompt":"The school delayed its start by _____ minutes.","options":[]},{"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"Late arrivals increased after the delay.","options":["TRUE","FALSE","NOT GIVEN"]},{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What did teachers notice?","options":["A more positive mood","Longer lessons","More homework"]},{"type":"gap_fill","instruction":"Write ONE WORD from the audio.","prompt":"Students reported feeling less _____ during the day.","options":[]}]
+  },
+  {
+    "slug": "voa-test-anxiety-listening", "title": "Listen: Writing About Test Fears", "summary": "Nghe nghiên cứu VOA về lo lắng trước kỳ thi.", "skill": "listening", "band_group": "5_6", "duration_minutes": 12,
+    "source": {"title": "Anxious Students Gain on Tests by Writing About Fears", "url": "https://learningenglish.voanews.com/a/anxious-students-gain-on-tests-by-writing-about-fears-114235749/113753.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "transcript":"Some students become so nervous before a test that they perform poorly even when they know the material. Researchers asked anxious students to spend ten minutes writing about their worries. Students who wrote improved their performance by an average of five percent. In a biology class, highly anxious students who did the writing received an average grade of B plus, compared with B minus for students who did not.",
+    "questions":[{"type":"gap_fill","instruction":"Write ONE NUMBER from the audio.","prompt":"Students wrote for _____ minutes.","options":[]},{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What did writers write about?","options":["Their worries","Their holiday","Their teacher's salary"]},{"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"Writers improved by five percent on average.","options":["TRUE","FALSE","NOT GIVEN"]},{"type":"gap_fill","instruction":"Write ONE WORD from the audio.","prompt":"The later study took place in a _____ class.","options":[]},{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What grade did anxious writers receive on average?","options":["B plus","A plus","C minus"]}]
+  },
+  {
+    "slug": "voa-learning-from-failure-listening", "title": "Listen: Learning from Failure", "summary": "Nghe báo cáo VOA về việc tổ chức học từ thất bại.", "skill": "listening", "band_group": "6_7", "duration_minutes": 15,
+    "source": {"title": "How Failure Can Lead to Long-Lasting Knowledge", "url": "https://learningenglish.voanews.com/amp/sometimes-failure-leads-to-long-lasting-knowledge-102475329/113656.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "transcript":"A study says organizations learn more from failures than successes and keep that knowledge longer. The researchers examined organizations that launch space vehicles. After the Columbia shuttle broke apart in 2003, NASA suspended flights and an investigation suggested changes. One researcher says searching for solutions after failure can make leaders more open-minded and that organizations should share useful information openly.",
+    "questions":[{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What can organizations retain for longer after failure?","options":["Knowledge","Fuel","Employees"]},{"type":"gap_fill","instruction":"Write ONE NUMBER from the audio.","prompt":"The Columbia event happened in _____.","options":[]},{"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"NASA continued flights without an investigation.","options":["TRUE","FALSE","NOT GIVEN"]},{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What can failure make leaders become?","options":["More open-minded","Less informed","More secretive"]},{"type":"gap_fill","instruction":"Write ONE WORD from the audio.","prompt":"Organizations should share _____ information openly.","options":[]}]
+  },
+  {
+    "slug": "voa-science-websites-listening", "title": "Listen: Science Websites for Children", "summary": "Nghe VOA Learning English nói về khám phá khoa học trực tuyến.", "skill": "listening", "band_group": "8_plus", "duration_minutes": 18,
+    "source": {"title": "New Science Websites for Children", "url": "https://learningenglish.voanews.com/a/new-science-websites-for-children-112524799/113713.html", "license": "Public domain", "attribution": "VOA Learning English"},
+    "transcript":"The Mad Science Group launched a science-based social network for children called Mad Science Kids Club. It was designed for children aged six to fourteen. Children could join groups about mathematics or space, ask science questions, and try experiments with their parents at home. The report also described websites that explain science news in accessible language and provide definitions of important words.",
+    "questions":[{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"What did Mad Science Group launch?","options":["A science social network","A television channel","A sports club"]},{"type":"gap_fill","instruction":"Write ONE NUMBER from the audio.","prompt":"The club included children from six to _____ years old.","options":[]},{"type":"true_false_not_given","instruction":"Choose TRUE, FALSE or NOT GIVEN.","prompt":"Children could try experiments with parents at home.","options":["TRUE","FALSE","NOT GIVEN"]},{"type":"multiple_choice","instruction":"Choose ONE answer.","prompt":"Which topic could children explore in a group?","options":["Space","Car repair","Cooking"]},{"type":"gap_fill","instruction":"Write ONE WORD from the audio.","prompt":"Some sites gave definitions of important _____.","options":[]}]
+  }
+]

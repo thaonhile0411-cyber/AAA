@@ -39,4 +39,6 @@ jobs:
 
       - name: Build application
         run: npm run build
-        
+
+      - name: Test goal rules and practice interactions
+        run: npm test

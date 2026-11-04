@@ -9,8 +9,6 @@ import {
 import { GOAL_COLUMNS, profileFromRow, type GoalRow } from "@/lib/goal-record";
 import { apiFailure, json } from "@/lib/api-response";
 
-export const dynamic = "force-dynamic";
-
 async function handle(request?: Request) {
   try {
     const supabase = await createClient();
@@ -103,7 +101,9 @@ async function handle(request?: Request) {
       !configuredPath.startsWith("//") &&
       !configuredPath.includes("\\")
         ? configuredPath
-        : null;
+        : nextStep === "placement"
+          ? "/onboarding/placement-test"
+          : "/practice";
     const body: GoalResponse = {
       profile,
       today,

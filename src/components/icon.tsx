@@ -1,4 +1,5 @@
 const paths = {
+  pen: "m15 3 6 6L8 22H2v-6ZM12 6l6 6",
   arrow: "M4 12h15m-6-6 6 6-6 6",
   check: "m5 12 4 4L19 6",
   chevron: "m9 5 7 7-7 7",
