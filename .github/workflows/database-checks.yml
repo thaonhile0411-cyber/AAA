@@ -42,7 +42,7 @@ jobs:
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.placement_questions;")" = "6"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.placement_question_keys;")" = "6"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.learning_materials;")" = "8"
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_policies where schemaname = 'public';")" = "28"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_policies where schemaname = 'public';")" = "31"
 
       - name: Stop local Supabase
         if: always()
