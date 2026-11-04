@@ -1,32 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  practiceResources,
-  resourceCollections,
-  resourceSheetUrl,
-} from "@/data/practice-resources";
+  originalPracticeTests,
+  practiceSkills,
+  type TestSkill,
+} from "@/data/original-practice-tests";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 
-function skillLabel(skills: string[]) {
-  return skills.map((skill) => skill.toUpperCase()).join(" & ");
-}
-
-function skillIcon(skills: string[]): "book" | "headphones" | "pen" {
-  if (skills.includes("writing")) return "pen";
-  if (skills.includes("speaking")) return "headphones";
-  return "book";
+function iconFor(skill: TestSkill): "book" | "headphones" | "pen" {
+  return skill === "listening" || skill === "speaking"
+    ? "headphones"
+    : skill === "writing"
+      ? "pen"
+      : "book";
 }
 
 export function PracticeLibrary() {
-  const [collection, setCollection] = useState("Tất cả");
-  const resources = useMemo(
+  const [skill, setSkill] = useState<TestSkill | "all">("all");
+  const tests = useMemo(
     () =>
-      collection === "Tất cả"
-        ? practiceResources
-        : practiceResources.filter((item) => item.collection === collection),
-    [collection],
+      skill === "all"
+        ? originalPracticeTests
+        : originalPracticeTests.filter((test) => test.skill === skill),
+    [skill],
   );
 
   return (
@@ -34,139 +33,111 @@ export function PracticeLibrary() {
       <div className="breadcrumb">
         <span>Không gian học tập</span>
         <Icon name="chevron" size={12} />
-        <span>Kho tài liệu</span>
+        <span>Kho bài luyện</span>
       </div>
       <div className="page-heading">
         <div>
           <span className="eyebrow">
             <span />
-            READING. LISTENING. LUYỆN TẬP.
+            BỐN KỸ NĂNG. MỘT HÀNH TRÌNH.
           </span>
           <h1>
-            Luyện theo bộ đề, <span>tiến bộ mỗi ngày.</span>
+            Luyện ngay trong AAA, <span>không rời trang.</span>
           </h1>
-          <p>
-            Chọn tài liệu phù hợp và mở nguồn để luyện đủ bốn kỹ năng IELTS.
-          </p>
+          <p>40 bài luyện IELTS tự soạn, gồm 10 bài cho mỗi kỹ năng.</p>
         </div>
         <span className="heading-detail">
-          <Icon name="book" size={17} /> IELTS Academic
+          <Icon name="book" size={17} /> Nội dung AAA
         </span>
       </div>
       <section className="practice-hero">
         <div>
-          <span className="practice-kicker">THƯ VIỆN TÀI LIỆU</span>
+          <span className="practice-kicker">KHO BÀI LUYỆN NỘI BỘ</span>
           <h2>
-            Chọn đúng bộ đề.
+            Làm bài, lưu câu trả lời,
             <br />
-            Giữ nhịp luyện đều.
+            rồi tiếp tục bất cứ lúc nào.
           </h2>
           <p>
-            Danh mục được cập nhật từ kế hoạch học tập của bạn.
+            Reading, Listening, Writing và Speaking đều mở trực tiếp trong ứng
+            dụng.
             <br />
-            Mỗi thẻ sẽ mở trang tài liệu nguồn trong tab mới.
+            Không dùng đề, đáp án hay audio của bên thứ ba.
           </p>
         </div>
         <div className="practice-band-card">
           <Icon name="book" size={27} />
-          <small>TÀI LIỆU CÓ SẴN</small>
-          <strong>{practiceResources.length}</strong>
-          <span>4 kỹ năng IELTS</span>
+          <small>BÀI LUYỆN CÓ SẴN</small>
+          <strong>{originalPracticeTests.length}</strong>
+          <span>10 bài cho mỗi kỹ năng</span>
         </div>
       </section>
-      <section
-        className="practice-catalog"
-        aria-label="Danh mục tài liệu luyện IELTS"
-      >
+      <section className="practice-catalog" aria-label="Danh sách bài luyện">
         <div className="catalog-heading">
           <div>
-            <h2>Danh mục tài liệu</h2>
-            <p>Lọc theo bộ đề rồi mở bài luyện trực tiếp từ nguồn.</p>
+            <h2>Chọn kỹ năng để bắt đầu</h2>
+            <p>Mỗi bài có nội dung và câu hỏi được soạn riêng cho AAA.</p>
           </div>
-          <a
-            className="text-link"
-            href={resourceSheetUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Xem danh mục gốc <Icon name="arrow" size={16} />
-          </a>
         </div>
         <div className="catalog-filters">
-          <div className="skill-tabs" aria-label="Bộ tài liệu">
-            {resourceCollections.map((item) => (
+          <div className="skill-tabs" aria-label="Kỹ năng">
+            {practiceSkills.map((item) => (
               <button
-                key={item}
-                aria-pressed={collection === item}
-                onClick={() => setCollection(item)}
+                key={item.value}
+                aria-pressed={skill === item.value}
+                onClick={() => setSkill(item.value)}
               >
-                <Icon name="book" size={17} />
-                {item}
+                <Icon
+                  name={
+                    item.value === "writing"
+                      ? "pen"
+                      : item.value === "listening" || item.value === "speaking"
+                        ? "headphones"
+                        : "book"
+                  }
+                  size={17}
+                />
+                {item.label}
               </button>
             ))}
           </div>
         </div>
         <div className="catalog-count" role="status">
-          <strong>{resources.length} tài liệu</strong>
-          <span>
-            Liên kết ngoài · Không lưu nội dung, đáp án hoặc audio của nguồn vào
-            AAA
-          </span>
+          <strong>{tests.length} bài luyện</strong>
+          <span>Nội dung tự soạn · làm trực tiếp trong AAA</span>
         </div>
         <div className="exercise-grid">
-          {resources.map((resource, index) => (
-            <article
-              className="exercise-card resource-card"
-              key={resource.title}
-            >
-              <div className="exercise-cover reading">
+          {tests.map((test, index) => (
+            <article className="exercise-card" key={test.slug}>
+              <div
+                className={`exercise-cover ${test.skill === "listening" || test.skill === "speaking" ? "listening" : "reading"}`}
+              >
                 <span className="exercise-skill">
-                  <Icon name={skillIcon(resource.skills)} size={15} />
-                  {skillLabel(resource.skills)}
+                  <Icon name={iconFor(test.skill)} size={15} />{" "}
+                  {test.skill.toUpperCase()}
                 </span>
                 <span className="exercise-cover-symbol" aria-hidden="true">
-                  <Icon name={skillIcon(resource.skills)} size={56} />
+                  <Icon name={iconFor(test.skill)} size={56} />
                 </span>
                 <span className="exercise-cover-number" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="exercise-band">{resource.collection}</span>
+                <span className="exercise-band">Bài tự soạn</span>
               </div>
               <div className="exercise-card-body">
-                <h3>{resource.title}</h3>
-                <p>{resource.description}</p>
-                <a
-                  className="exercise-source"
-                  href={resource.url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Nguồn tài liệu: DOL English
-                </a>
+                <h3>{test.title}</h3>
+                <p>{test.summary}</p>
                 <div className="exercise-card-footer">
-                  <span>Mở trong tab mới</span>
-                  <a
-                    href={resource.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Mở ${resource.title} từ nguồn`}
-                  >
-                    Mở tài liệu <Icon name="arrow" size={17} />
-                  </a>
+                  <span>Lưu bài trên thiết bị</span>
+                  <Link href={`/practice/${test.slug}`}>
+                    Bắt đầu <Icon name="arrow" size={17} />
+                  </Link>
                 </div>
               </div>
             </article>
           ))}
         </div>
       </section>
-      <div className="practice-tip">
-        <Icon name="shield" size={20} />
-        <p>
-          <strong>Tôn trọng nguồn học liệu.</strong> AAA chỉ tổ chức các đường
-          dẫn theo danh mục bạn cung cấp. Nội dung, đáp án và điều khoản sử dụng
-          thuộc về trang nguồn; hãy xem điều khoản tại đó trước khi sử dụng.
-        </p>
-      </div>
     </AppShell>
   );
 }

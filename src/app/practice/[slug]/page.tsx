@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { PracticeWorkspace } from "@/components/practice-workspace";
-export const metadata: Metadata = { title: "Luyện Reading & Listening | AAA" };
+import { OriginalPracticeTestPage } from "@/components/original-practice-test";
+export const metadata: Metadata = { title: "Bài luyện IELTS | AAA" };
 export default async function ExercisePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <PracticeWorkspace slug={slug} />;
+  return <OriginalPracticeTestPage key={slug} slug={slug} />;
 }
