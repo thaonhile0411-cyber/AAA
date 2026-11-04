@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
+import { PracticeAudio } from "./practice-audio";
 import Image from "next/image";
 import {
   cambridgeIelts10Tests,
@@ -48,6 +49,86 @@ function partNumbers(part: CambridgePart) {
   return Array.from(
     { length: part.questionEnd - part.questionStart + 1 },
     (_, index) => part.questionStart! + index,
+  );
+}
+
+function formatRecordingTime(seconds: number) {
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function SpeakingRecorder() {
+  const [status, setStatus] = useState<"idle" | "recording" | "ready">("idle");
+  const [elapsed, setElapsed] = useState(0);
+  const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
+
+  function stopStream() {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }
+
+  function stop() {
+    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+  }
+
+  async function start() {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setError("This browser does not support microphone recording.");
+      return;
+    }
+    setError("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      recorderRef.current = recorder;
+      chunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size) chunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        stopStream();
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        const url = URL.createObjectURL(blob);
+        if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = url;
+        setRecordingUrl(url);
+        setStatus("ready");
+      };
+      recorder.start();
+      setElapsed(0);
+      setStatus("recording");
+      timerRef.current = setInterval(() => setElapsed((current) => current + 1), 1000);
+    } catch (caught) {
+      const name = caught instanceof DOMException ? caught.name : "";
+      setError(name === "NotAllowedError" ? "Microphone permission was not granted." : "Could not start the microphone recording.");
+      stopStream();
+    }
+  }
+
+  useEffect(() => () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+    stopStream();
+    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+  }, []);
+
+  return (
+    <section className="cambridge-recorder" aria-label="Speaking recording">
+      <div><strong>Record your response</strong><span>{status === "recording" ? `Recording ${formatRecordingTime(elapsed)}` : recordingUrl ? `Recorded ${formatRecordingTime(elapsed)}` : "Microphone is requested only when you start."}</span></div>
+      <div className="cambridge-recorder-controls">
+        {status === "recording" ? <button type="button" className="exam-step" onClick={stop}>Stop recording</button> : <button type="button" className="primary-button" onClick={start}>{recordingUrl ? "Record again" : "Start recording"}</button>}
+        {recordingUrl && <audio controls src={recordingUrl}>Your browser cannot play this recording.</audio>}
+      </div>
+      {error && <p className="cambridge-recorder-error" role="alert">{error}</p>}
+    </section>
   );
 }
 
@@ -169,6 +250,8 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const [mobilePane, setMobilePane] = useState<"source" | "answers">("source");
   const [split, setSplit] = useState(50);
   const [resizing, setResizing] = useState(false);
+  const [audioPosition, setAudioPosition] = useState(() => Number(answers.__audioPosition) || 0);
+  const [audioSpeed, setAudioSpeed] = useState(() => Number(answers.__audioSpeed) || 1);
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
   const isWritingOrSpeaking = active.section.skill === "writing" || active.section.skill === "speaking";
@@ -260,10 +343,22 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
         </div>
         <div ref={bodyRef} className={`exam-modal-body show-${mobilePane}`} style={{ gridTemplateColumns: `minmax(0, ${split}fr) 8px minmax(0, ${100 - split}fr)` }}>
           <section className="exam-source-pane" aria-label="Nội dung từ Cambridge IELTS 10">
-            {isListening && (
-              <p className="exam-audio-unavailable" role="note">
-                No audio file was provided with this Cambridge IELTS 10 source package. Audio playback is unavailable for this section.
-              </p>
+            {isListening && active.part.audioPath && (
+              <PracticeAudio
+                source={active.part.audioPath}
+                title={`${active.test.title} · ${active.part.label}`}
+                initialTime={audioPosition}
+                speed={audioSpeed}
+                onPosition={(time) => {
+                  setAudioPosition(time);
+                  persist({ ...answers, __audioPosition: String(time) });
+                }}
+                onSpeed={(speed) => {
+                  setAudioSpeed(speed);
+                  persist({ ...answers, __audioSpeed: String(speed) });
+                }}
+                caption="Official Cambridge IELTS 10 audio supplied with this book."
+              />
             )}
             {active.part.sourcePages.map((page) => <Image key={page} src={assetForPage(page)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt={`Cambridge IELTS 10, source page ${page}`} />)}
             {submitted && answerKey && <Image className="exam-answer-key" src={assetForPage(answerKey)} width={673} height={983} sizes="(max-width: 700px) 100vw, 50vw" unoptimized alt="Answer key from Cambridge IELTS 10" />}
@@ -282,6 +377,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                 <label className="exam-response-label" htmlFor="exam-response">{active.section.skill === "writing" ? "Your writing" : "Your notes / response"}</label>
                 <textarea id="exam-response" ref={(element) => { answersRef.current.response = element; }} value={answers.response ?? ""} onChange={(event) => persist({ ...answers, response: event.target.value })} />
                 <small>{answers.response?.trim() ? answers.response.trim().split(/\s+/).length : 0} words · Saved on this device</small>
+                {active.section.skill === "speaking" && <SpeakingRecorder />}
               </>
             ) : (
               <>
