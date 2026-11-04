@@ -296,6 +296,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
   const [reviewedNumber, setReviewedNumber] = useState<number | null>(null);
   const answersRef = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
+  const reviewRef = useRef<HTMLElement>(null);
   const isWriting = active.section.skill === "writing";
   const isSpeaking = active.section.skill === "speaking";
   const isWritingOrSpeaking = isWriting || isSpeaking;
@@ -382,6 +383,14 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
     setMobilePane("source");
   }
 
+  useEffect(() => {
+    if (!reviewedListeningAnswer) return;
+    const frame = window.requestAnimationFrame(() =>
+      reviewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+    return () => window.cancelAnimationFrame(frame);
+  }, [reviewedListeningAnswer, reviewedNumber]);
+
   return (
     <div className="exam-modal-backdrop" role="presentation">
       <section className="exam-modal" role="dialog" aria-modal="true" aria-labelledby="exam-player-title">
@@ -424,7 +433,7 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
               </section>
             )}
             {submitted && reviewedListeningAnswer && active.part.audioPath && (
-              <section className="cambridge-answer-review" aria-live="polite">
+              <section ref={reviewRef} className="cambridge-answer-review" aria-live="polite" tabIndex={-1}>
                 <span>QUESTION {reviewedNumber} · ANSWER EVIDENCE</span>
                 <h2>Why this answer is correct</h2>
                 <p lang="en"><mark>{reviewedListeningAnswer.evidence}</mark></p>
