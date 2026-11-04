@@ -837,6 +837,15 @@ export function PracticeSession({ exercise, context, offline }: Loaded) {
               <a
                 key={question.id}
                 href={`#question-${question.id}`}
+                onClick={(event) => {
+                  const questionResult = resultByQuestion.get(question.id);
+                  // On the review screen, question navigation is also passage
+                  // navigation: selecting a result takes the learner straight
+                  // to the evidence and opens its explanation.
+                  if (!questionResult) return;
+                  event.preventDefault();
+                  showExplanation(questionResult);
+                }}
                 className={
                   resultByQuestion.get(question.id)
                     ? resultByQuestion.get(question.id)!.correct
