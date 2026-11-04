@@ -4,6 +4,8 @@ import { RoadmapWorkspace } from "@/components/roadmap-workspace";
 import { loadActiveRoadmap } from "@/lib/active-roadmap";
 import { authenticatedClient } from "@/lib/supabase/server";
 
+export const instant = false;
+
 export const metadata: Metadata = { title: "Lộ trình của tôi | AAA" };
 
 export default async function RoadmapPage() {
