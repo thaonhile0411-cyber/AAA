@@ -301,4 +301,3 @@ test("Overall Band: Calculates correct IELTS half-band rounding when all 4 skill
   });
   assert.equal(result4, 6.0);
 });
-

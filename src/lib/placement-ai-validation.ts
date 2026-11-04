@@ -212,4 +212,3 @@ export function calculateOverallIeltsBand(skills: {
   const mean = (listening + reading + writing + speaking) / 4;
   return roundToIeltsBand(mean);
 }
-
