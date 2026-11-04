@@ -50,7 +50,9 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
   const [saved, setSaved] = useState(false);
   const [listening, setListening] = useState(false);
   const [grade, setGrade] = useState<GradeResult | null>(null);
+  const [answerError, setAnswerError] = useState("");
   const evidenceRef = useRef<HTMLElement>(null);
+  const questionRef = useRef<HTMLFieldSetElement>(null);
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
   useEffect(() => {
@@ -86,6 +88,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
   function updateAnswer(value: string) {
     setAnswer(value);
     setGrade(null);
+    setAnswerError("");
     setSaved(false);
   }
 
@@ -111,9 +114,26 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
   }
 
   function checkAnswer() {
-    if (!question || !answer.trim()) return;
-    save();
-    setGrade(gradePracticeAnswer(answer, question));
+    if (!question) return;
+
+    // Chrome can restore a checked radio after a dev-server restart without
+    // replaying its change event. Read the native field as a fallback so a
+    // visibly selected option can always be graded.
+    const restoredChoice = questionRef.current?.querySelector<HTMLInputElement>(
+      'input[type="radio"]:checked',
+    )?.value;
+    const answerToGrade = answer.trim() || restoredChoice?.trim() || "";
+
+    if (!answerToGrade) {
+      setAnswerError("Hãy chọn hoặc nhập đáp án trước khi chấm bài.");
+      return;
+    }
+
+    if (answerToGrade !== answer) setAnswer(answerToGrade);
+    localStorage.setItem(responseKey(test!), answerToGrade);
+    setSaved(true);
+    setAnswerError("");
+    setGrade(gradePracticeAnswer(answerToGrade, question));
   }
 
   return (
@@ -251,7 +271,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
 
           {isGradable && question ? (
             <div className="question-list original-question-list" lang="en">
-              <fieldset className="practice-question">
+              <fieldset className="practice-question" ref={questionRef}>
                 <legend>
                   <span>1</span>
                   {question.type === "multiple_choice"
@@ -294,6 +314,12 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                   </>
                 )}
               </fieldset>
+
+              {answerError && (
+                <p className="field-error" role="alert">
+                  {answerError}
+                </p>
+              )}
 
               {grade && (
                 <section
@@ -348,7 +374,6 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
               <>
                 <button
                   className="primary-button"
-                  disabled={!answer.trim()}
                   onClick={checkAnswer}
                 >
                   <Icon name="check" size={18} /> Chấm bài
