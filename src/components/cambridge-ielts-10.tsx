@@ -7,6 +7,8 @@ import Image from "next/image";
 import {
   cambridgeIelts10Tests,
   cambridgeSkillLabels,
+  answerKeyFor,
+  answerGroupsFor,
   type CambridgePart,
   type CambridgeSkill,
   type CambridgeSkillSection,
@@ -47,6 +49,10 @@ function partNumbers(part: CambridgePart) {
     { length: part.questionEnd - part.questionStart + 1 },
     (_, index) => part.questionStart! + index,
   );
+}
+
+function normaliseAnswer(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
 
 export function CambridgeIelts10() {
@@ -220,6 +226,20 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
     ? Boolean(answers.response?.trim())
     : numbers.filter((number) => answers[String(number)]?.trim()).length;
   const answerKey = answerKeyPage(active.test.id, active.section.skill);
+  const acceptedAnswers = answerKeyFor(active.test.id, active.section.skill);
+  const answerGroups = answerGroupsFor(active.test.id, active.section.skill);
+  const scoredNumbers = numbers.filter((number) => acceptedAnswers?.[number]);
+  const correct = scoredNumbers.filter((number) => {
+    const group = answerGroups.find((item) => item.numbers.includes(number));
+    if (group) {
+      const actual = group.numbers.map((item) => normaliseAnswer(answers[String(item)] ?? "")).sort();
+      const expected = group.accepted.map(normaliseAnswer).sort();
+      return actual.every((answer, index) => answer === expected[index]);
+    }
+    return acceptedAnswers![number].some(
+      (answer) => normaliseAnswer(answer) === normaliseAnswer(answers[String(number)] ?? ""),
+    );
+  });
 
   return (
     <div className="exam-modal-backdrop" role="presentation">
@@ -255,20 +275,28 @@ export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: (
                   {numbers.map((number) => (
                     <label className={selectedQuestion === number ? "selected" : ""} key={number} htmlFor={`exam-answer-${number}`}>
                       <span>{number}</span>
-                      <input id={`exam-answer-${number}`} ref={(element) => { answersRef.current[String(number)] = element; }} value={answers[String(number)] ?? ""} onFocus={() => setSelectedQuestion(number)} onChange={(event) => persist({ ...answers, [number]: event.target.value })} autoComplete="off" />
+                      <input id={`exam-answer-${number}`} ref={(element) => { answersRef.current[String(number)] = element; }} value={answers[String(number)] ?? ""} onFocus={() => setSelectedQuestion(number)} onChange={(event) => persist({ ...answers, [number]: event.target.value })} autoComplete="off" disabled={submitted} />
+                      {submitted && acceptedAnswers?.[number] && (
+                        <small className={correct.includes(number) ? "exam-answer-result correct" : "exam-answer-result incorrect"}>
+                          {correct.includes(number) ? "Correct" : `Accepted answer: ${acceptedAnswers[number].join(" / ")}`}
+                        </small>
+                      )}
                     </label>
                   ))}
                 </div>
               </>
             )}
-            {submitted && <p className="exam-submitted" role="status">Your response has been submitted. The source Answer Key is now available in the content pane.</p>}
+            {submitted && <p className="exam-submitted" role="status">
+              {acceptedAnswers ? `${correct.length}/${scoredNumbers.length} correct. ` : "Your response has been submitted. "}
+              The source Answer Key is now available in the content pane.
+            </p>}
           </section>
         </div>
         <footer className="exam-modal-footer">
           <span>{active.part.label}</span>
           {!isWritingOrSpeaking && <nav aria-label="Question navigation">{numbers.map((number) => <button key={number} type="button" className={`${selectedQuestion === number ? "current" : ""} ${answers[String(number)]?.trim() ? "answered" : ""}`} onClick={() => { setSelectedQuestion(number); setMobilePane("answers"); requestAnimationFrame(() => answersRef.current[String(number)]?.focus()); }}>{number}</button>)}</nav>}
           <div><button type="button" className="exam-step" onClick={() => moveQuestion(-1)} disabled={!numbers.length || selectedQuestion === numbers[0]}>Previous</button><button type="button" className="exam-step" onClick={() => moveQuestion(1)} disabled={!numbers.length || selectedQuestion === numbers.at(-1)}>Next</button><button type="button" className="primary-button" onClick={() => setSubmitted(true)}>{submitted ? "Submitted" : "Submit"}</button></div>
-          <small>{typeof completed === "number" ? `${completed}/${numbers.length} answered` : completed ? "Response saved" : "No response yet"}</small>
+          <small>{submitted && acceptedAnswers ? `${correct.length}/${scoredNumbers.length} correct` : typeof completed === "number" ? `${completed}/${numbers.length} answered` : completed ? "Response saved" : "No response yet"}</small>
         </footer>
       </section>
     </div>

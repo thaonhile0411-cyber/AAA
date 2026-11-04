@@ -22,6 +22,58 @@ export type CambridgeTest = {
   skills: CambridgeSkillSection[];
 };
 
+/** Answer keys transcribed from the book's dedicated Answer Keys pages.
+ * Keep this separate from question-page assets so answers can never be
+ * rendered before a learner submits a part. */
+export type CambridgeAnswerKey = Record<number, string[]>;
+export type CambridgeAnswerGroup = {
+  numbers: number[];
+  accepted: string[];
+};
+
+export const cambridgeAnswerKeys: Partial<Record<string, Partial<Record<"listening" | "reading", CambridgeAnswerKey>>>> = {
+  "academic-test-1": {
+    listening: {
+      1: ["Ardleigh"], 2: ["newspaper"], 3: ["theme"], 4: ["tent"], 5: ["castle"],
+      6: ["beach", "beaches"], 7: ["2020"], 8: ["flight"], 9: ["429"], 10: ["dinner"],
+      11: ["A", "C"], 12: ["A", "C"], 13: ["health problems"], 14: ["safety rules"],
+      15: ["plan"], 16: ["joining"], 17: ["free entry"], 18: ["peak"], 19: ["guests"],
+      20: ["photo card", "photo cards"], 21: ["C"], 22: ["A"], 23: ["B"], 24: ["A"],
+      25: ["C"], 26: ["presentation"], 27: ["model"], 28: ["material", "materials"],
+      29: ["grant"], 30: ["technical"], 31: ["gene"], 32: ["power", "powers"],
+      33: ["strangers"], 34: ["erosion"], 35: ["islands"], 36: ["roads"], 37: ["fishing"],
+      38: ["reproduction"], 39: ["method", "methods"], 40: ["expansion"],
+    },
+    reading: {
+      1: ["FALSE"], 2: ["TRUE"], 3: ["NOT GIVEN"], 4: ["NOT GIVEN"], 5: ["TRUE"],
+      6: ["pavilions"], 7: ["drought"], 8: ["tourists"], 9: ["earthquake"],
+      10: ["4", "four sides"], 11: ["tank"], 12: ["verandas", "verandahs"], 13: ["underwater"],
+      14: ["viii"], 15: ["iii"], 16: ["xi"], 17: ["i"], 18: ["v"], 19: ["x"],
+      20: ["ii"], 21: ["iv"], 22: ["TRUE"], 23: ["FALSE"], 24: ["NOT GIVEN"],
+      25: ["NOT GIVEN"], 26: ["FALSE"], 27: ["C"], 28: ["A"], 29: ["D"],
+      30: ["B"], 31: ["G"], 32: ["E"], 33: ["A"], 34: ["F"], 35: ["B"],
+      36: ["NO"], 37: ["YES"], 38: ["NOT GIVEN"], 39: ["NOT GIVEN"], 40: ["NO"],
+    },
+  },
+};
+
+/** Groups explicitly marked IN EITHER ORDER in the book's answer key. */
+export const cambridgeAnswerGroups: Partial<Record<string, Partial<Record<"listening" | "reading", CambridgeAnswerGroup[]>>>> = {
+  "academic-test-1": {
+    listening: [{ numbers: [11, 12], accepted: ["A", "C"] }],
+  },
+};
+
+export function answerKeyFor(testId: string, skill: CambridgeSkill) {
+  if (skill !== "listening" && skill !== "reading") return undefined;
+  return cambridgeAnswerKeys[testId]?.[skill];
+}
+
+export function answerGroupsFor(testId: string, skill: CambridgeSkill) {
+  if (skill !== "listening" && skill !== "reading") return [];
+  return cambridgeAnswerGroups[testId]?.[skill] ?? [];
+}
+
 function pages(start: number, end: number) {
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
