@@ -103,7 +103,9 @@ async function handle(request?: Request) {
       !configuredPath.startsWith("//") &&
       !configuredPath.includes("\\")
         ? configuredPath
-        : null;
+        : nextStep === "placement"
+          ? "/onboarding/placement-test"
+          : "/practice";
     const body: GoalResponse = {
       profile,
       today,

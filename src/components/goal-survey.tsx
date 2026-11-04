@@ -177,7 +177,10 @@ export function GoalSurvey({
       setSaved(true);
       if (!settings)
         router.replace(
-          result.nextPath ?? `/onboarding/goals?next=${result.nextStep}`,
+          result.nextPath ??
+            (result.nextStep === "placement"
+              ? "/onboarding/placement-test"
+              : "/practice"),
         );
     } catch (err) {
       if (err instanceof GoalApiError && err.fields) setErrors(err.fields);
@@ -235,7 +238,8 @@ export function GoalSurvey({
             </p>
             {serverWarning && <p className="field-error">{serverWarning}</p>}
             <p>
-              Bạn có thể điều chỉnh mục tiêu bất cứ lúc nào trong cài đặt tài khoản.
+              Bạn có thể điều chỉnh mục tiêu bất cứ lúc nào trong cài đặt tài
+              khoản.
             </p>
             <Link className="primary-button" href="/settings/goals">
               Xem mục tiêu đã lưu <Icon name="arrow" />
