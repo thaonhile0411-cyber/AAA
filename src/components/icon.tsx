@@ -1,4 +1,8 @@
 const paths = {
+  headphones: "M4 14v-3a8 8 0 0 1 16 0v3M4 12H3v8h5v-8ZM20 12h1v8h-5v-8Z",
+  play: "m9 5 11 7-11 7Z",
+  pause: "M8 5v14M16 5v14",
+  pen: "m15 3 6 6L8 22H2v-6ZM12 6l6 6",
   arrow: "M4 12h15m-6-6 6 6-6 6",
   check: "m5 12 4 4L19 6",
   chevron: "m9 5 7 7-7 7",

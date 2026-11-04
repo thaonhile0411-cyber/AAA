@@ -38,11 +38,14 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
         run: |
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_tables where schemaname = 'public' and tablename in ('profiles','learning_goals','placement_questions','placement_question_keys','placement_attempts','placement_answers','learning_materials','roadmaps','roadmap_milestones','roadmap_activities');")" = "10"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_tables where schemaname = 'public' and tablename in ('profiles','learning_goals','placement_questions','placement_question_keys','placement_attempts','placement_answers','learning_materials','roadmaps','roadmap_milestones','roadmap_activities','practice_exercises','practice_questions');")" = "12"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.placement_questions;")" = "6"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.placement_question_keys;")" = "6"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.learning_materials;")" = "8"
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_policies where schemaname = 'public';")" = "28"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_policies where schemaname = 'public';")" = "30"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.practice_exercises;")" = "8"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.practice_questions;")" = "40"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.practice_exercises where source_attribution = 'VOA Learning English';")" = "8"
 
       - name: Stop local Supabase
         if: always()
