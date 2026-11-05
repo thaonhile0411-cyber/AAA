@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import {
   findOriginalPracticeTest,
@@ -43,6 +44,10 @@ function EvidenceText({
 
 export function OriginalPracticeTestPage({ slug, userId }: { slug: string; userId: string }) {
   const test = findOriginalPracticeTest(slug);
+  const searchParams = useSearchParams();
+  const openedFromRoadmap = Boolean(searchParams.get("task"));
+  const backHref = openedFromRoadmap ? "/roadmap" : "/practice";
+  const backLabel = openedFromRoadmap ? "Lộ trình của tôi" : "Kho bài luyện";
   const [answer, setAnswer] = useState(() =>
     typeof window !== "undefined" && test
       ? (localStorage.getItem(responseKey(test, userId)) ?? "")
@@ -308,7 +313,7 @@ export function OriginalPracticeTestPage({ slug, userId }: { slug: string; userI
   return (
     <AppShell active="practice">
       <div className="breadcrumb">
-        <Link href="/practice">Kho bài luyện</Link>
+        <Link href={backHref}>{backLabel}</Link>
         <Icon name="chevron" size={12} />
         <span>{test.skill}</span>
       </div>
@@ -326,8 +331,8 @@ export function OriginalPracticeTestPage({ slug, userId }: { slug: string; userI
             </span>
           </div>
         </div>
-        <Link className="secondary-button" href="/practice">
-          ← Kho bài luyện
+        <Link className="secondary-button" href={backHref}>
+          ← {backLabel}
         </Link>
       </div>
       <div className="practice-session-bar">
