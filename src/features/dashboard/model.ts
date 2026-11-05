@@ -6,6 +6,7 @@ export type Task = {
   resource_slug: string | null;
   scheduled_date: string | null;
 };
+export type CompletedTask = Task & { completed_at: string };
 export type StreakOverview = {
   current: number;
   todayActive: boolean;
@@ -37,6 +38,7 @@ export type Overview = {
   } | null;
   streak?: StreakOverview;
   tasks: Task[];
+  completedTasks?: CompletedTask[];
   unscheduled: Task[];
 };
 export function progress(completed: number, total: number) {
@@ -62,11 +64,9 @@ export function availableBand(band: unknown, status?: string) {
 }
 export function currentAssessment(data: Overview) {
   const placement = data.placementResult;
-  if (
-    placement &&
-    (!data.assessmentDate ||
-      Date.parse(placement.date) > Date.parse(data.assessmentDate))
-  ) {
+  // placement_tests is the canonical four-skill record. The older
+  // placement_attempts table has only Reading/Listening and is fallback-only.
+  if (placement) {
     // Overall is meaningful only when every skill has an available assessment.
     const complete = skills.every(
       (skill) =>

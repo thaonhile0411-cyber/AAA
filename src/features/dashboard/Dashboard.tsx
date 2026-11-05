@@ -140,6 +140,7 @@ export function Dashboard({
     new Date(value).toLocaleDateString("vi-VN", {
       timeZone: "Asia/Ho_Chi_Minh",
     });
+
   return (
     <div className={styles.dashboard}>
       <header className={styles.heading}>
@@ -268,56 +269,50 @@ export function Dashboard({
             {data.tasks.length} chưa hoàn thành
           </span>
         </div>
-        {data.tasks.map((task) => (
-          <article className={styles.task} key={task.task_id}>
-            <span className={styles.skillIcon}>
-              {task.skill.slice(0, 1).toUpperCase()}
-            </span>
-            <div>
-              <span className={styles.caption}>{task.skill}</span>
-              <h3>{task.title}</h3>
-            </div>
-            <Link className={styles.primary} href={taskHref(task)}>
-              Start Learning <span aria-hidden="true">→</span>
-            </Link>
-          </article>
-        ))}
-        {!data.tasks.length && (
-          <div className={styles.empty}>
-            <h3>
-              {data.total
-                ? "Bạn đã sẵn sàng cho bước tiếp theo"
-                : "Bắt đầu hành trình IELTS của bạn"}
-            </h3>
-            <p>
-              {data.total
-                ? "Không còn nhiệm vụ chưa hoàn thành đến hạn hôm nay."
-                : "Đặt mục tiêu và làm bài đánh giá để chuẩn bị lộ trình cá nhân."}
-            </p>
-            <Link
-              className={styles.primary}
-              href={
-                data.unscheduled[0]
-                  ? taskHref(data.unscheduled[0])
-                  : data.total
-                    ? "/roadmap"
-                    : "/onboarding/placement-test"
-              }
-            >
-              {data.unscheduled[0]
-                ? `Học trước: ${data.unscheduled[0].title}`
-                : data.total
-                  ? "Xem lộ trình →"
-                  : "Làm bài đánh giá đầu vào →"}
-            </Link>
-            {data.unscheduled[0] && (
-              <p className={styles.caption}>
-                Lịch học:{" "}
-                {data.unscheduled[0].scheduled_date ?? "chưa xếp ngày"}
-              </p>
+        <div className={styles.taskColumns}>
+          <div className={styles.taskColumn}>
+            {data.tasks.map((task) => (
+              <article className={styles.task} key={task.task_id}>
+                <span className={styles.skillIcon}>{task.skill.slice(0, 1).toUpperCase()}</span>
+                <div>
+                  <span className={styles.caption}>{task.skill}</span>
+                  <h3>{task.title}</h3>
+                </div>
+                <Link className={styles.primary} href={taskHref(task)}>
+                  Start Learning <span aria-hidden="true">→</span>
+                </Link>
+              </article>
+            ))}
+            {!data.tasks.length && (
+              <div className={styles.empty}>
+                <h3>{data.total ? "Bạn đã hoàn thành nhiệm vụ hôm nay" : "Bắt đầu hành trình IELTS của bạn"}</h3>
+                <p>{data.total ? "Các bài đã làm được lưu trong lịch sử bên cạnh." : "Đặt mục tiêu và làm bài đánh giá để chuẩn bị lộ trình cá nhân."}</p>
+                <Link className={styles.primary} href={data.unscheduled[0] ? taskHref(data.unscheduled[0]) : data.total ? "/roadmap" : "/onboarding/placement-test"}>
+                  {data.unscheduled[0] ? `Học trước: ${data.unscheduled[0].title}` : data.total ? "Xem lộ trình →" : "Làm bài đánh giá đầu vào →"}
+                </Link>
+              </div>
             )}
           </div>
-        )}
+          <aside className={styles.historyColumn} aria-labelledby="completed-history">
+            <div className={styles.historyHeading}>
+              <div>
+                <p className={styles.eyebrow}>LỊCH SỬ</p>
+                <h3 id="completed-history">Đã hoàn thành</h3>
+              </div>
+              <span className={styles.historyCount}>{data.completedTasks?.length ?? 0}</span>
+            </div>
+            {(data.completedTasks ?? []).map((task) => (
+              <article className={styles.historyTask} key={task.task_id}>
+                <span className={styles.historyCheck}>✓</span>
+                <div>
+                  <strong>{task.title}</strong>
+                  <p>{task.skill} · {date(task.completed_at)}</p>
+                </div>
+              </article>
+            ))}
+            {!(data.completedTasks?.length) && <p className={styles.historyEmpty}>Hoàn thành một bài để xem lịch sử tại đây.</p>}
+          </aside>
+        </div>
       </section>
       <section className={styles.panel} aria-labelledby="skill-bands">
         <div className={styles.sectionHeading}>

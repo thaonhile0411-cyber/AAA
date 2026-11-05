@@ -40,6 +40,7 @@ import {
   getWritingWordCount,
 } from "@/lib/placement-progress";
 import { savePlacementTestCloud } from "@/lib/supabase-client";
+import { notifyStudyUpdate } from "@/features/dashboard/notify";
 import type {
   PlacementTestAnswers,
   PlacementTestResult,
@@ -121,13 +122,31 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
       const submitted = reassessment ? false : isTestSubmitted();
       if (submitted) isSubmittedRef.current = true;
       const savedRes = loadSavedResult();
+      const savedAns = loadSavedAnswers();
       if (savedRes) {
+        setAnswers(savedAns);
         setResult(savedRes);
         setStage("result");
+        // A previous result may have been saved locally while the connection
+        // was unavailable. Reconcile it when the learner returns so Dashboard
+        // and Roadmap always read the same four-skill placement record.
+        void savePlacementTestCloud({
+          current_skill: "speaking",
+          completed_skills: ["listening", "reading", "writing", "speaking"],
+          listening_answers: savedAns.listening,
+          reading_answers: savedAns.reading,
+          writing_response: savedAns.writing,
+          speaking_recordings: savedAns.speakingRecordings,
+          assessment_results: savedRes,
+          overall_band: savedRes.overallBand,
+          assessment_kind: "placement",
+          status: "completed",
+        }).then((sync) => {
+          if (sync.success) notifyStudyUpdate();
+        });
         return;
       }
 
-      const savedAns = loadSavedAnswers();
       setAnswers(savedAns);
 
       const savedCompleted = loadCompletedSkills();
@@ -765,6 +784,8 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
       });
       if (!saveResult.success) {
         console.warn("Could not save the completed placement result:", saveResult.error);
+      } else {
+        notifyStudyUpdate();
       }
 
       setStage("result");
@@ -863,15 +884,19 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
 
         setResult(updatedResult);
         saveResultToStorage(updatedResult);
-        savePlacementTestCloud({
+        const saveResult = await savePlacementTestCloud({
           current_skill: "speaking",
           completed_skills: ["listening", "reading", "writing", "speaking"],
           listening_answers: answers.listening,
           reading_answers: answers.reading,
           writing_response: answers.writing,
           speaking_recordings: answers.speakingRecordings,
+          assessment_results: updatedResult,
+          overall_band: updatedResult.overallBand,
+          assessment_kind: reassessment ? "reassessment" : "placement",
           status: "completed",
         });
+        if (saveResult.success) notifyStudyUpdate();
       }
     } catch (err) {
       console.warn("Failed retrying AI skills:", err);

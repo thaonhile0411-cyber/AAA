@@ -48,6 +48,8 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
       : "",
   );
   const [saved, setSaved] = useState(false);
+  const [isDraftReady, setIsDraftReady] = useState(!test || test.skill !== "writing");
+  const [isSaving, setIsSaving] = useState(false);
   const [listening, setListening] = useState(false);
   const [grade, setGrade] = useState<GradeResult | null>(null);
   const [answerError, setAnswerError] = useState("");
@@ -55,6 +57,31 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
   const questionRef = useRef<HTMLFieldSetElement>(null);
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  useEffect(() => {
+    if (!test || test.skill !== "writing") return;
+    const writingTest = test;
+    let cancelled = false;
+
+    async function loadDraft() {
+      try {
+        const response = await fetch(`/api/practice/drafts/${writingTest.slug}`, { cache: "no-store" });
+        const payload = (await response.json()) as { draft?: { content?: string } | null };
+        if (!response.ok || cancelled) return;
+        if (typeof payload.draft?.content === "string") {
+          setAnswer(payload.draft.content);
+          localStorage.setItem(responseKey(writingTest), payload.draft.content);
+          setSaved(true);
+        }
+      } catch {
+        // The device copy remains available if the learner is temporarily offline.
+      } finally {
+        if (!cancelled) setIsDraftReady(true);
+      }
+    }
+
+    void loadDraft();
+    return () => { cancelled = true; };
+  }, [test]);
   useEffect(() => {
     if (!grade) return;
     const frame = window.requestAnimationFrame(() => {
@@ -108,9 +135,34 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
     window.speechSynthesis.speak(utterance);
   }
 
-  function save() {
-    localStorage.setItem(responseKey(test!), answer);
-    setSaved(true);
+  async function save() {
+    if (!test || test.skill !== "writing") {
+      localStorage.setItem(responseKey(test!), answer);
+      setSaved(true);
+      window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
+      return;
+    }
+
+    setIsSaving(true);
+    setAnswerError("");
+    try {
+      const response = await fetch(`/api/practice/drafts/${test.slug}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: answer }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Không thể lưu bài viết.");
+      localStorage.setItem(responseKey(test), answer);
+      setSaved(true);
+      // When this page was opened from Dashboard/Roadmap, StudyTracker owns
+      // the task id and turns this one event into the shared completion log.
+      window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
+    } catch (error) {
+      setAnswerError(error instanceof Error ? error.message : "Không thể lưu bài viết.");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   function checkAnswer() {
@@ -133,8 +185,12 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
     localStorage.setItem(responseKey(test!), answerToGrade);
     setSaved(true);
     setAnswerError("");
-    setGrade(gradePracticeAnswer(answerToGrade, question));
-    window.dispatchEvent(new CustomEvent('practice-completed', { detail: { resourceSlug: slug } }));
+    const result = gradePracticeAnswer(answerToGrade, question);
+    setGrade(result);
+    // A wrong answer should not complete a roadmap task or start a streak.
+    if (result.correct) {
+      window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
+    }
   }
 
   return (
@@ -164,7 +220,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
       </div>
       <div className="practice-session-bar">
         <span>
-          <Icon name="shield" size={16} /> Bài làm được lưu trên thiết bị này
+          <Icon name="shield" size={16} /> {isWriting ? "Bài viết được lưu vào tài khoản" : "Bài làm được lưu trên thiết bị này"}
         </span>
         <span role="status">{saved ? "Đã lưu" : "Chưa lưu"}</span>
       </div>
@@ -248,7 +304,8 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 maxLength={10000}
                 value={answer}
                 onChange={(event) => updateAnswer(event.target.value)}
-                placeholder="Write your answer here…"
+                disabled={!isDraftReady}
+                placeholder={isDraftReady ? "Write your answer here…" : "Loading your saved draft…"}
               />
               <small>
                 {answer.trim() ? answer.trim().split(/\s+/).length : 0} words
@@ -385,9 +442,12 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 </p>
               </>
             ) : (
-              <button className="primary-button" onClick={save}>
-                <Icon name="check" size={18} /> Lưu bài luyện
-              </button>
+              <>
+                <button className="primary-button" disabled={isSaving || !isDraftReady} onClick={save}>
+                  <Icon name="check" size={18} /> {isSaving ? "Đang lưu..." : "Lưu bài luyện"}
+                </button>
+                {answerError && <p className="field-error" role="alert">{answerError}</p>}
+              </>
             )}
           </div>
         </section>

@@ -67,12 +67,14 @@ assert.equal(initial.totalSeconds, 27000);
 assert.equal(initial.completed, 15);
 assert.equal(initial.total, 60);
 assert.equal(initial.tasks.length, 45);
+assert.equal(initial.completedTasks.length, 10);
 const task = initial.tasks[0].task_id;
 await db.query(
   "update public.roadmap_activities set completed_at=now() where id=$1",
   [task],
 );
 assert.equal((await overview()).completed, 16);
+assert.equal((await overview()).completedTasks[0].task_id, task);
 await db.query(
   "update public.roadmap_activities set completed_at=now() where id=$1",
   [task],
