@@ -870,6 +870,12 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
           reading_answers: answers.reading,
           writing_response: answers.writing,
           speaking_recordings: answers.speakingRecordings,
+          // The roadmap API reads the completed result from Supabase, rather
+          // than browser storage. Persist the re-evaluated AI scores as well
+          // as the raw answers; otherwise a successful retry remains partial
+          // in the database and blocks roadmap generation.
+          assessment_results: updatedResult,
+          overall_band: updatedResult.overallBand,
           status: "completed",
         });
       }
@@ -914,6 +920,31 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
     setStage("intro");
     setCurrentSkill("listening");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function persistResultForRoadmap() {
+    if (!result) {
+      throw new Error("Chưa có kết quả Placement Test để đồng bộ.");
+    }
+
+    const saved = await savePlacementTestCloud({
+      current_skill: "speaking",
+      completed_skills: ["listening", "reading", "writing", "speaking"],
+      listening_answers: answers.listening,
+      reading_answers: answers.reading,
+      writing_response: answers.writing,
+      speaking_recordings: answers.speakingRecordings,
+      assessment_results: result,
+      overall_band: result.overallBand,
+      assessment_kind: reassessment ? "reassessment" : "placement",
+      status: "completed",
+    });
+
+    if (!saved.success) {
+      throw new Error(
+        "Chưa thể đồng bộ kết quả 4 kỹ năng với tài khoản. Vui lòng kiểm tra kết nối và thử lại.",
+      );
+    }
   }
 
   if (!isMounted) {
@@ -1108,6 +1139,7 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
           isReassessment={reassessment}
           onRetakeTest={handleRetakeTest}
           onRetryAssessment={handleRetryFailedAiSkills}
+          onPersistForRoadmap={persistResultForRoadmap}
           isRetrying={isRetrying}
         />
       )}
