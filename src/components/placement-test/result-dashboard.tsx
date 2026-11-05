@@ -15,6 +15,8 @@ type ResultDashboardProps = {
   isReassessment?: boolean;
   onRetakeTest: () => void;
   onRetryAssessment?: () => void;
+  /** Persist the displayed four-skill result before the roadmap API reads it. */
+  onPersistForRoadmap?: () => Promise<void>;
   isRetrying?: boolean;
 };
 
@@ -37,6 +39,7 @@ export function ResultDashboard({
   isReassessment = false,
   onRetakeTest,
   onRetryAssessment,
+  onPersistForRoadmap,
   isRetrying = false,
 }: ResultDashboardProps) {
   const router = useRouter();
@@ -117,6 +120,10 @@ export function ResultDashboard({
     }
     setIsGeneratingRoadmap(true);
     try {
+      // A previous AI retry may have updated this browser result after the
+      // original Supabase row was saved. Sync first so the server validates
+      // the exact four scores shown to the learner.
+      await onPersistForRoadmap?.();
       const response = await fetch("/api/v1/personalized-roadmap/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -135,7 +142,9 @@ export function ResultDashboard({
           ? "Bạn đã có một lộ trình đang hoạt động."
           : "Đã tạo lộ trình cá nhân hóa và lưu danh sách tài liệu của bạn.",
       );
+      // Refresh the route after the write, without bypassing Next.js routing.
       router.push("/roadmap");
+      router.refresh();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Chưa thể tạo lộ trình. Vui lòng thử lại.");
     } finally {

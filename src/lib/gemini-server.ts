@@ -37,15 +37,21 @@ const PLACEHOLDER_KEYS = new Set([
   "placeholder",
 ]);
 
-export const DEFAULT_GEMINI_MODEL = "gemini-flash-lite-latest";
+// Use a versioned, documented model rather than a moving `-latest` alias.
+// The alias was intermittently returning 503s in production. Gemini 3.5
+// Flash-Lite is Google's current low-latency multimodal option for new
+// projects and supports the text and audio inputs used by Placement Test.
+export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 /**
- * Returns centralized Gemini model name, auto-upgrading deprecated models like gemini-2.5-flash
+ * Returns centralized Gemini model name, auto-upgrading legacy aliases and
+ * models that are no longer available to newly-created Gemini projects.
  */
 export function getCentralGeminiModel(): string {
   const envModel = process.env.GEMINI_MODEL?.trim().replace(/^["']|["']$/g, "");
   if (
     !envModel ||
+    envModel === "gemini-flash-lite-latest" ||
     envModel === "gemini-2.5-flash" ||
     envModel === "gemini-2.5-flash-lite"
   ) {

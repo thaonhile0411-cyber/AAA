@@ -46,8 +46,8 @@ function answerKeyPage(testId: string, skill: CambridgeSkill) {
     : keys[testId]?.[skill];
 }
 
-function storageKey(active: ActivePart) {
-  return `aaa:cambridge-10:v1:${active.test.id}:${active.section.skill}:${active.part.id}`;
+function storageKey(active: ActivePart, userId: string) {
+  return `aaa:cambridge-10:v1:${userId}:${active.test.id}:${active.section.skill}:${active.part.id}`;
 }
 
 function partNumbers(part: CambridgePart) {
@@ -294,7 +294,7 @@ function ReadingPassageLocator({
   );
 }
 
-export function CambridgeIelts10({ taskId = null, initialSkill }: { taskId?: string | null; initialSkill?: string } = {}) {
+export function CambridgeIelts10({ taskId = null, initialSkill, userId }: { taskId?: string | null; initialSkill?: string; userId: string }) {
   const [selectedTestId, setSelectedTestId] = useState(cambridgeIelts10Tests[0].id);
   const [selectedSkill, setSelectedSkill] = useState<CambridgeSkill | null>(() => cambridgeIelts10Tests[0].skills.find(section => section.skill === initialSkill)?.skill ?? null);
   const [active, setActive] = useState<ActivePart | null>(() => {
@@ -371,7 +371,7 @@ export function CambridgeIelts10({ taskId = null, initialSkill }: { taskId?: str
           />
         )}
       </main>
-      {active && <><StudyTracker key={`${active.part.id}:${taskId}`} resourceSlug="cambridge-10" taskId={taskId} /><ExamPlayer key={active.part.id} active={active} onClose={() => setActive(null)} /></>}
+      {active && <><StudyTracker key={`${active.part.id}:${taskId}`} resourceSlug="cambridge-10" taskId={taskId} /><ExamPlayer key={`${userId}:${active.part.id}`} active={active} userId={userId} onClose={() => setActive(null)} /></>}
     </AppShell>
   );
 }
@@ -396,9 +396,9 @@ function PartList({ section, onOpen }: { section: CambridgeSkillSection; onOpen:
   );
 }
 
-export function ExamPlayer({ active, onClose }: { active: ActivePart; onClose: () => void }) {
+export function ExamPlayer({ active, onClose, userId }: { active: ActivePart; onClose: () => void; userId: string }) {
   const numbers = useMemo(() => partNumbers(active.part), [active.part]);
-  const key = storageKey(active);
+  const key = storageKey(active, userId);
   const [answers, setAnswers] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") return {};
     try {

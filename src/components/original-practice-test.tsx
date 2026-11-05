@@ -13,9 +13,10 @@ import {
 } from "@/lib/practice-grading";
 import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
+import { notifyStudyUpdate } from "@/features/dashboard/notify";
 
-function responseKey(test: OriginalPracticeTest) {
-  return `aaa:original-practice:v1:${test.slug}`;
+function responseKey(test: OriginalPracticeTest, userId: string) {
+  return `aaa:original-practice:v1:${userId}:${test.slug}`;
 }
 
 function EvidenceText({
@@ -40,48 +41,74 @@ function EvidenceText({
   );
 }
 
-export function OriginalPracticeTestPage({ slug }: { slug: string }) {
+export function OriginalPracticeTestPage({ slug, userId }: { slug: string; userId: string }) {
   const test = findOriginalPracticeTest(slug);
   const [answer, setAnswer] = useState(() =>
     typeof window !== "undefined" && test
-      ? (localStorage.getItem(responseKey(test)) ?? "")
+      ? (localStorage.getItem(responseKey(test, userId)) ?? "")
       : "",
   );
   const [saved, setSaved] = useState(false);
-  const [isDraftReady, setIsDraftReady] = useState(!test || test.skill !== "writing");
   const [isSaving, setIsSaving] = useState(false);
   const [listening, setListening] = useState(false);
   const [grade, setGrade] = useState<GradeResult | null>(null);
   const [answerError, setAnswerError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioBase64, setAudioBase64] = useState<string | null>(null);
+  const [audioMimeType, setAudioMimeType] = useState<string | null>(null);
+  const [audioDurationSeconds, setAudioDurationSeconds] = useState<number | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingElapsed, setRecordingElapsed] = useState(0);
+  const [microphoneError, setMicrophoneError] = useState("");
   const evidenceRef = useRef<HTMLElement>(null);
   const questionRef = useRef<HTMLFieldSetElement>(null);
+  const changedSinceLoad = useRef(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingStreamRef = useRef<MediaStream | null>(null);
+  const recordingTimerRef = useRef<number | null>(null);
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
   useEffect(() => {
-    if (!test || test.skill !== "writing") return;
-    const writingTest = test;
+    const currentTest = test;
+    const testSlug: string = currentTest?.slug ?? "";
+    if (testSlug.length === 0) return;
     let cancelled = false;
-
-    async function loadDraft() {
+    async function restoreSavedWork() {
       try {
-        const response = await fetch(`/api/practice/drafts/${writingTest.slug}`, { cache: "no-store" });
-        const payload = (await response.json()) as { draft?: { content?: string } | null };
-        if (!response.ok || cancelled) return;
-        if (typeof payload.draft?.content === "string") {
-          setAnswer(payload.draft.content);
-          localStorage.setItem(responseKey(writingTest), payload.draft.content);
-          setSaved(true);
+        const response = await fetch(`/api/practice/original/${encodeURIComponent(testSlug)}/save`, {
+          cache: "no-store",
+        });
+        const payload = (await response.json()) as {
+          response?: string;
+          audioBase64?: string | null;
+          audioMimeType?: string | null;
+          audioDurationSeconds?: number | null;
+          savedAt?: string | null;
+        };
+        if (!cancelled && response.ok && !changedSinceLoad.current) {
+          if (payload.response) setAnswer(payload.response);
+          if (payload.audioBase64 && payload.audioMimeType) {
+            setAudioBase64(payload.audioBase64);
+            setAudioMimeType(payload.audioMimeType);
+            setAudioDurationSeconds(payload.audioDurationSeconds ?? null);
+            setAudioUrl(`data:${payload.audioMimeType};base64,${payload.audioBase64}`);
+          }
+          setSaved(Boolean(payload.savedAt));
         }
       } catch {
-        // The device copy remains available if the learner is temporarily offline.
-      } finally {
-        if (!cancelled) setIsDraftReady(true);
+        // Keep the device copy available when the learner is temporarily offline.
       }
     }
-
-    void loadDraft();
+    void restoreSavedWork();
     return () => { cancelled = true; };
   }, [test]);
+  useEffect(() => () => {
+    window.speechSynthesis?.cancel();
+    if (recordingTimerRef.current !== null) window.clearInterval(recordingTimerRef.current);
+    recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+  }, []);
   useEffect(() => {
     if (!grade) return;
     const frame = window.requestAnimationFrame(() => {
@@ -111,11 +138,14 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
   const isGradable = test.skill === "reading" || test.skill === "listening";
   const isListening = test.skill === "listening";
   const isWriting = test.skill === "writing";
+  const isSpeaking = test.skill === "speaking";
 
   function updateAnswer(value: string) {
+    changedSinceLoad.current = true;
     setAnswer(value);
     setGrade(null);
     setAnswerError("");
+    setSaveError("");
     setSaved(false);
   }
 
@@ -135,37 +165,121 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
     window.speechSynthesis.speak(utterance);
   }
 
-  async function save() {
-    if (!test || test.skill !== "writing") {
-      localStorage.setItem(responseKey(test!), answer);
-      setSaved(true);
-      window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
+  function stopRecording() {
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+  }
+
+  async function startRecording() {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setMicrophoneError("Trình duyệt này không hỗ trợ thu âm. Hãy dùng Chrome hoặc Edge phiên bản mới.");
       return;
     }
-
-    setIsSaving(true);
-    setAnswerError("");
     try {
-      const response = await fetch(`/api/practice/drafts/${test.slug}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: answer }),
+      setMicrophoneError("");
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
       });
-      const payload = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(payload.error ?? "Không thể lưu bài viết.");
-      localStorage.setItem(responseKey(test), answer);
-      setSaved(true);
-      // When this page was opened from Dashboard/Roadmap, StudyTracker owns
-      // the task id and turns this one event into the shared completion log.
-      window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
+      recordingStreamRef.current = stream;
+      const preferredMime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : "";
+      const recorder = preferredMime
+        ? new MediaRecorder(stream, { mimeType: preferredMime })
+        : new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+      const startedAt = Date.now();
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.push(event.data);
+      };
+      recorder.onstop = () => {
+        if (recordingTimerRef.current !== null) {
+          window.clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
+        }
+        recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
+        recordingStreamRef.current = null;
+        setIsRecording(false);
+        const duration = Math.max(1, Math.min(120, Math.round((Date.now() - startedAt) / 1000)));
+        const mimeType = recorder.mimeType || preferredMime || "audio/webm";
+        const blob = new Blob(chunks, { type: mimeType });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const dataUrl = typeof reader.result === "string" ? reader.result : "";
+          const base64 = dataUrl.replace(/^data:[^,]+,/, "");
+          if (!base64) {
+            setMicrophoneError("Không thể đọc tệp ghi âm. Hãy thử thu lại.");
+            return;
+          }
+          if (audioUrl?.startsWith("blob:")) URL.revokeObjectURL(audioUrl);
+          setAudioUrl(URL.createObjectURL(blob));
+          setAudioBase64(base64);
+          setAudioMimeType(mimeType);
+          setAudioDurationSeconds(duration);
+          setRecordingElapsed(duration);
+          changedSinceLoad.current = true;
+          setSaved(false);
+        };
+        reader.readAsDataURL(blob);
+      };
+      mediaRecorderRef.current = recorder;
+      setRecordingElapsed(0);
+      setIsRecording(true);
+      recorder.start();
+      recordingTimerRef.current = window.setInterval(() => {
+        const elapsed = Math.min(120, Math.floor((Date.now() - startedAt) / 1000));
+        setRecordingElapsed(elapsed);
+        if (elapsed >= 120) recorder.stop();
+      }, 500);
     } catch (error) {
-      setAnswerError(error instanceof Error ? error.message : "Không thể lưu bài viết.");
+      setMicrophoneError(
+        error instanceof DOMException && error.name === "NotAllowedError"
+          ? "Bạn cần cho phép micro để thu âm câu trả lời."
+          : "Không thể mở micro. Hãy kiểm tra thiết bị rồi thử lại.",
+      );
+    }
+  }
+
+  async function save(response = answer, completeTask = true) {
+    if (isSpeaking ? !audioBase64 : !response.trim()) {
+      setSaveError(isSpeaking ? "Hãy thu âm câu trả lời trước khi lưu bài Speaking." : "Hãy nhập câu trả lời trước khi lưu bài.");
+      return false;
+    }
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      const taskId = new URLSearchParams(window.location.search).get("task");
+      const result = await fetch(`/api/practice/original/${encodeURIComponent(test!.slug)}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          response: isSpeaking ? "" : response,
+          taskId,
+          completeTask,
+          audioBase64: isSpeaking ? audioBase64 : undefined,
+          audioMimeType: isSpeaking ? audioMimeType : undefined,
+          audioDurationSeconds: isSpeaking ? audioDurationSeconds : undefined,
+        }),
+      });
+      const payload = (await result.json().catch(() => ({}))) as { error?: string };
+      if (!result.ok) throw new Error(payload.error ?? "Không thể lưu bài vào tài khoản.");
+      localStorage.setItem(responseKey(test!, userId), response);
+      setSaved(true);
+      if (completeTask) {
+        notifyStudyUpdate();
+        window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
+      }
+      return true;
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Không thể lưu bài vào tài khoản.");
+      return false;
     } finally {
       setIsSaving(false);
     }
   }
 
-  function checkAnswer() {
+  async function checkAnswer() {
     if (!question) return;
 
     // Chrome can restore a checked radio after a dev-server restart without
@@ -182,15 +296,12 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
     }
 
     if (answerToGrade !== answer) setAnswer(answerToGrade);
-    localStorage.setItem(responseKey(test!), answerToGrade);
-    setSaved(true);
     setAnswerError("");
     const result = gradePracticeAnswer(answerToGrade, question);
     setGrade(result);
-    // A wrong answer should not complete a roadmap task or start a streak.
-    if (result.correct) {
-      window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));
-    }
+    // Save every response, but complete the assigned roadmap task only when
+    // the auto-graded Reading/Listening answer is correct.
+    await save(answerToGrade, result.correct);
   }
 
   return (
@@ -220,10 +331,11 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
       </div>
       <div className="practice-session-bar">
         <span>
-          <Icon name="shield" size={16} /> {isWriting ? "Bài viết được lưu vào tài khoản" : "Bài làm được lưu trên thiết bị này"}
+          <Icon name="shield" size={16} /> Bài làm được lưu trong tài khoản của bạn
         </span>
         <span role="status">{saved ? "Đã lưu" : "Chưa lưu"}</span>
       </div>
+      {saveError && <p className="field-error mx-auto max-w-5xl" role="alert">{saveError}</p>}
       <div className={`practice-split ${test.skill}`}>
         <section className="practice-resource">
           <div className="reading-passage" lang="en">
@@ -277,20 +389,26 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
             </section>
           )}
 
-          {test.skill === "speaking" && (
+          {isSpeaking && (
             <section className="practice-notes">
-              <label htmlFor="spoken-response">
-                <Icon name="headphones" size={17} /> Speaking plan or
-                self-reflection
+              <label>
+                <Icon name="headphones" size={17} /> Record your answer
               </label>
-              <textarea
-                id="spoken-response"
-                rows={10}
-                maxLength={5000}
-                value={answer}
-                onChange={(event) => updateAnswer(event.target.value)}
-                placeholder="Plan your response, then speak aloud for one to two minutes. Write notes or a self-reflection here…"
-              />
+              <p>Press record, speak for up to two minutes, then stop and listen back before saving.</p>
+              <div className="flex flex-wrap items-center gap-3">
+                {isRecording ? (
+                  <button type="button" className="secondary-button" onClick={stopRecording}>
+                    <Icon name="pause" size={17} /> Stop recording ({recordingElapsed}s)
+                  </button>
+                ) : (
+                  <button type="button" className="primary-button" onClick={() => void startRecording()}>
+                    <Icon name="mic" size={17} /> {audioUrl ? "Record again" : "Start recording"}
+                  </button>
+                )}
+                {audioDurationSeconds && !isRecording ? <small>{audioDurationSeconds}s recorded</small> : null}
+              </div>
+              {microphoneError ? <p className="field-error" role="alert">{microphoneError}</p> : null}
+              {audioUrl ? <audio className="mt-4 w-full" controls preload="metadata" src={audioUrl}>Your browser does not support audio playback.</audio> : null}
             </section>
           )}
           {isWriting && (
@@ -304,8 +422,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 maxLength={10000}
                 value={answer}
                 onChange={(event) => updateAnswer(event.target.value)}
-                disabled={!isDraftReady}
-                placeholder={isDraftReady ? "Write your answer here…" : "Loading your saved draft…"}
+                placeholder="Write your answer here…"
               />
               <small>
                 {answer.trim() ? answer.trim().split(/\s+/).length : 0} words
@@ -421,7 +538,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
             <div className="loading-card">
               <p>
                 {test.skill === "speaking"
-                  ? "Use the prompt on the left, speak aloud, and write a short self-reflection if helpful."
+                  ? "Record your answer on the left, listen back, then save the recording."
                   : "Write your response in the editor on the left."}
               </p>
             </div>
@@ -433,8 +550,9 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 <button
                   className="primary-button"
                   onClick={checkAnswer}
+                  disabled={isSaving}
                 >
-                  <Icon name="check" size={18} /> Chấm bài
+                  <Icon name="check" size={18} /> {isSaving ? "Đang lưu…" : "Chấm bài"}
                 </button>
                 <p>
                   Không phân biệt chữ hoa/thường. Bạn có thể sửa đáp án và chấm
@@ -442,12 +560,9 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
                 </p>
               </>
             ) : (
-              <>
-                <button className="primary-button" disabled={isSaving || !isDraftReady} onClick={save}>
-                  <Icon name="check" size={18} /> {isSaving ? "Đang lưu..." : "Lưu bài luyện"}
-                </button>
-                {answerError && <p className="field-error" role="alert">{answerError}</p>}
-              </>
+              <button className="primary-button" onClick={() => void save()} disabled={isSaving}>
+                <Icon name="check" size={18} /> {isSaving ? "Đang lưu…" : "Lưu bài luyện"}
+              </button>
             )}
           </div>
         </section>

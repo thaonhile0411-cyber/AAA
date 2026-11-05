@@ -40,6 +40,12 @@ export type Overview = {
   tasks: Task[];
   completedTasks?: CompletedTask[];
   unscheduled: Task[];
+  savedWork?: Array<{
+    resourceSlug: string;
+    skill: string;
+    savedAt: string;
+    completedAt: string | null;
+  }>;
 };
 export function progress(completed: number, total: number) {
   return total > 0
