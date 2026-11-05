@@ -70,7 +70,7 @@ test("getGeminiServerConfig: Cleanly extracts and sanitizes valid GEMINI_API_KEY
     assert.equal(config.ok, true);
     if (config.ok) {
       assert.equal(config.config.apiKey, "AIzaSyDemoValidSecretKey123456789");
-      assert.equal(config.config.model, "gemini-flash-lite-latest");
+      assert.equal(config.config.model, "gemini-3.5-flash-lite");
     }
   } finally {
     if (origKey !== undefined) {
