@@ -15,7 +15,7 @@ async function Workspace({ searchParams }: { searchParams: Promise<{ task?: stri
   const { supabase, userId } = await authenticatedClient();
   if (task && /^[0-9a-f-]{36}$/i.test(task)) {
     const { data } = await supabase.from('user_roadmaps').select('task_id,skill').eq('task_id',task).eq('user_id',userId).eq('resource_slug','cambridge-10').eq('status','active').maybeSingle();
-    if (data) return <CambridgeIelts10 taskId={data.task_id} initialSkill={data.skill} />;
+    if (data) return <CambridgeIelts10 userId={userId} taskId={data.task_id} initialSkill={data.skill} />;
   }
-  return <CambridgeIelts10 initialSkill={skill} />;
+  return <CambridgeIelts10 userId={userId} initialSkill={skill} />;
 }

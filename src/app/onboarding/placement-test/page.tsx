@@ -1,5 +1,5 @@
 import { DiagnosticTest } from "@/components/diagnostic-test";
-import { connection } from "next/server";
+import { authenticatedClient } from "@/lib/supabase/server";
 
 // This page reads request-specific search params to select placement or
 // reassessment mode, so it must be allowed to render as a blocking route.
@@ -16,7 +16,7 @@ export default async function PlacementTestPage({
 }: {
   searchParams: Promise<{ mode?: string }>;
 }) {
-  await connection();
+  const { userId } = await authenticatedClient();
   const { mode } = await searchParams;
-  return <DiagnosticTest reassessment={mode === "reassessment"} />;
+  return <DiagnosticTest userId={userId} reassessment={mode === "reassessment"} />;
 }

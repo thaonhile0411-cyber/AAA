@@ -16,6 +16,18 @@ export const PLACEMENT_CLOUD_TEST_ID_KEY = "aaa:us103:placement:test_id";
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
+// Placement drafts and results live in browser storage only as an offline cache.
+// Never share that cache between authenticated learners using the same browser.
+let activeUserId: string | null = null;
+
+export function setPlacementStorageUserId(userId: string | null) {
+  activeUserId = userId && userId.length > 0 ? userId : null;
+}
+
+export function placementStorageKey(key: string) {
+  return activeUserId ? `${key}:user:${activeUserId}` : key;
+}
+
 export function loadSavedAnswers(
   storage: StorageLike = window.localStorage,
 ): PlacementTestAnswers {
@@ -27,7 +39,7 @@ export function loadSavedAnswers(
   };
 
   try {
-    const raw = storage.getItem(PLACEMENT_ANSWERS_KEY);
+    const raw = storage.getItem(placementStorageKey(PLACEMENT_ANSWERS_KEY));
     if (!raw) return defaultAnswers;
     const parsed = JSON.parse(raw);
     return {
@@ -83,7 +95,7 @@ export function saveAnswersToStorage(
     };
 
     try {
-      storage.setItem(PLACEMENT_ANSWERS_KEY, JSON.stringify(payload));
+      storage.setItem(placementStorageKey(PLACEMENT_ANSWERS_KEY), JSON.stringify(payload));
     } catch {
       // If quota exceeded due to large base64, save metadata without base64
       const fallbackSpeaking: Record<
@@ -100,7 +112,7 @@ export function saveAnswersToStorage(
         }
       }
       storage.setItem(
-        PLACEMENT_ANSWERS_KEY,
+        placementStorageKey(PLACEMENT_ANSWERS_KEY),
         JSON.stringify({ ...payload, speakingRecordings: fallbackSpeaking }),
       );
     }
@@ -113,7 +125,7 @@ export function loadSavedSection(
   storage: StorageLike = window.localStorage,
 ): TestSkill {
   try {
-    const val = storage.getItem(PLACEMENT_SECTION_KEY) as TestSkill | null;
+    const val = storage.getItem(placementStorageKey(PLACEMENT_SECTION_KEY)) as TestSkill | null;
     if (val && ["listening", "reading", "writing", "speaking"].includes(val)) {
       return val;
     }
@@ -126,7 +138,7 @@ export function saveActiveSection(
   storage: StorageLike = window.localStorage,
 ): void {
   try {
-    storage.setItem(PLACEMENT_SECTION_KEY, skill);
+    storage.setItem(placementStorageKey(PLACEMENT_SECTION_KEY), skill);
   } catch {}
 }
 
@@ -134,7 +146,7 @@ export function loadCompletedSkills(
   storage: StorageLike = window.localStorage,
 ): TestSkill[] {
   try {
-    const raw = storage.getItem(PLACEMENT_COMPLETED_KEY);
+    const raw = storage.getItem(placementStorageKey(PLACEMENT_COMPLETED_KEY));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
@@ -151,7 +163,7 @@ export function saveCompletedSkills(
   storage: StorageLike = window.localStorage,
 ): void {
   try {
-    storage.setItem(PLACEMENT_COMPLETED_KEY, JSON.stringify(skills));
+    storage.setItem(placementStorageKey(PLACEMENT_COMPLETED_KEY), JSON.stringify(skills));
   } catch {}
 }
 
@@ -159,7 +171,7 @@ export function loadSavedResult(
   storage: StorageLike = window.localStorage,
 ): PlacementTestResult | null {
   try {
-    const raw = storage.getItem(PLACEMENT_RESULT_KEY);
+    const raw = storage.getItem(placementStorageKey(PLACEMENT_RESULT_KEY));
     if (!raw) return null;
     return JSON.parse(raw) as PlacementTestResult;
   } catch {
@@ -172,7 +184,7 @@ export function saveResultToStorage(
   storage: StorageLike = window.localStorage,
 ): void {
   try {
-    storage.setItem(PLACEMENT_RESULT_KEY, JSON.stringify(result));
+    storage.setItem(placementStorageKey(PLACEMENT_RESULT_KEY), JSON.stringify(result));
   } catch (err) {
     console.warn("Could not save placement test result", err);
   }
@@ -184,8 +196,8 @@ export function saveTestTimer(
   storage: StorageLike = window.localStorage,
 ): void {
   try {
-    storage.setItem(PLACEMENT_TIMER_START_KEY, String(startTimeMs));
-    storage.setItem(PLACEMENT_TIMER_DEADLINE_KEY, String(deadlineMs));
+    storage.setItem(placementStorageKey(PLACEMENT_TIMER_START_KEY), String(startTimeMs));
+    storage.setItem(placementStorageKey(PLACEMENT_TIMER_DEADLINE_KEY), String(deadlineMs));
   } catch {}
 }
 
@@ -193,8 +205,8 @@ export function loadTestTimer(
   storage: StorageLike = window.localStorage,
 ): { startTimeMs: number | null; deadlineMs: number | null } {
   try {
-    const startStr = storage.getItem(PLACEMENT_TIMER_START_KEY);
-    const deadlineStr = storage.getItem(PLACEMENT_TIMER_DEADLINE_KEY);
+    const startStr = storage.getItem(placementStorageKey(PLACEMENT_TIMER_START_KEY));
+    const deadlineStr = storage.getItem(placementStorageKey(PLACEMENT_TIMER_DEADLINE_KEY));
     return {
       startTimeMs: startStr ? Number(startStr) : null,
       deadlineMs: deadlineStr ? Number(deadlineStr) : null,
@@ -210,9 +222,9 @@ export function setTestSubmitted(
 ): void {
   try {
     if (isSubmitted) {
-      storage.setItem(PLACEMENT_SUBMITTED_KEY, "true");
+      storage.setItem(placementStorageKey(PLACEMENT_SUBMITTED_KEY), "true");
     } else {
-      storage.removeItem(PLACEMENT_SUBMITTED_KEY);
+      storage.removeItem(placementStorageKey(PLACEMENT_SUBMITTED_KEY));
     }
   } catch {}
 }
@@ -221,7 +233,7 @@ export function isTestSubmitted(
   storage: StorageLike = window.localStorage,
 ): boolean {
   try {
-    return storage.getItem(PLACEMENT_SUBMITTED_KEY) === "true";
+    return storage.getItem(placementStorageKey(PLACEMENT_SUBMITTED_KEY)) === "true";
   } catch {
     return false;
   }
@@ -231,7 +243,7 @@ export function loadUnlockedSkills(
   storage: StorageLike = window.localStorage,
 ): TestSkill[] {
   try {
-    const raw = storage.getItem(PLACEMENT_UNLOCKED_KEY);
+    const raw = storage.getItem(placementStorageKey(PLACEMENT_UNLOCKED_KEY));
     if (!raw) return ["listening"];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
@@ -248,7 +260,7 @@ export function saveUnlockedSkills(
   storage: StorageLike = window.localStorage,
 ): void {
   try {
-    storage.setItem(PLACEMENT_UNLOCKED_KEY, JSON.stringify(skills));
+    storage.setItem(placementStorageKey(PLACEMENT_UNLOCKED_KEY), JSON.stringify(skills));
   } catch {}
 }
 
@@ -256,16 +268,16 @@ export function clearPlacementTestStorage(
   storage: StorageLike = window.localStorage,
 ): void {
   try {
-    storage.removeItem(PLACEMENT_ANSWERS_KEY);
-    storage.removeItem(PLACEMENT_SECTION_KEY);
-    storage.removeItem(PLACEMENT_COMPLETED_KEY);
-    storage.removeItem(PLACEMENT_RESULT_KEY);
-    storage.removeItem(PLACEMENT_TIMER_START_KEY);
-    storage.removeItem(PLACEMENT_TIMER_DEADLINE_KEY);
-    storage.removeItem(PLACEMENT_SUBMITTED_KEY);
-    storage.removeItem(PLACEMENT_UNLOCKED_KEY);
+    storage.removeItem(placementStorageKey(PLACEMENT_ANSWERS_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_SECTION_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_COMPLETED_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_RESULT_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_TIMER_START_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_TIMER_DEADLINE_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_SUBMITTED_KEY));
+    storage.removeItem(placementStorageKey(PLACEMENT_UNLOCKED_KEY));
     // Only removes the browser pointer to the current attempt. The completed
     // placement_tests row in Supabase remains available for later comparison.
-    storage.removeItem(PLACEMENT_CLOUD_TEST_ID_KEY);
+    storage.removeItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY));
   } catch {}
 }

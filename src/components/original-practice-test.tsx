@@ -15,8 +15,8 @@ import { AppShell } from "./app-shell";
 import { Icon } from "./icon";
 import { notifyStudyUpdate } from "@/features/dashboard/notify";
 
-function responseKey(test: OriginalPracticeTest) {
-  return `aaa:original-practice:v1:${test.slug}`;
+function responseKey(test: OriginalPracticeTest, userId: string) {
+  return `aaa:original-practice:v1:${userId}:${test.slug}`;
 }
 
 function EvidenceText({
@@ -41,11 +41,11 @@ function EvidenceText({
   );
 }
 
-export function OriginalPracticeTestPage({ slug }: { slug: string }) {
+export function OriginalPracticeTestPage({ slug, userId }: { slug: string; userId: string }) {
   const test = findOriginalPracticeTest(slug);
   const [answer, setAnswer] = useState(() =>
     typeof window !== "undefined" && test
-      ? (localStorage.getItem(responseKey(test)) ?? "")
+      ? (localStorage.getItem(responseKey(test, userId)) ?? "")
       : "",
   );
   const [saved, setSaved] = useState(false);
@@ -263,7 +263,7 @@ export function OriginalPracticeTestPage({ slug }: { slug: string }) {
       });
       const payload = (await result.json().catch(() => ({}))) as { error?: string };
       if (!result.ok) throw new Error(payload.error ?? "Không thể lưu bài vào tài khoản.");
-      localStorage.setItem(responseKey(test!), response);
+      localStorage.setItem(responseKey(test!, userId), response);
       setSaved(true);
       notifyStudyUpdate();
       window.dispatchEvent(new CustomEvent("practice-completed", { detail: { resourceSlug: slug } }));

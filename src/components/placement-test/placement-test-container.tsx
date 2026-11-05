@@ -32,7 +32,9 @@ import {
   saveResultToStorage,
   saveTestTimer,
   saveUnlockedSkills,
+  setPlacementStorageUserId,
   setTestSubmitted,
+  placementStorageKey,
 } from "@/lib/placement-storage";
 import {
   getSectionProgress,
@@ -65,7 +67,13 @@ const DEFAULT_ANSWERS: PlacementTestAnswers = {
 
 const emptySubscribe = () => () => {};
 
-export function PlacementTestContainer({ reassessment = false }: { reassessment?: boolean }) {
+export function PlacementTestContainer({
+  reassessment = false,
+  userId,
+}: {
+  reassessment?: boolean;
+  userId: string;
+}) {
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const [stage, setStage] = useState<"intro" | "testing" | "result">("intro");
@@ -92,6 +100,7 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
 
   // Initialize state from localStorage asynchronously after mount
   useEffect(() => {
+    setPlacementStorageUserId(userId);
     let cancelled = false;
     Promise.resolve().then(() => {
       if (cancelled) return;
@@ -109,12 +118,12 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
 
       const savedAttemptId = reassessment
         ? null
-        : localStorage.getItem("aaa_placement_attempt_id");
+        : localStorage.getItem(placementStorageKey("aaa_placement_attempt_id"));
       const currentAttemptId =
         savedAttemptId ??
         `attempt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
       if (!savedAttemptId) {
-        localStorage.setItem("aaa_placement_attempt_id", currentAttemptId);
+        localStorage.setItem(placementStorageKey("aaa_placement_attempt_id"), currentAttemptId);
       }
       setAttemptId(currentAttemptId);
 
@@ -170,7 +179,89 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
     return () => {
       cancelled = true;
     };
-  }, [reassessment]);
+  }, [reassessment, userId]);
+
+  // The server is the source of truth for an authenticated learner. The
+  // browser cache above is only used for an offline continuation and is
+  // namespaced by user id; it must never choose another account's attempt.
+  useEffect(() => {
+    if (reassessment) return;
+    let cancelled = false;
+    async function restoreAccountAttempt() {
+      try {
+        const response = await fetch("/api/placement-test/save", { cache: "no-store" });
+        const payload = (await response.json()) as {
+          test?: {
+            id?: unknown;
+            current_skill?: unknown;
+            completed_skills?: unknown;
+            listening_answers?: unknown;
+            reading_answers?: unknown;
+            writing_response?: unknown;
+            speaking_recordings?: unknown;
+            assessment_results?: unknown;
+            status?: unknown;
+          } | null;
+        };
+        const cloud = payload.test;
+        if (!response.ok || cancelled || !cloud || typeof cloud.id !== "string") return;
+
+        localStorage.setItem(placementStorageKey("aaa_placement_attempt_id"), cloud.id);
+        localStorage.setItem(placementStorageKey("aaa:us103:placement:test_id"), cloud.id);
+        setAttemptId(cloud.id);
+
+        const cloudAnswers: PlacementTestAnswers = {
+          listening: cloud.listening_answers && typeof cloud.listening_answers === "object"
+            ? cloud.listening_answers as Record<string, string> : {},
+          reading: cloud.reading_answers && typeof cloud.reading_answers === "object"
+            ? cloud.reading_answers as Record<string, string> : {},
+          writing: cloud.writing_response && typeof cloud.writing_response === "object"
+            ? {
+                task1: typeof (cloud.writing_response as { task1?: unknown }).task1 === "string"
+                  ? (cloud.writing_response as { task1: string }).task1 : "",
+                task2: typeof (cloud.writing_response as { task2?: unknown }).task2 === "string"
+                  ? (cloud.writing_response as { task2: string }).task2 : "",
+              }
+            : { task1: "", task2: "" },
+          speakingRecordings: cloud.speaking_recordings && typeof cloud.speaking_recordings === "object"
+            ? cloud.speaking_recordings as PlacementTestAnswers["speakingRecordings"] : {},
+        };
+        const cloudCompleted = Array.isArray(cloud.completed_skills)
+          ? cloud.completed_skills.filter((skill): skill is TestSkill =>
+              typeof skill === "string" && ["listening", "reading", "writing", "speaking"].includes(skill),
+            )
+          : [];
+        const cloudSkill: TestSkill = typeof cloud.current_skill === "string" &&
+          ["listening", "reading", "writing", "speaking"].includes(cloud.current_skill)
+          ? cloud.current_skill as TestSkill
+          : "listening";
+
+        setAnswers(cloudAnswers);
+        setCompletedSkills(cloudCompleted);
+        setUnlockedSkills(Array.from(new Set<TestSkill>(["listening", ...cloudCompleted, cloudSkill])));
+        setCurrentSkill(cloudSkill);
+        saveAnswersToStorage(cloudAnswers);
+        saveCompletedSkills(cloudCompleted);
+        saveUnlockedSkills(Array.from(new Set<TestSkill>(["listening", ...cloudCompleted, cloudSkill])));
+        saveActiveSection(cloudSkill);
+
+        if (cloud.status === "completed" && cloud.assessment_results && typeof cloud.assessment_results === "object") {
+          const cloudResult = cloud.assessment_results as PlacementTestResult;
+          setResult(cloudResult);
+          saveResultToStorage(cloudResult);
+          setTestSubmitted(true);
+          isSubmittedRef.current = true;
+          setStage("result");
+        } else {
+          setStage("testing");
+        }
+      } catch {
+        // Offline learners can still resume only their own namespaced cache.
+      }
+    }
+    void restoreAccountAttempt();
+    return () => { cancelled = true; };
+  }, [reassessment, userId]);
 
   // Timer countdown while testing (calculates against saved deadline)
   useEffect(() => {
@@ -897,7 +988,7 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
     const newAttempt = `attempt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     setAttemptId(newAttempt);
     if (typeof window !== "undefined") {
-      localStorage.setItem("aaa_placement_attempt_id", newAttempt);
+      localStorage.setItem(placementStorageKey("aaa_placement_attempt_id"), newAttempt);
     }
 
     Object.values(answers.speakingRecordings).forEach((rec) => {

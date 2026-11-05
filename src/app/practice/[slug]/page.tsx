@@ -30,10 +30,10 @@ async function ExerciseContent({
 }) {
   const { slug } = await params;
   const { task } = await searchParams;
-  await authenticatedClient();
+  const { userId } = await authenticatedClient();
   const taskId = task && /^[0-9a-f-]{36}$/i.test(task) ? task : null;
   return <><StudyTracker key={`${slug}:${taskId}`} resourceSlug={slug} taskId={taskId} />{findOriginalPracticeTest(slug) ? (
-    <OriginalPracticeTestPage key={slug} slug={slug} />
+    <OriginalPracticeTestPage key={`${userId}:${slug}`} slug={slug} userId={userId} />
   ) : (
     <PracticeWorkspace key={slug} slug={slug} />
   )}</>;

@@ -25,6 +25,30 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (authError || !user) return json({ error: "Bạn cần đăng nhập để xem Placement Test." }, 401);
+
+    const { data, error } = await supabase
+      .from("placement_tests")
+      .select("id, current_skill, completed_skills, listening_answers, reading_answers, writing_response, speaking_recordings, assessment_results, overall_band, assessment_kind, status, updated_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .limit(10);
+    if (error) throw error;
+    const test = data?.find((row) => row.status === "completed" && row.assessment_results) ?? data?.[0] ?? null;
+    return json({ test });
+  } catch (error) {
+    console.error("Placement test load route failed:", error);
+    return json({ error: "Không thể tải Placement Test đã lưu." }, 503);
+  }
+}
+
 /**
  * Saves the browser's placement attempt through the authenticated server
  * session. The browser cannot read the app's httpOnly Supabase auth cookie,
@@ -81,7 +105,17 @@ export async function POST(request: Request) {
     if (typeof body.overall_band === "number" || body.overall_band === null) {
       row.overall_band = body.overall_band;
     }
-    if (typeof body.id === "string" && UUID.test(body.id)) row.id = body.id;
+    if (typeof body.id === "string" && UUID.test(body.id)) {
+      // A browser pointer is only a convenience cache. Never let a pointer
+      // copied from another account select or overwrite that learner's row.
+      const { data: ownedAttempt, error: lookupError } = await supabase
+        .from("placement_tests")
+        .select("id")
+        .eq("id", body.id)
+        .maybeSingle();
+      if (lookupError) throw lookupError;
+      if (ownedAttempt) row.id = ownedAttempt.id;
+    }
 
     const { data, error } = await supabase
       .from("placement_tests")

@@ -2,7 +2,7 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { PLACEMENT_CLOUD_TEST_ID_KEY } from "@/lib/placement-storage";
+import { PLACEMENT_CLOUD_TEST_ID_KEY, placementStorageKey } from "@/lib/placement-storage";
 import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -61,7 +61,7 @@ export async function savePlacementTestCloud(
     // the write to a Route Handler so it can use that cookie reliably.
     let testId = payload.id;
     if (!testId && typeof window !== "undefined") {
-      testId = window.localStorage.getItem(PLACEMENT_CLOUD_TEST_ID_KEY) || undefined;
+      testId = window.localStorage.getItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY)) || undefined;
     }
     const response = await fetch("/api/placement-test/save", {
       method: "POST",
@@ -79,7 +79,7 @@ export async function savePlacementTestCloud(
     }
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(PLACEMENT_CLOUD_TEST_ID_KEY, data.id);
+      window.localStorage.setItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY), data.id);
     }
     return { success: true, id: data.id };
   } catch (err) {
@@ -107,7 +107,7 @@ export async function uploadSpeakingAudio(
   try {
     const { data: authData } = await supabase.auth.getUser();
     const userId = authData?.user?.id || "guest";
-    const tid = testId || window.localStorage.getItem(PLACEMENT_CLOUD_TEST_ID_KEY) || "demo_session";
+    const tid = testId || window.localStorage.getItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY)) || "demo_session";
     const ext = audioBlob.type.includes("mp4") ? "mp4" : "webm";
     const filePath = `${userId}/${tid}/${questionKey}_${Date.now()}.${ext}`;
 
