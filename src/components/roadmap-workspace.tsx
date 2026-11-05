@@ -2,7 +2,7 @@
 import { notifyStudyUpdate } from '@/features/dashboard/notify';
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ActiveRoadmap } from "@/lib/active-roadmap";
 import { PROFILE_SKILLS } from "@/lib/learner-skill-profile";
 
@@ -17,12 +17,48 @@ const ADJUSTMENT_LABELS = {
 
 export function RoadmapWorkspace({ initialRoadmap }: { initialRoadmap: ActiveRoadmap | null }) {
   const [roadmap, setRoadmap] = useState(initialRoadmap);
+  const [isReconciling, setIsReconciling] = useState(initialRoadmap === null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  useEffect(() => {
+    if (initialRoadmap) {
+      setRoadmap(initialRoadmap);
+      setIsReconciling(false);
+      return;
+    }
+
+    let cancelled = false;
+    async function reconcileRoadmap() {
+      try {
+        const response = await fetch("/api/v1/personalized-roadmap/active", {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" },
+        });
+        const payload = (await response.json()) as { roadmap?: ActiveRoadmap | null };
+        if (!cancelled && response.ok && payload.roadmap) setRoadmap(payload.roadmap);
+      } catch {
+        // The ordinary empty state remains correct for an offline user or a
+        // learner who genuinely has not created a roadmap yet.
+      } finally {
+        if (!cancelled) setIsReconciling(false);
+      }
+    }
+
+    void reconcileRoadmap();
+    return () => { cancelled = true; };
+  }, [initialRoadmap]);
   const activities = useMemo(() => roadmap?.milestones.flatMap((milestone) => milestone.activities) ?? [], [roadmap]);
   const completedCount = activities.filter((activity) => activity.completedAt !== null).length;
   const progress = activities.length === 0 ? 0 : Math.round((completedCount / activities.length) * 100);
   const totalMinutes = activities.reduce((total, activity) => total + (activity.estimatedMinutes ?? 0), 0);
   const isRoadmapComplete = activities.length > 0 && completedCount === activities.length;
+
+  if (!roadmap && isReconciling) {
+    return <section className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm" aria-live="polite">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Lộ trình cá nhân hóa</p>
+      <h1 className="mt-2 text-2xl font-bold text-slate-900">Đang tải lộ trình của bạn…</h1>
+      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">Đang đồng bộ danh sách bài học mới nhất.</p>
+    </section>;
+  }
 
   async function toggleActivity(activityId: string, completed: boolean) {
     setSavingId(activityId);
