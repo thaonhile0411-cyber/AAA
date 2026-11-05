@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { WritingAssessment } from "../features/writing/assessment.ts";
 
 export type AssessmentStatus =
   | "success"
@@ -76,6 +77,7 @@ export type WritingAssessmentResponse = {
   wordCount?: number;
   provider?: string;
   modelUsed?: string;
+  submission?: { id: string; assessment: WritingAssessment };
   message?: string;
   error?: string;
 };

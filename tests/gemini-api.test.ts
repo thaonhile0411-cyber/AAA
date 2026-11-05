@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   categorizeGeminiError,
+  getCentralGeminiModel,
   getGeminiServerConfig,
 } from "../src/lib/gemini-server.ts";
 import {
@@ -17,6 +18,21 @@ import { roundToIeltsBand } from "../src/lib/placement-scoring.ts";
 // ==========================================
 // 1. CONFIGURATION & API KEY AUDIT TESTS
 // ==========================================
+
+test("getCentralGeminiModel: Writing uses the centralized default and sanitized override", () => {
+  const original = process.env.GEMINI_MODEL;
+  try {
+    delete process.env.GEMINI_MODEL;
+    assert.equal(getCentralGeminiModel(), "gemini-3.5-flash-lite");
+    process.env.GEMINI_MODEL = '  "gemini-3.7-flash"  ';
+    assert.equal(getCentralGeminiModel(), "gemini-3.7-flash");
+    process.env.GEMINI_MODEL = "gemini-2.5-flash-lite";
+    assert.equal(getCentralGeminiModel(), "gemini-3.5-flash-lite");
+  } finally {
+    if (original === undefined) delete process.env.GEMINI_MODEL;
+    else process.env.GEMINI_MODEL = original;
+  }
+});
 
 test("getGeminiServerConfig: Missing API key returns missing_api_key status", () => {
   const origKey = process.env.GEMINI_API_KEY;

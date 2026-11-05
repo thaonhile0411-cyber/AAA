@@ -1,4 +1,5 @@
 import type { Skill } from "@/lib/goals";
+import type { WritingAssessment } from "@/features/writing/assessment";
 
 export type { Skill };
 export type TestSkill = Skill; // "listening" | "reading" | "writing" | "speaking"
@@ -160,6 +161,7 @@ export type SkillScoreResult = {
     description: string;
   }[];
   feedback: string;
+  writingSubmission?: { id: string; essay: string; assessment: WritingAssessment };
   evaluationDetails?: {
     notableErrors?: string[];
     improvementSuggestions?: string[];

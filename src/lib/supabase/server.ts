@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 
-export async function supabaseServer() {
+export async function supabaseServer(signal?: AbortSignal) {
   const store = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const restUrl = `${url.replace(/\/+$/, "")}/rest/v1/`;
@@ -25,6 +25,10 @@ export async function supabaseServer() {
       cookieOptions: { httpOnly: true },
       global: {
         async fetch(input, init) {
+          if (signal) {
+            const requestSignal = init?.signal ?? (input instanceof Request ? input.signal : null);
+            init = { ...init, signal: requestSignal ? AbortSignal.any([signal, requestSignal]) : signal };
+          }
           const response = await fetch(input, init);
           // Only retry PostgREST calls. Refreshing an Auth request would recurse.
           if (response.status !== 401 || typeof input !== "string" || !input.startsWith(restUrl)) {

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Icon } from "@/components/icon";
 import { WRITING_TASKS } from "@/data/placement-test-data";
+import { MAX_ESSAY_LENGTH } from "@/features/writing/assessment";
 import { countWords } from "@/lib/placement-scoring";
 
 type WritingSectionProps = {
@@ -146,6 +147,8 @@ export function WritingSection({
           {/* Textarea Area */}
           <div className="p-4 flex-1 flex flex-col">
             <textarea
+              aria-label="Bài viết Task 2"
+              maxLength={MAX_ESSAY_LENGTH}
               value={localText}
               disabled={disabled}
               onChange={(e) => handleTextChange(e.target.value)}
@@ -178,8 +181,9 @@ export function WritingSection({
       <div className="pt-4 flex flex-wrap items-center justify-end gap-4 border-t border-[#edf0f5]">
         <button
           type="button"
+          disabled={!isTargetMet || disabled}
           onClick={handleCompleteSection}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[#175cdd] hover:bg-[#104dc1] text-white text-xs md:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#175cdd] hover:bg-[#104dc1] text-white text-xs md:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span>Hoàn thành Writing & Tiếp tục</span>
           <Icon name="arrow" size={16} />

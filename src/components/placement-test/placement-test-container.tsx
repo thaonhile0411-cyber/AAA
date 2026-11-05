@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Icon } from "@/components/icon";
+import { CLIENT_GRADING_TIMEOUT_MS } from "@/features/writing/assessment";
 import {
   scoreListening,
   scoreReading,
@@ -553,7 +554,7 @@ export function PlacementTestContainer({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(45000),
+        signal: AbortSignal.timeout(CLIENT_GRADING_TIMEOUT_MS),
       });
 
       const writingJson = (await writingRes.json()) as WritingAssessmentResponse;
@@ -612,6 +613,9 @@ export function PlacementTestContainer({
             evaluationSummary: writingJson.feedback?.summary,
             isAiEvaluated: writingJson.provider !== "mock",
           },
+          ...(writingJson.submission && {
+            writingSubmission: { ...writingJson.submission, essay: essayText },
+          }),
         };
       }
 

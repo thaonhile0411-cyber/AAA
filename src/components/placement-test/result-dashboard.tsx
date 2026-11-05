@@ -305,7 +305,7 @@ export function ResultDashboard({
                             <>
                               <span className="text-[10px] font-semibold text-[#175cdd] bg-[#eff5ff] border border-[#d6e4fd] px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <Icon name="sparkle" size={10} />
-                                {providerLabel(s.provider)}
+                                Band ước tính bởi AI · {providerLabel(s.provider)}
                               </span>
                               <span className="text-[10px] font-semibold text-[#147054] bg-[#f0faf5] border border-[#bce4d6] px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <Icon name="check" size={10} />
@@ -545,7 +545,7 @@ export function ResultDashboard({
                     Chi tiết 4 tiêu chí chấm điểm IELTS {SKILL_NAMES[selectedSkillModal]}
                   </h3>
                   <span className="text-xs text-[#64748b]">
-                    Overall Skill Band: <strong>{selectedSkillData.band !== null ? selectedSkillData.band.toFixed(1) : "—"}</strong>
+                    Band ước tính bởi AI: <strong>{selectedSkillData.band !== null ? selectedSkillData.band.toFixed(1) : "—"}</strong>
                     {selectedSkillData.provider && ` • Đánh giá bởi ${providerLabel(selectedSkillData.provider)}`}
                     {selectedSkillData.modelUsed && ` (${selectedSkillData.modelUsed})`}
                   </span>

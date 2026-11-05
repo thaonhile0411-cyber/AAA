@@ -219,6 +219,39 @@ const { data, error } = await supabase
 
 RLS makes these filters a convenience, not the security boundary: a user still cannot access another user's row by changing an ID.
 
+## US-304 Writing assessments
+
+Apply the `writing_submissions` migration and configure `SUPABASE_SECRET_KEY`
+and `GEMINI_API_KEY` on the server. Both Writing routes use the same grading
+pipeline. The signed-in learner can read their own submissions through RLS.
+Only the server can claim submissions or write results.
+
+Each row contains the exact submitted essay, word count, processing state and
+validated feedback. Identical essay versions for the same learner, prompt and
+source reuse the same row. Failed attempts can retry against that row.
+The practice GET route returns the latest ten saved versions; the Writing UI
+lets learners reopen them and polls active grading attempts until completion
+or lease expiry. An expired attempt can be retried from its saved essay.
+Writing grading and its reported model name use the centralized Gemini model
+configuration.
+
+US-104 can load the most recent completed, scorable US-103 Writing submission
+using the authenticated Supabase client. Use the returned submission ID to read
+a specific version. Bands in `assessment` are AI estimates.
+
+```ts
+const { data, error } = await supabase
+  .from("writing_submissions")
+  .select("id, prompt_id, word_count, assessment, created_at")
+  .eq("user_id", userId)
+  .eq("source", "placement")
+  .eq("status", "completed")
+  .neq("assessment->>taskFit", "unassessable")
+  .order("created_at", { ascending: false })
+  .limit(1)
+  .maybeSingle();
+```
+
 ## Safe database and RLS testing
 
 Use a local Supabase stack or a dedicated development project—never real student data.
