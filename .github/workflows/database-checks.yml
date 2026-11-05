@@ -42,7 +42,7 @@ jobs:
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.placement_questions;")" = "6"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.placement_question_keys;")" = "6"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.learning_materials;")" = "8"
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_policies where schemaname = 'public';")" = "34"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from pg_policies where schemaname = 'public';")" = "43"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.practice_exercises;")" = "8"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.practice_questions;")" = "40"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.practice_answer_keys;")" = "40"
