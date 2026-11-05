@@ -299,9 +299,10 @@ export function OriginalPracticeTestPage({ slug, userId }: { slug: string; userI
     setAnswerError("");
     const result = gradePracticeAnswer(answerToGrade, question);
     setGrade(result);
-    // Save every response, but complete the assigned roadmap task only when
-    // the auto-graded Reading/Listening answer is correct.
-    await save(answerToGrade, result.correct);
+    // Submitting an answer completes the assigned learning activity. The
+    // learner can be incorrect and still have finished this practice attempt;
+    // the visible grade remains available for review.
+    await save(answerToGrade, true);
   }
 
   return (
