@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 
-export const instant = false;
 export default function LegacyShadowingPage() {
-  redirect("/speaking");
+  redirect("/speaking/part-1");
 }
