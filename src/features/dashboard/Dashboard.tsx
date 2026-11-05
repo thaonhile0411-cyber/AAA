@@ -352,6 +352,35 @@ export function Dashboard({
           })}
         </div>
       </section>
+      <section className={styles.panel} aria-labelledby="saved-practice">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.eyebrow}>BÀI LUYỆN ĐÃ LƯU</p>
+            <h2 id="saved-practice">Bài luyện gần đây</h2>
+          </div>
+          <span className={styles.badge}>{data.savedWork?.length ?? 0} bài</span>
+        </div>
+        {data.savedWork?.length ? (
+          data.savedWork.map((work) => (
+            <article className={styles.task} key={work.resourceSlug}>
+              <span className={styles.skillIcon}>{work.skill.slice(0, 1).toUpperCase()}</span>
+              <div>
+                <span className={styles.caption}>{work.skill}</span>
+                <h3>{work.resourceSlug.replaceAll("-", " ")}</h3>
+                <p className={styles.caption}>Đã lưu: {date(work.savedAt)}</p>
+              </div>
+              <Link className={styles.primary} href={`/practice/${encodeURIComponent(work.resourceSlug)}`}>
+                Mở bài <span aria-hidden="true">→</span>
+              </Link>
+            </article>
+          ))
+        ) : (
+          <div className={styles.empty}>
+            <h3>Chưa có bài luyện được lưu</h3>
+            <p>Lưu bài Reading, Listening, Writing hoặc Speaking để xem lại tiến độ tại đây.</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

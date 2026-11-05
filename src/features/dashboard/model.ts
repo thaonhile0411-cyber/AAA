@@ -38,6 +38,12 @@ export type Overview = {
   streak?: StreakOverview;
   tasks: Task[];
   unscheduled: Task[];
+  savedWork?: Array<{
+    resourceSlug: string;
+    skill: string;
+    savedAt: string;
+    completedAt: string | null;
+  }>;
 };
 export function progress(completed: number, total: number) {
   return total > 0
