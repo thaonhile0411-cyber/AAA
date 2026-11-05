@@ -35,6 +35,16 @@ export function AppShell({
             {active === "practice" && <span className="nav-dot" />}
           </Link>
           <Link
+            href="/speaking/part-1"
+            className={active === "speaking" ? "active" : ""}
+            aria-current={active === "speaking" ? "page" : undefined}
+            aria-label="Luyện Shadowing và Speaking"
+          >
+            <Icon name="headphones" />
+            Shadowing
+            {active === "speaking" && <span className="nav-dot" />}
+          </Link>
+          <Link
             href="/roadmap"
             className={active === "roadmap" ? "active" : ""}
             aria-current={active === "roadmap" ? "page" : undefined}
