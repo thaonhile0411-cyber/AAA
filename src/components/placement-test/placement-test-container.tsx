@@ -942,7 +942,8 @@ export function PlacementTestContainer({ reassessment = false }: { reassessment?
 
     if (!saved.success) {
       throw new Error(
-        "Chưa thể đồng bộ kết quả 4 kỹ năng với tài khoản. Vui lòng kiểm tra kết nối và thử lại.",
+        saved.error ??
+          "Chưa thể đồng bộ kết quả 4 kỹ năng với tài khoản. Vui lòng kiểm tra kết nối và thử lại.",
       );
     }
   }
