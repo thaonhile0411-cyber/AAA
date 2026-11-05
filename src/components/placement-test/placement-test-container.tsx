@@ -42,6 +42,7 @@ import {
   getWritingWordCount,
 } from "@/lib/placement-progress";
 import { savePlacementTestCloud } from "@/lib/supabase-client";
+import { notifyStudyUpdate } from "@/features/dashboard/notify";
 import type {
   PlacementTestAnswers,
   PlacementTestResult,
@@ -856,6 +857,8 @@ export function PlacementTestContainer({
       });
       if (!saveResult.success) {
         console.warn("Could not save the completed placement result:", saveResult.error);
+      } else {
+        notifyStudyUpdate();
       }
 
       setStage("result");
@@ -954,7 +957,7 @@ export function PlacementTestContainer({
 
         setResult(updatedResult);
         saveResultToStorage(updatedResult);
-        savePlacementTestCloud({
+        const saveResult = await savePlacementTestCloud({
           current_skill: "speaking",
           completed_skills: ["listening", "reading", "writing", "speaking"],
           listening_answers: answers.listening,
@@ -967,8 +970,10 @@ export function PlacementTestContainer({
           // in the database and blocks roadmap generation.
           assessment_results: updatedResult,
           overall_band: updatedResult.overallBand,
+          assessment_kind: reassessment ? "reassessment" : "placement",
           status: "completed",
         });
+        if (saveResult.success) notifyStudyUpdate();
       }
     } catch (err) {
       console.warn("Failed retrying AI skills:", err);

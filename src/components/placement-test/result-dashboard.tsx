@@ -142,9 +142,9 @@ export function ResultDashboard({
           ? "Bạn đã có một lộ trình đang hoạt động."
           : "Đã tạo lộ trình cá nhân hóa và lưu danh sách tài liệu của bạn.",
       );
-      // The persistent sidebar can prefetch `/roadmap` before the database
-      // write above. A document navigation guarantees a fresh server render.
-      window.location.assign("/roadmap");
+      // Refresh the route after the write, without bypassing Next.js routing.
+      router.push("/roadmap");
+      router.refresh();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Chưa thể tạo lộ trình. Vui lòng thử lại.");
     } finally {

@@ -7,6 +7,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 type SaveBody = {
   response?: unknown;
   taskId?: unknown;
+  completeTask?: unknown;
   audioBase64?: unknown;
   audioMimeType?: unknown;
   audioDurationSeconds?: unknown;
@@ -77,6 +78,9 @@ export async function POST(
       return json({ error: "Hãy nhập câu trả lời trước khi lưu bài." }, 400);
     const taskId = typeof body.taskId === "string" && UUID.test(body.taskId) ? body.taskId : null;
     if (body.taskId !== undefined && taskId === null) return json({ error: "Task không hợp lệ." }, 400);
+    if (body.completeTask !== undefined && typeof body.completeTask !== "boolean")
+      return json({ error: "Trạng thái hoàn thành không hợp lệ." }, 400);
+    const completeTask = body.completeTask !== false;
 
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -93,8 +97,7 @@ export async function POST(
     }
 
     const now = new Date().toISOString();
-    const { error } = await supabase.from("practice_saved_work").upsert(
-      {
+    const savedWork = {
         user_id: user.id,
         resource_slug: slug,
         skill: test.skill,
@@ -104,15 +107,17 @@ export async function POST(
         audio_duration_seconds: test.skill === "speaking" ? audioDurationSeconds : null,
         task_id: taskId,
         saved_at: now,
-        completed_at: now,
-      },
+        ...(completeTask ? { completed_at: now } : {}),
+      };
+    const { error } = await supabase.from("practice_saved_work").upsert(
+      savedWork,
       { onConflict: "user_id,resource_slug" },
     );
     if (error) throw error;
 
     // A practice opened from the dashboard/roadmap carries its assigned task.
     // Complete only that learner-owned task after the work itself is safely saved.
-    if (taskId) {
+    if (taskId && completeTask) {
       const { error: completionError } = await supabase
         .from("roadmap_activities")
         .update({ completed_at: now })

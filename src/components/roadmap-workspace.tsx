@@ -20,11 +20,10 @@ export function RoadmapWorkspace({ initialRoadmap }: { initialRoadmap: ActiveRoa
   const [isReconciling, setIsReconciling] = useState(initialRoadmap === null);
   const [savingId, setSavingId] = useState<string | null>(null);
   useEffect(() => {
-    if (initialRoadmap) {
-      setRoadmap(initialRoadmap);
-      setIsReconciling(false);
-      return;
-    }
+    // A server-rendered roadmap is already the source of truth. Only ask the
+    // reconciliation endpoint when the first server render was empty, e.g.
+    // immediately after creating a roadmap in another browser action.
+    if (initialRoadmap) return;
 
     let cancelled = false;
     async function reconcileRoadmap() {
@@ -107,6 +106,15 @@ function Metric({ label, value }: { label: string; value: string }) {
 function ActivityRow({ activity, saving, onToggle }: { activity: ActiveRoadmap["milestones"][number]["activities"][number]; saving: boolean; onToggle: (id: string, completed: boolean) => void }) {
   const isComplete = activity.completedAt !== null;
   const difficulty = activity.difficultyBandMin === null || activity.difficultyBandMax === null ? null : `${activity.difficultyBandMin.toFixed(1)}–${activity.difficultyBandMax.toFixed(1)}`;
-  const href = activity.resourceSlug === "cambridge-10" ? "/practice/cambridge-10" : activity.resourceSlug ? `/practice/${activity.resourceSlug}` : null;
+  // Always carry the exact assignment ID from the roadmap. The practice page
+  // uses it to save work and mark this (not another identical resource) done.
+  const resourceHref = activity.resourceSlug === "cambridge-10"
+    ? "/practice/cambridge-10"
+    : activity.resourceSlug
+      ? `/practice/${encodeURIComponent(activity.resourceSlug)}`
+      : null;
+  const href = resourceHref
+    ? `${resourceHref}?task=${encodeURIComponent(activity.id)}&skill=${encodeURIComponent(activity.skill)}`
+    : null;
   return <li className="flex flex-wrap items-center gap-3 px-5 py-4"><button type="button" disabled={saving} onClick={() => onToggle(activity.id, isComplete)} aria-label={isComplete ? `Đánh dấu ${activity.title} chưa hoàn thành` : `Đánh dấu ${activity.title} hoàn thành`} className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold ${isComplete ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-300 text-transparent"}`}>✓</button><div className="min-w-48 flex-1"><p className={`text-sm font-semibold ${isComplete ? "text-slate-400 line-through" : "text-slate-900"}`}>{activity.title}</p>{activity.description && <p className="mt-0.5 text-xs text-slate-500">{activity.description}</p>}<div className="mt-2 flex flex-wrap gap-2">{activity.adjustmentKind !== "standard" && <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-bold text-violet-700">{ADJUSTMENT_LABELS[activity.adjustmentKind]}</span>}{difficulty && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">Band {difficulty}</span>}</div></div><span className="text-xs text-slate-500">{activity.estimatedMinutes ?? "—"} phút</span>{href && <Link href={href} className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100">Mở đề</Link>}</li>;
 }

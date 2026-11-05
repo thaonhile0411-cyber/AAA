@@ -23,9 +23,27 @@ alter table public.roadmap_activities
   add column if not exists difficulty_band_max numeric(2,1)
     check (difficulty_band_max between 1.0 and 9.0 and (difficulty_band_max * 2) = trunc(difficulty_band_max * 2)),
   add column if not exists adjustment_kind text not null default 'standard'
-    check (adjustment_kind in ('standard', 'accelerated', 'foundation_review', 'targeted_review', 'continue')),
-  add constraint roadmap_activities_difficulty_range_check
-    check (difficulty_band_min is null or difficulty_band_max is null or difficulty_band_min <= difficulty_band_max);
+    check (adjustment_kind in ('standard', 'accelerated', 'foundation_review', 'targeted_review', 'continue'));
+
+-- Supabase's SQL editor may re-run a migration that was already applied.
+-- PostgreSQL has no ADD CONSTRAINT IF NOT EXISTS, so guard it explicitly.
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'roadmap_activities_difficulty_range_check'
+      and conrelid = 'public.roadmap_activities'::regclass
+  ) then
+    alter table public.roadmap_activities
+      add constraint roadmap_activities_difficulty_range_check
+      check (
+        difficulty_band_min is null
+        or difficulty_band_max is null
+        or difficulty_band_min <= difficulty_band_max
+      );
+  end if;
+end $$;
 
 create table if not exists public.roadmap_adjustments (
   id uuid primary key default gen_random_uuid(),
@@ -54,10 +72,21 @@ create index if not exists roadmap_activities_scheduled_week_idx
 
 alter table public.roadmap_adjustments enable row level security;
 
-create policy "roadmap_adjustments_select_own"
-  on public.roadmap_adjustments for select
-  to authenticated
-  using ((select auth.uid()) = user_id);
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'roadmap_adjustments'
+      and policyname = 'roadmap_adjustments_select_own'
+  ) then
+    create policy "roadmap_adjustments_select_own"
+      on public.roadmap_adjustments for select
+      to authenticated
+      using ((select auth.uid()) = user_id);
+  end if;
+end $$;
 
 -- The API invokes this RPC with the learner's authenticated Supabase session.
 -- The row lock plus the unique source assessment index makes retries safe and
