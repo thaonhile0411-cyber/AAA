@@ -2,7 +2,8 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { TestSkill } from "@/types/placement-test";
+import { PLACEMENT_CLOUD_TEST_ID_KEY, placementStorageKey } from "@/lib/placement-storage";
+import type { PlacementTestResult, TestSkill } from "@/types/placement-test";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -42,6 +43,9 @@ export type PlacementTestCloudPayload = {
   >;
   target_band?: number | null;
   expected_exam_date?: string | null;
+  assessment_results?: PlacementTestResult;
+  overall_band?: number | null;
+  assessment_kind?: "placement" | "reassessment";
   status?: "in_progress" | "evaluating" | "completed";
 };
 
@@ -52,59 +56,32 @@ export type PlacementTestCloudPayload = {
 export async function savePlacementTestCloud(
   payload: PlacementTestCloudPayload,
 ): Promise<{ success: boolean; id?: string; error?: string }> {
-  const supabase = getSupabaseClient();
-  if (!supabase) {
-    return {
-      success: false,
-      error: "Supabase is not configured (missing URL or Anon Key).",
-    };
-  }
-
   try {
-    const { data: authData } = await supabase.auth.getUser();
-    const userId = authData?.user?.id || null;
-
-    // Use test ID or generate a stable local session ID
+    // The authenticated app session is stored in an httpOnly cookie. Delegate
+    // the write to a Route Handler so it can use that cookie reliably.
     let testId = payload.id;
-    if (!testId) {
-      testId = window.localStorage.getItem("aaa:us103:placement:test_id") || undefined;
+    if (!testId && typeof window !== "undefined") {
+      testId = window.localStorage.getItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY)) || undefined;
     }
-
-    const upsertData: Record<string, unknown> = {
-      user_id: userId,
-      current_skill: payload.current_skill,
-      completed_skills: payload.completed_skills,
-      listening_answers: payload.listening_answers,
-      reading_answers: payload.reading_answers,
-      writing_response: payload.writing_response,
-      speaking_recordings: payload.speaking_recordings,
-      target_band: payload.target_band,
-      expected_exam_date: payload.expected_exam_date,
-      status: payload.status || "in_progress",
-      updated_at: new Date().toISOString(),
+    const response = await fetch("/api/placement-test/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, id: testId }),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      success?: boolean;
+      id?: string;
+      error?: string;
     };
 
-    if (testId) {
-      upsertData.id = testId;
+    if (!response.ok || !data.success || !data.id) {
+      return { success: false, error: data.error ?? "Không thể lưu Placement Test." };
     }
 
-    const { data, error } = await supabase
-      .from("placement_tests")
-      .upsert(upsertData)
-      .select("id")
-      .single();
-
-    if (error) {
-      console.warn("Supabase autosave error:", error.message);
-      return { success: false, error: error.message };
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY), data.id);
     }
-
-    if (data?.id) {
-      window.localStorage.setItem("aaa:us103:placement:test_id", data.id);
-      return { success: true, id: data.id };
-    }
-
-    return { success: true };
+    return { success: true, id: data.id };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.warn("Failed to autosave to Supabase:", message);
@@ -130,7 +107,7 @@ export async function uploadSpeakingAudio(
   try {
     const { data: authData } = await supabase.auth.getUser();
     const userId = authData?.user?.id || "guest";
-    const tid = testId || window.localStorage.getItem("aaa:us103:placement:test_id") || "demo_session";
+    const tid = testId || window.localStorage.getItem(placementStorageKey(PLACEMENT_CLOUD_TEST_ID_KEY)) || "demo_session";
     const ext = audioBlob.type.includes("mp4") ? "mp4" : "webm";
     const filePath = `${userId}/${tid}/${questionKey}_${Date.now()}.${ext}`;
 

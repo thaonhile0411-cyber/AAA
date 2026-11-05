@@ -1,4 +1,5 @@
 import type { Skill } from "@/lib/goals";
+import type { WritingAssessment } from "@/features/writing/assessment";
 
 export type { Skill };
 export type TestSkill = Skill; // "listening" | "reading" | "writing" | "speaking"
@@ -71,6 +72,7 @@ export type WritingTaskChart = {
 };
 
 export type WritingTaskData = {
+  id?: string;
   taskNumber: 1 | 2;
   title: string;
   type: "academic_chart" | "essay";
@@ -126,6 +128,7 @@ export type SpeakingRecordingInfo = {
   timestamp: string;
   blobUrl?: string;
   audioBase64?: string;
+  mimeType?: string;
   storagePath?: string;
 };
 
@@ -146,6 +149,8 @@ export type SkillScoreResult = {
   band: number | null;
   status?: AssessmentStatus;
   statusMessage?: string;
+  provider?: string;
+  modelUsed?: string;
   rawScore?: number;
   totalQuestions?: number;
   percentage?: number;
@@ -156,6 +161,7 @@ export type SkillScoreResult = {
     description: string;
   }[];
   feedback: string;
+  writingSubmission?: { id: string; essay: string; assessment: WritingAssessment };
   evaluationDetails?: {
     notableErrors?: string[];
     improvementSuggestions?: string[];

@@ -1,8 +1,14 @@
 import { z } from "zod";
+import type { WritingAssessment } from "../features/writing/assessment.ts";
 
 export type AssessmentStatus =
   | "success"
   | "missing_api_key"
+  | "invalid_api_key"
+  | "quota_exceeded"
+  | "timeout"
+  | "model_error"
+  | "invalid_json"
   | "invalid_response"
   | "insufficient_response"
   | "audio_processing_error"
@@ -69,6 +75,9 @@ export type WritingAssessmentResponse = {
     summary: string;
   } | null;
   wordCount?: number;
+  provider?: string;
+  modelUsed?: string;
+  submission?: { id: string; assessment: WritingAssessment };
   message?: string;
   error?: string;
 };
@@ -125,6 +134,8 @@ export type SpeakingAssessmentResponse = {
     summary: string;
   } | null;
   transcripts?: Record<string, string>;
+  provider?: string;
+  modelUsed?: string;
   message?: string;
   error?: string;
 };

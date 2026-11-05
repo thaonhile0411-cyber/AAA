@@ -11,10 +11,14 @@ export async function loadGoals(): Promise<GoalResponse> {
   if (error) throw new Error("Không thể tải mục tiêu học tập.");
   const scores = data?.self_reported_scores as Scores | null | undefined;
   const today = todayInVietnam();
+  const nextStep = scores ? "roadmap" : "placement";
   return {
+    demoMode: false,
     today,
     minExamDate: addDays(today, 7),
-    demoMode: false,
+    warning: null,
+    nextStep,
+    nextPath: nextStep === "placement" ? "/onboarding/placement-test" : "/practice",
     profile: data ? {
       targetBand: Number(data.target_band),
       examDate: data.expected_exam_date,

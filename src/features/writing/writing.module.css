@@ -1,0 +1,284 @@
+.page {
+  min-height: 100dvh;
+  padding: clamp(16px, 4vw, 40px);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+.back {
+  color: var(--blue);
+  font-size: 0.875rem;
+  text-decoration: underline;
+}
+
+.title,
+.resultHeading,
+.promptTitle,
+.cardTitle {
+  color: var(--navy);
+  line-height: 1.25;
+}
+
+.title {
+  margin: 16px 0 0;
+  font-size: 2rem;
+}
+.intro {
+  margin: 8px 0 0;
+}
+.resultHeading {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.promptTitle {
+  margin: 8px 0 0;
+  font-size: 1.25rem;
+}
+.cardTitle {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.stack,
+.workspace {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.stack {
+  margin-top: 24px;
+}
+
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  font-weight: 650;
+}
+
+.card {
+  min-width: 0;
+  padding: clamp(14px, 3vw, 20px);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #1652b7;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.instructions,
+.essay {
+  margin: 12px 0 0;
+  line-height: 1.65;
+}
+
+.tableRegion {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.table caption {
+  margin-bottom: 8px;
+  text-align: left;
+  font-weight: 650;
+}
+
+.table thead {
+  background: #edf3ff;
+}
+.table th,
+.table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.select,
+.editor {
+  max-width: 100%;
+  border: 1px solid #a7b4c8;
+  border-radius: 8px;
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+
+.select {
+  padding: 8px;
+}
+
+.editor {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.count,
+.warning,
+.hint {
+  font-size: 0.875rem;
+}
+.count {
+  margin: 8px 0 0;
+}
+.warning {
+  color: #8a3a0e;
+}
+.ready {
+  color: #147054;
+}
+.hint {
+  margin: 6px 0 0;
+  color: #46536b;
+}
+
+.submit {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #175cdd;
+  color: white;
+  font-weight: 650;
+}
+
+.submit:hover:not(:disabled) {
+  background: #104bb9;
+}
+.submit:disabled {
+  background: #606e83;
+  cursor: not-allowed;
+}
+
+.loading,
+.error,
+.correction {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+}
+
+.loading {
+  background: #edf3ff;
+  color: #123b82;
+}
+.error,
+.correction {
+  background: #fff0f0;
+  color: #8b2424;
+}
+.correction p {
+  margin: 0;
+}
+.correction p + p {
+  margin-top: 4px;
+}
+
+.pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #175cdd;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulse {
+    animation: pulse 1s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    to {
+      opacity: 0.25;
+    }
+  }
+}
+
+.overall {
+  margin-left: 8px;
+  color: #1652b7;
+  font-size: 1.5rem;
+}
+
+.scores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.scores > div {
+  padding: 12px;
+  border-radius: 8px;
+  background: #edf3ff;
+}
+
+.scores dt {
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+.scores dd {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.essay {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.marked {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #922323;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline wavy #ba2727;
+  text-underline-offset: 4px;
+}
+
+.marked[aria-pressed="true"] {
+  background: #fbe1e1;
+}
+.vocabulary {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding-inline-start: 20px;
+}
+.vocabulary p:first-child {
+  margin: 0;
+}
+
+@media (min-width: 850px) {
+  .workspace {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: start;
+  }
+}
